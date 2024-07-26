@@ -22,6 +22,7 @@ subprojects {
     }
 
     ext.lwjglVersion = '3.3.4'
+    //ext.lwjglVersion = '3.1.6'
     ext.lwjglNatives = ''
 
     ext.log4jVersion = '2.23.1'
@@ -36,6 +37,15 @@ subprojects {
     }
 
     dependencies {
-        implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+        implementation platform("org.lwjgl:lwjgl-bom:${lwjglVersion}")
+
+        /*implementation "org.lwjgl:lwjgl:${lwjglVersion}"
+        implementation "org.lwjgl:lwjgl-assimp:${lwjglVersion}"
+        implementation "org.lwjgl:lwjgl-glfw:${lwjglVersion}"
+        implementation "org.lwjgl:lwjgl-jemalloc:${lwjglVersion}"
+        implementation "org.lwjgl:lwjgl-openal:${lwjglVersion}"
+        implementation "org.lwjgl:lwjgl-opengl:${lwjglVersion}"
+        implementation "org.lwjgl:lwjgl-vulkan:${lwjglVersion}"
+        implementation "org.lwjgl:lwjgl-stb:${lwjglVersion}"*/
     }
 }
