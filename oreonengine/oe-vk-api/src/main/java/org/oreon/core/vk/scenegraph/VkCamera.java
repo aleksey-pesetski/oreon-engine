@@ -8,7 +8,7 @@ import lombok.Getter;
 import org.lwjgl.vulkan.VkDevice;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.math.Vec3f;
-import org.oreon.core.scenegraph.Camera;
+import org.oreon.core.scenegraph.BaseOreonCamera;
 import org.oreon.core.util.BufferUtil;
 import org.oreon.core.vk.context.DeviceManager.DeviceType;
 import org.oreon.core.vk.context.VkOreonContext;
@@ -19,7 +19,7 @@ import org.oreon.core.vk.wrapper.buffer.VkUniformBuffer;
 import org.oreon.core.vk.wrapper.descriptor.VkDescriptor;
 
 @Getter
-public class VkCamera extends Camera {
+public class VkCamera extends BaseOreonCamera {
 
   private VkUniformBuffer uniformBuffer;
   private DescriptorSet descriptorSet;
@@ -27,8 +27,12 @@ public class VkCamera extends Camera {
 
   public VkCamera() {
 
-    super(new Vec3f(-179.94112f, 63.197327f, -105.08341f), new Vec3f(0.48035842f, -0.39218548f, 0.7845039f),
-        new Vec3f(0.20479666f, 0.9198862f, 0.33446646f));
+    super(
+        null, null, null,
+        new Vec3f(-179.94112f, 63.197327f, -105.08341f),
+        new Vec3f(0.48035842f, -0.39218548f, 0.7845039f),
+        new Vec3f(0.20479666f, 0.9198862f, 0.33446646f)
+    );
 
     // flip y-axxis for vulkan coordinate system
     getProjectionMatrix().set(1, 1, -getProjectionMatrix().get(1, 1));

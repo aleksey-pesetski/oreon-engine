@@ -1,13 +1,15 @@
 rootProject.name = 'oreon-engine'
-include 'examples-opengl'
-include 'examples-vulkan'
+include 'oe-core'
 include 'oe-common-ui'
 include 'oe-common-world'
-include 'oe-core'
+
 include 'oe-gl-api'
 include 'oe-gl-components'
 include 'oe-gl-deferred'
+include 'examples-opengl'
+
 include 'oe-vk-api'
 include 'oe-vk-components'
 include 'oe-vk-deferred'
 include 'oe-vk-raytracing'
+include 'examples-vulkan'

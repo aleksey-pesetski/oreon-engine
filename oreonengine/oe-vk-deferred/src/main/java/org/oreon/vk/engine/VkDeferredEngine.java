@@ -13,7 +13,7 @@ import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.util.LinkedHashMap;
 import lombok.Setter;
-import org.oreon.core.RenderEngine;
+import org.oreon.core.BaseOreonRenderEngine;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.scenegraph.NodeComponentType;
 import org.oreon.core.scenegraph.RenderList;
@@ -35,7 +35,7 @@ import org.oreon.vk.components.filter.Bloom;
 import org.oreon.vk.components.planet.Planet;
 import org.oreon.vk.components.ui.VkGUI;
 
-public class VkDeferredEngine extends RenderEngine {
+public class VkDeferredEngine extends BaseOreonRenderEngine {
 
   private SwapChain swapChain;
   private VkDeviceBundle graphicsDevice;
@@ -79,12 +79,16 @@ public class VkDeferredEngine extends RenderEngine {
   @Setter
   private VkGUI gui;
 
+  public VkDeferredEngine() {
+    super(null, null);
+  }
+
   @Override
   public void init() {
 
     super.init();
 
-    sceneGraph.addObject(new VkDirectionalLight());
+    getSceneGraph().addObject(new VkDirectionalLight());
 
     offScreenRenderList = new RenderList();
     transparencyRenderList = new RenderList();
@@ -230,15 +234,15 @@ public class VkDeferredEngine extends RenderEngine {
   @Override
   public void render() {
 
-    sceneGraph.render();
+    getSceneGraph().render();
     offScreenRenderList.setChanged(false);
-    sceneGraph.record(offScreenRenderList);
+    getSceneGraph().record(offScreenRenderList);
 
     // update Terrain/Planet Quadtree
-    if (sceneGraph.hasTerrain()) {
-      if (camera.isCameraMoved()) {
+    if (getSceneGraph().hasTerrain()) {
+      if (getCamera().isCameraMoved()) {
         // start waiting updateQuadtree thread
-        ((Planet) sceneGraph.getTerrain()).getQuadtree().signal();
+        ((Planet) getSceneGraph().getTerrain()).getQuadtree().signal();
       }
     }
 
@@ -277,7 +281,7 @@ public class VkDeferredEngine extends RenderEngine {
     deferredStageSubmitInfo.submit(graphicsDevice.getLogicalDevice().getComputeQueue());
 
     transparencyRenderList.setChanged(false);
-    sceneGraph.recordTransparentObjects(transparencyRenderList);
+    getSceneGraph().recordTransparentObjects(transparencyRenderList);
 
     if (transparencyRenderList.hasChanged() && !transparencyRenderList.isEmpty()) {
 

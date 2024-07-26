@@ -18,16 +18,20 @@ import static org.lwjgl.opengl.GL11.GL_TRUE;
 
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.WGLEXTSwapControl;
-import org.oreon.core.context.ContextHolder;
+import org.oreon.core.context.Config;
 import org.oreon.core.platform.Window;
 
 public class GLWindow extends Window {
 
-  public GLWindow() {
+  private final Config config;
+
+  public GLWindow(Config config) {
     super(
-        ContextHolder.getContext().getConfig().getDisplayTitle(),
-        ContextHolder.getContext().getConfig().getWindowWidth(),
-        ContextHolder.getContext().getConfig().getWindowHeight());
+        config.getDisplayTitle(),
+        config.getWindowWidth(),
+        config.getWindowHeight()
+    );
+    this.config = config;
   }
 
   public void create() {
@@ -48,7 +52,7 @@ public class GLWindow extends Window {
 
     glfwSwapInterval(0);
 
-    if (ContextHolder.getContext().getConfig().isGlfwGLVSync()) {
+    if (config.isGlfwGLVSync()) {
       WGLEXTSwapControl.wglSwapIntervalEXT(1);
       glfwSwapInterval(1);
     }
@@ -76,8 +80,8 @@ public class GLWindow extends Window {
     glfwSetWindowSize(getId(), width, height);
     setHeight(height);
     setWidth(width);
-    ContextHolder.getContext().getConfig().setWindowWidth(width);
-    ContextHolder.getContext().getConfig().setWindowHeight(height);
+    config.setWindowWidth(width);
+    config.setWindowHeight(height);
     // TODO set camera projection
   }
 }

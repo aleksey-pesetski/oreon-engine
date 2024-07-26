@@ -4,27 +4,27 @@ import org.oreon.core.math.Vec2f;
 
 public interface Input {
 
-  public void create(long windowId);
+  void create(long windowId);
 
-  public void update();
+  void update();
 
-  public void shutdown();
+  void shutdown();
 
-  public boolean isKeyPushed(int key);
+  boolean isKeyPushed(int key);
 
-  public boolean isKeyHolding(int key);
+  boolean isKeyHolding(int key);
 
-  public boolean isKeyReleased(int key);
+  boolean isKeyReleased(int key);
 
-  public boolean isButtonPushed(int key);
+  boolean isButtonPushed(int key);
 
-  public boolean isButtonHolding(int key);
+  boolean isButtonHolding(int key);
 
-  public boolean isButtonReleased(int key);
+  boolean isButtonReleased(int key);
 
-  public float getScrollOffset();
+  float getScrollOffset();
 
-  public Vec2f getCursorPosition();
+  Vec2f getCursorPosition();
 
-  public Vec2f getLockedCursorPosition();
+  Vec2f getLockedCursorPosition();
 }

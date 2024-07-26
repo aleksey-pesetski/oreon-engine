@@ -4,7 +4,6 @@ import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
 import static org.lwjgl.glfw.GLFW.glfwTerminate;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
-import org.oreon.core.context.ContextHolder;
 import org.oreon.core.platform.Input;
 import org.oreon.core.platform.Window;
 import org.oreon.core.util.Constants;
@@ -19,15 +18,17 @@ public class CoreEngine {
 
   private Window window;
   private Input input;
-  private RenderEngine renderEngine;
+  private BaseOreonRenderEngine renderEngine;
   private GLFWErrorCallback errorCallback;
+
+  public CoreEngine(final Window window, final Input input, final BaseOreonRenderEngine renderEngine) {
+    this.window = window;
+    this.input = input;
+    this.renderEngine = renderEngine;
+  }
 
   private void init() {
     glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
-
-    renderEngine = ContextHolder.getContext().getRenderEngine();
-    window = ContextHolder.getContext().getWindow();
-    input = ContextHolder.getContext().getInput();
 
     input.create(window.getId());
     window.show();
@@ -68,7 +69,7 @@ public class CoreEngine {
         render = true;
         unprocessedTime -= frameTime;
 
-        if (ContextHolder.getContext().getWindow().isCloseRequested()) {
+        if (window.isCloseRequested()) {
           stop();
         }
 

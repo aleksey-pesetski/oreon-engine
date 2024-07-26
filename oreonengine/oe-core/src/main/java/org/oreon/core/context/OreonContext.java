@@ -1,18 +1,18 @@
 package org.oreon.core.context;
 
 import org.oreon.core.CoreEngine;
-import org.oreon.core.RenderEngine;
-import org.oreon.core.platform.GLFWInput;
+import org.oreon.core.BaseOreonRenderEngine;
+import org.oreon.core.platform.Input;
 import org.oreon.core.platform.Window;
-import org.oreon.core.scenegraph.Camera;
+import org.oreon.core.scenegraph.BaseOreonCamera;
 
-public interface OreonContext<C extends Camera, W extends Window> {
+public interface OreonContext<I extends Input, C extends BaseOreonCamera, W extends Window> {
 
   Config getConfig();
 
-  GLFWInput getInput();
+  I getInput();
 
-  RenderEngine getRenderEngine();
+  BaseOreonRenderEngine getRenderEngine();
 
   C getCamera();
 
@@ -20,6 +20,6 @@ public interface OreonContext<C extends Camera, W extends Window> {
 
   CoreEngine getCoreEngine();
 
-  void setRenderEngine(RenderEngine renderEngine);
+  void setRenderEngine(BaseOreonRenderEngine renderEngine);
 
 }

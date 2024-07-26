@@ -1,11 +1,9 @@
 package org.oreon.core.instanced;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.ArrayList;
 import java.util.List;
-
+import lombok.Getter;
+import lombok.Setter;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.math.Matrix4f;
 import org.oreon.core.math.Vec3f;

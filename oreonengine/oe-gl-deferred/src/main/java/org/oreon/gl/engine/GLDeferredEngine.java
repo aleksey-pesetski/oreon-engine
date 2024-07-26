@@ -5,16 +5,17 @@ import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glFinish;
 import static org.lwjgl.opengl.GL11.glViewport;
 
-import lombok.Getter;
 import lombok.Setter;
 import org.lwjgl.glfw.GLFW;
-import org.oreon.core.RenderEngine;
+import org.oreon.core.BaseOreonRenderEngine;
+import org.oreon.core.context.Config;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.context.OreonContext;
-import org.oreon.core.gl.context.GLOreonContext;
+import org.oreon.core.gl.context.GLResources;
 import org.oreon.core.gl.framebuffer.GLFrameBufferObject;
 import org.oreon.core.gl.light.GLDirectionalLight;
 import org.oreon.core.gl.picking.TerrainPicking;
+import org.oreon.core.gl.scenegraph.GLCamera;
 import org.oreon.core.gl.shadow.ParallelSplitShadowMapsFbo;
 import org.oreon.core.gl.surface.FullScreenMultisampleQuad;
 import org.oreon.core.gl.surface.FullScreenQuad;
@@ -23,6 +24,7 @@ import org.oreon.core.gl.util.GLUtil;
 import org.oreon.core.instanced.InstancedHandler;
 import org.oreon.core.light.LightHandler;
 import org.oreon.core.scenegraph.RenderList;
+import org.oreon.core.scenegraph.Renderable;
 import org.oreon.core.target.FrameBufferObject.Attachment;
 import org.oreon.gl.components.filter.bloom.Bloom;
 import org.oreon.gl.components.filter.contrast.ContrastController;
@@ -39,7 +41,7 @@ import org.oreon.gl.engine.antialiasing.SampleCoverage;
 import org.oreon.gl.engine.deferred.DeferredLighting;
 import org.oreon.gl.engine.transparency.OpaqueTransparencyBlending;
 
-public class GLDeferredEngine extends RenderEngine {
+public class GLDeferredEngine extends BaseOreonRenderEngine {
 
   private RenderList opaqueSceneRenderList;
   private RenderList transparencySceneRenderList;
@@ -80,47 +82,60 @@ public class GLDeferredEngine extends RenderEngine {
   private boolean renderSSAOBuffer = false;
   private boolean renderPostProcessingEffects = true;
 
+  private final GLResources resources;
+
+  public GLDeferredEngine(final Config config, final GLCamera camera, final GLResources resources) {
+    super(config, camera);
+    this.resources = resources;
+  }
 
   @Override
   public void init() {
     super.init();
 
-    final GLOreonContext context = (GLOreonContext) ContextHolder.getContext();
-
-    sceneGraph.addObject(new GLDirectionalLight());
+    getSceneGraph().addObject(new GLDirectionalLight());
 
     opaqueSceneRenderList = new RenderList();
     transparencySceneRenderList = new RenderList();
 
     instancingObjectHandler = InstancedHandler.getInstance();
 
-    primarySceneFbo = new OffScreenFbo(config.getFrameWidth(),
-        config.getFrameHeight(), config.getMultisampling_sampleCount());
-    secondarySceneFbo = new TransparencyFbo(config.getFrameWidth(),
-        config.getFrameHeight());
-    context.getResources().setPrimaryFbo(primarySceneFbo);
+    primarySceneFbo = new OffScreenFbo(
+        getConfig().getFrameWidth(),
+        getConfig().getFrameHeight(),
+        getConfig().getMultisampling_sampleCount());
+    secondarySceneFbo = new TransparencyFbo(
+        getConfig().getFrameWidth(),
+        getConfig().getFrameHeight());
+    resources.setPrimaryFbo(primarySceneFbo);
 
     fullScreenQuad = new FullScreenQuad();
     fullScreenQuadMultisample = new FullScreenMultisampleQuad();
     pssmFbo = new ParallelSplitShadowMapsFbo();
-    sampleCoverage = new SampleCoverage(config.getFrameWidth(), config.getFrameHeight());
+    sampleCoverage = new SampleCoverage(
+        getConfig().getFrameWidth(),
+        getConfig().getFrameHeight());
     fxaa = new FXAA();
 
-    deferredLighting = new DeferredLighting(config.getFrameWidth(),
-        config.getFrameHeight());
-    opaqueTransparencyBlending = new OpaqueTransparencyBlending(config.getFrameWidth(),
-        config.getFrameHeight());
+    deferredLighting = new DeferredLighting(
+        getConfig().getFrameWidth(),
+        getConfig().getFrameHeight());
+    opaqueTransparencyBlending = new OpaqueTransparencyBlending(
+        getConfig().getFrameWidth(),
+        getConfig().getFrameHeight());
 
     motionBlur = new MotionBlur();
     depthOfField = new DepthOfField();
     bloom = new Bloom();
     sunlightScattering = new SunLightScattering();
     lensFlare = new LensFlare();
-    ssao = new SSAO(config.getFrameWidth(), config.getFrameHeight());
+    ssao = new SSAO(
+        getConfig().getFrameWidth(),
+        getConfig().getFrameHeight());
     underWaterRenderer = new UnderWaterRenderer();
     contrastController = new ContrastController();
 
-    context.getResources().setSceneDepthMap(primarySceneFbo.getAttachmentTexture(Attachment.DEPTH));
+    resources.setSceneDepthMap(primarySceneFbo.getAttachmentTexture(Attachment.DEPTH));
 
     if (gui != null) {
       gui.init();
@@ -149,13 +164,13 @@ public class GLDeferredEngine extends RenderEngine {
     //      Record Render Objects       //
     //----------------------------------//
 
-    sceneGraph.record(opaqueSceneRenderList);
+    getSceneGraph().record(opaqueSceneRenderList);
 
     //----------------------------------//
     //        render shadow maps        //
     //----------------------------------//
 
-    final OreonContext<?, ?> context = ContextHolder.getContext();
+    final OreonContext<?, ?, ?> context = ContextHolder.getContext();
     if (context.getConfig().isShadowsEnable()) {
       pssmFbo.getFbo().bind();
       pssmFbo.getConfig().enable();
@@ -165,7 +180,7 @@ public class GLDeferredEngine extends RenderEngine {
       {
         object.renderShadows();
       });
-      glViewport(0, 0, config.getFrameWidth(), config.getFrameHeight());
+      glViewport(0, 0, getConfig().getFrameWidth(), getConfig().getFrameHeight());
       pssmFbo.getConfig().disable();
       pssmFbo.getFbo().unbind();
     }
@@ -192,8 +207,8 @@ public class GLDeferredEngine extends RenderEngine {
     //------------------------------------------------------//
 
     secondarySceneFbo.bind();
-    sceneGraph.recordTransparentObjects(transparencySceneRenderList);
-    transparencySceneRenderList.getValues().forEach(object -> object.render());
+    getSceneGraph().recordTransparentObjects(transparencySceneRenderList);
+    transparencySceneRenderList.getValues().forEach(Renderable::render);
     secondarySceneFbo.unbind();
 
     //-----------------------------------//
@@ -242,9 +257,9 @@ public class GLDeferredEngine extends RenderEngine {
     }
 
     // update Terrain Quadtree
-    if (camera.isCameraMoved()) {
-      if (sceneGraph.hasTerrain()) {
-        ((GLTerrain) sceneGraph.getTerrain()).getQuadtree().signal();
+    if (getCamera().isCameraMoved()) {
+      if (getSceneGraph().hasTerrain()) {
+        ((GLTerrain) getSceneGraph().getTerrain()).getQuadtree().signal();
       }
     }
 
@@ -259,9 +274,9 @@ public class GLDeferredEngine extends RenderEngine {
         sampleCoverage.getSpecularEmissionBloomMaskSingleSample()
         : primarySceneFbo.getAttachmentTexture(Attachment.SPECULAR_EMISSION_DIFFUSE_SSAO_BLOOM);
 
-    boolean doMotionBlur = camera.getPreviousPosition().sub(camera.getPosition()).length() > 0.04f
-        || camera.getForward().sub(camera.getPreviousForward()).length() > 0.01f;
-    boolean doFXAA = !camera.isCameraMoved() && !camera.isCameraRotated();
+    boolean doMotionBlur = getCamera().getPreviousPosition().sub(getCamera().getPosition()).length() > 0.04f
+        || getCamera().getForward().sub(getCamera().getPreviousForward()).length() > 0.01f;
+    boolean doFXAA = !getCamera().isCameraMoved() && !getCamera().isCameraRotated();
 
     //-----------------------------------------------//
     //                  render FXAA                  //
@@ -376,7 +391,7 @@ public class GLDeferredEngine extends RenderEngine {
       gui.render();
     }
 
-    glViewport(0, 0, config.getFrameWidth(), config.getFrameHeight());
+    glViewport(0, 0, getConfig().getFrameWidth(), getConfig().getFrameHeight());
   }
 
   @Override
@@ -492,7 +507,7 @@ public class GLDeferredEngine extends RenderEngine {
 
     contrastController.update();
 
-    if (sceneGraph.hasTerrain()) {
+    if (getSceneGraph().hasTerrain()) {
       TerrainPicking.getInstance().getTerrainPosition();
     }
   }
@@ -503,8 +518,8 @@ public class GLDeferredEngine extends RenderEngine {
     super.shutdown();
 
     instancingObjectHandler.signalAll();
-    if (sceneGraph.hasTerrain()) {
-      ((GLTerrain) sceneGraph.getTerrain()).getQuadtree().signal();
+    if (getSceneGraph().hasTerrain()) {
+      ((GLTerrain) getSceneGraph().getTerrain()).getQuadtree().signal();
     }
   }
 

@@ -1,4 +1,5 @@
 /.idea/*
 /oreonengine/.gradle
 /oreonengine/build
-/oreonengine/*/build/*
+/oreonengine/**/build
+/*.log
