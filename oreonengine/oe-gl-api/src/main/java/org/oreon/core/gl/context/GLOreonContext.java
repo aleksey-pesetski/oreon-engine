@@ -32,8 +32,9 @@ public class GLOreonContext extends BaseOreonContext<GLFWInput, GLCamera, GLWind
       throw new IllegalStateException("Unable to initialize GLFW");
     }
 
+    //TODO moved context to main
     // create OpenGL Context
-    getWindow().create();
+    //getWindow().create();
 
     log.info("OpenGL version: " + GL11.glGetString(GL11.GL_VERSION));
 //		log.info("Max Geometry Uniform Blocks: " + GL11.glGetInteger(GL31.GL_MAX_GEOMETRY_UNIFORM_BLOCKS));

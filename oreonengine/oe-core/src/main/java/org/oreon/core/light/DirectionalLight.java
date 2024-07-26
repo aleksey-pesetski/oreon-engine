@@ -1,9 +1,7 @@
 package org.oreon.core.light;
 
 import java.nio.FloatBuffer;
-
 import org.lwjgl.glfw.GLFW;
-import org.oreon.core.context.BaseOreonContext;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.math.Matrix4f;
 import org.oreon.core.math.Vec3f;
@@ -28,19 +26,18 @@ public abstract class DirectionalLight extends Light {
       + Float.BYTES * 24;  // 6 floats, 3 floats offset each
 
   protected DirectionalLight() {
-
     this(
         ContextHolder.getContext().getConfig().getSunPosition().normalize(),
         new Vec3f(ContextHolder.getContext().getConfig().getAmbient()),
         ContextHolder.getContext().getConfig().getSunColor(),
-        ContextHolder.getContext().getConfig().getSunIntensity());
+        ContextHolder.getContext().getConfig().getSunIntensity()
+    );
   }
 
   private DirectionalLight(Vec3f direction, Vec3f ambient, Vec3f color, float intensity) {
-
     super(direction, color, intensity);
     this.direction = direction;
-    this.setAmbient(ambient);
+    this.ambient = ambient;
 
     getLocalTransform().setTranslation(
         direction.add(new Vec3f(0, ContextHolder.getContext().getConfig().getHorizonVerticalShift(), 0))
@@ -53,9 +50,9 @@ public abstract class DirectionalLight extends Light {
     // log.warn("DirectionalLight vector up " + up + " and direction " +  direction + " not orthogonal");
 
     {
-      right = up.cross(getDirection()).normalize();
+      right = up.cross(direction).normalize();
     }
-    m_View = new Matrix4f().View(getDirection(), up);
+    m_View = new Matrix4f().View(direction, up);
 
     floatBufferMatrices = BufferUtil.createFloatBuffer(matricesBufferSize);
 
@@ -75,12 +72,11 @@ public abstract class DirectionalLight extends Light {
       floatBufferMatrices.put(0);
     }
 
-    setFloatBufferLight(BufferUtil.createFloatBuffer(getLightBufferSize()));
+    floatBufferLight = BufferUtil.createFloatBuffer(getLightBufferSize());
     updateLightBuffer();
   }
 
   public void update() {
-
     if (ContextHolder.getContext().getCamera().isCameraRotated() ||
         ContextHolder.getContext().getCamera().isCameraMoved()) {
       updateShadowMatrices(false);
@@ -89,8 +85,8 @@ public abstract class DirectionalLight extends Light {
 
     // change sun orientation
     if (ContextHolder.getContext().getInput().isKeyHolding(GLFW.GLFW_KEY_I)) {
-      if (getDirection().getY() >= -0.8f) {
-        setDirection(getDirection().add(new Vec3f(0, -0.001f, 0)).normalize());
+      if (direction.getY() >= -0.8f) {
+        setDirection(direction.add(new Vec3f(0, -0.001f, 0)).normalize());
         updateLightBuffer();
         updateShadowMatrices(true);
         updateLightUbo();
@@ -98,8 +94,8 @@ public abstract class DirectionalLight extends Light {
       }
     }
     if (ContextHolder.getContext().getInput().isKeyHolding(GLFW.GLFW_KEY_K)) {
-      if (getDirection().getY() <= 0.00f) {
-        setDirection(getDirection().add(new Vec3f(0, 0.001f, 0)).normalize());
+      if (direction.getY() <= 0.00f) {
+        setDirection(direction.add(new Vec3f(0, 0.001f, 0)).normalize());
         updateLightBuffer();
         updateShadowMatrices(true);
         updateLightUbo();
@@ -107,14 +103,14 @@ public abstract class DirectionalLight extends Light {
       }
     }
     if (ContextHolder.getContext().getInput().isKeyHolding(GLFW.GLFW_KEY_J)) {
-      setDirection(getDirection().add(new Vec3f(0.00075f, 0, -0.00075f)).normalize());
+      setDirection(direction.add(new Vec3f(0.00075f, 0, -0.00075f)).normalize());
       updateLightBuffer();
       updateShadowMatrices(true);
       updateLightUbo();
       updateMatricesUbo();
     }
     if (ContextHolder.getContext().getInput().isKeyHolding(GLFW.GLFW_KEY_L)) {
-      setDirection(getDirection().add(new Vec3f(-0.00075f, 0, 0.00075f)).normalize());
+      setDirection(direction.add(new Vec3f(-0.00075f, 0, 0.00075f)).normalize());
       updateLightBuffer();
       updateShadowMatrices(true);
       updateLightUbo();
@@ -125,9 +121,9 @@ public abstract class DirectionalLight extends Light {
   public void updateLightBuffer() {
 
     floatBufferLight.clear();
-    floatBufferLight.put(BufferUtil.createFlippedBuffer(getDirection()));
+    floatBufferLight.put(BufferUtil.createFlippedBuffer(direction));
     floatBufferLight.put(intensity);
-    floatBufferLight.put(BufferUtil.createFlippedBuffer(getAmbient()));
+    floatBufferLight.put(BufferUtil.createFlippedBuffer(ambient));
     floatBufferLight.put(0);
     floatBufferLight.put(BufferUtil.createFlippedBuffer(getColor()));
     floatBufferLight.put(0);
@@ -152,10 +148,6 @@ public abstract class DirectionalLight extends Light {
     }
   }
 
-  public Vec3f getDirection() {
-    return direction;
-  }
-
   public void setDirection(Vec3f direction) {
 
     this.direction = direction;
@@ -166,14 +158,14 @@ public abstract class DirectionalLight extends Light {
 //			log.warn("DirectionalLight vector up " + up + " and direction " +  direction + " not orthogonal");
 
     {
-      right = up.cross(getDirection()).normalize();
+      right = up.cross(direction).normalize();
     }
-    m_View = new Matrix4f().View(getDirection(), up);
+    m_View = new Matrix4f().View(direction, up);
 
-    ContextHolder.getContext().getConfig().setSunPosition(getDirection());
+    ContextHolder.getContext().getConfig().setSunPosition(direction);
 
     getLocalTransform().setTranslation(
-        getDirection().add(new Vec3f(0, ContextHolder.getContext().getConfig().getHorizonVerticalShift(), 0))
+        direction.add(new Vec3f(0, ContextHolder.getContext().getConfig().getHorizonVerticalShift(), 0))
             .mul(Constants.ZFAR * 100));
   }
 
@@ -181,43 +173,6 @@ public abstract class DirectionalLight extends Light {
   public abstract void updateLightUbo();
 
   public abstract void updateMatricesUbo();
-
-
-  public Vec3f getUp() {
-    return up;
-  }
-
-  public void setUp(Vec3f up) {
-    this.up = up;
-  }
-
-  public Vec3f getRight() {
-    return right;
-  }
-
-  public void setRight(Vec3f right) {
-    this.right = right;
-  }
-
-  public Vec3f getAmbient() {
-    return ambient;
-  }
-
-  public void setAmbient(Vec3f ambient) {
-    this.ambient = ambient;
-  }
-
-  public Matrix4f getM_View() {
-    return m_View;
-  }
-
-  public void setM_View(Matrix4f m_view) {
-    this.m_View = m_view;
-  }
-
-  public PssmCamera[] getSplitLightCameras() {
-    return splitLightCameras;
-  }
 
   public int getLightBufferSize() {
     return lightBufferSize;
@@ -231,15 +186,7 @@ public abstract class DirectionalLight extends Light {
     return floatBufferLight;
   }
 
-  public void setFloatBufferLight(FloatBuffer floatBufferLight) {
-    this.floatBufferLight = floatBufferLight;
-  }
-
   public FloatBuffer getFloatBufferMatrices() {
     return floatBufferMatrices;
-  }
-
-  public void setFloatBufferMatrices(FloatBuffer floatBufferMatrices) {
-    this.floatBufferMatrices = floatBufferMatrices;
   }
 }

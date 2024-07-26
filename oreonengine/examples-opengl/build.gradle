@@ -8,10 +8,6 @@
     }
 }*/
 
-java {
-    sourceCompatibility = '21'
-}
-
 dependencies {
     api project(':oe-core')
     api project(':oe-gl-api')

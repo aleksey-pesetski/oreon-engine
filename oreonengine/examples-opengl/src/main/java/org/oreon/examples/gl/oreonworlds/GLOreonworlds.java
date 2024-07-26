@@ -1,5 +1,7 @@
 package org.oreon.examples.gl.oreonworlds;
 
+import static org.lwjgl.glfw.GLFW.glfwInit;
+
 import lombok.extern.log4j.Log4j2;
 import org.oreon.core.CoreEngine;
 import org.oreon.core.context.Config;
@@ -31,6 +33,17 @@ public class GLOreonworlds {
       var renderEngine = new GLDeferredEngine(config, camera, resources);
       var coreEngine = new CoreEngine(window, input, renderEngine);
 
+
+      if (!glfwInit()) {
+        throw new IllegalStateException("Unable to initialize GLFW");
+      }
+      window.create();
+      ContextHolder.setContext(
+          new GLOreonContext(
+              config, input, resources,
+              window, camera, renderEngine
+              , coreEngine)
+      );
       //		renderEngine.setGui(new GLSystemMonitor());
       renderEngine.init();
       renderEngine.getSceneGraph().addObject(new Atmosphere());
@@ -52,9 +65,8 @@ public class GLOreonworlds {
       //		renderEngine.getSceneGraph().getRoot().addChild(new Rock01ClusterGroup());
       //		renderEngine.getSceneGraph().getRoot().addChild(new Rock02ClusterGroup());
 
-      ContextHolder.setContext(new GLOreonContext(config, input, resources, window, camera, renderEngine, coreEngine));
     } catch (Exception e) {
-      log.error(e);
+      log.error(e.getMessage(), e);
       System.exit(1);
     }
   }

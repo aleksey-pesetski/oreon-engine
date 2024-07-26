@@ -11,7 +11,7 @@ subprojects {
     group = 'org.oreon'
 
     java {
-        sourceCompatibility = '21'
+        sourceCompatibility = '17'
     }
 
     repositories {
@@ -22,7 +22,7 @@ subprojects {
     }
 
     ext.lwjglVersion = '3.3.4'
-    //ext.lwjglVersion = '3.1.6'
+    //ext.lwjglVersion = '3.1.7-SNAPSHOT'
     ext.lwjglNatives = ''
 
     ext.log4jVersion = '2.23.1'

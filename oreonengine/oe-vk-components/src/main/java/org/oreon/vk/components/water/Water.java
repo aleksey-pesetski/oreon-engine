@@ -349,7 +349,7 @@ public class Water extends Renderable {
         16);
 
     CommandBuffer graphicsCommandBuffer = new SecondaryDrawCmdBuffer(
-        device.getHandle(), device.getGraphicsCommandPool(Thread.currentThread().threadId()).getHandle(),
+        device.getHandle(), device.getGraphicsCommandPool(Thread.currentThread().getId()).getHandle(),
         graphicsPipeline.getHandle(), graphicsPipeline.getLayoutHandle(),
         context.getResources().getOffScreenFbo().getFrameBuffer().getHandle(),
         context.getResources().getOffScreenFbo().getRenderPass().getHandle(),
@@ -370,7 +370,7 @@ public class Water extends Renderable {
         16);
 
     CommandBuffer wireframeCommandBuffer = new SecondaryDrawCmdBuffer(
-        device.getHandle(), device.getGraphicsCommandPool(Thread.currentThread().threadId()).getHandle(),
+        device.getHandle(), device.getGraphicsCommandPool(Thread.currentThread().getId()).getHandle(),
         wireframeGraphicsPipeline.getHandle(), wireframeGraphicsPipeline.getLayoutHandle(),
         context.getResources().getOffScreenFbo().getFrameBuffer().getHandle(),
         context.getResources().getOffScreenFbo().getRenderPass().getHandle(),

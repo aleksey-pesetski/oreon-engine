@@ -75,6 +75,6 @@ public class VkOreonContext extends BaseOreonContext<Input, VkCamera, VkWindow, 
     descriptorPool.addPoolSize(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 2);
     descriptorPool.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 12);
     descriptorPool.create();
-    majorDevice.getLogicalDevice().addDescriptorPool(Thread.currentThread().threadId(), descriptorPool);
+    majorDevice.getLogicalDevice().addDescriptorPool(Thread.currentThread().getId(), descriptorPool);
   }
 }
