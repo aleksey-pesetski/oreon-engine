@@ -1,9 +1,3 @@
-/oreonengine/oe-common-ui/build/
-/oreonengine/oe-common-world/build/
-/oreonengine/oe-core/build/
-/oreonengine/oe-gl-api/build/
-/oreonengine/oe-gl-components/build/
-/oreonengine/oe-gl-deferred/build/
 /.idea/*
 /oreonengine/.gradle
 /oreonengine/build
