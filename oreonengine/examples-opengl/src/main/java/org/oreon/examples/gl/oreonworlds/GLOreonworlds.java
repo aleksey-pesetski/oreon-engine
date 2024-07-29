@@ -23,8 +23,12 @@ import org.oreon.gl.engine.GLDeferredEngine;
 public class GLOreonworlds {
 
   public static void main(String[] args) {
-
+    log.info("Starting GLOreonworlds.");
     try {
+      if (!glfwInit()) {
+        throw new IllegalStateException("Unable to initialize GLFW");
+      }
+
       var input = new GLFWInput();
       var config = new Config();
       var window = new GLWindow(config);
@@ -33,28 +37,15 @@ public class GLOreonworlds {
       var renderEngine = new GLDeferredEngine(config, camera, resources);
       var coreEngine = new CoreEngine(window, input, renderEngine);
 
-
-      if (!glfwInit()) {
-        throw new IllegalStateException("Unable to initialize GLFW");
-      }
       window.create();
-      ContextHolder.setContext(
-          new GLOreonContext(
-              config, input, resources,
-              window, camera, renderEngine
-              , coreEngine)
-      );
+      ContextHolder.setContext(new GLOreonContext(config, input, resources, window, camera, renderEngine, coreEngine));
       //		renderEngine.setGui(new GLSystemMonitor());
       renderEngine.init();
       renderEngine.getSceneGraph().addObject(new Atmosphere());
       renderEngine.getSceneGraph().setWater(new Ocean());
       renderEngine.getSceneGraph().setTerrain(
-          new Terrain(
-              TerrainShader.getInstance(),
-              TerrainWireframeShader.getInstance(),
-              TerrainShadowShader.getInstance()
-          )
-      );
+          new Terrain(TerrainShader.getInstance(), TerrainWireframeShader.getInstance(),
+              TerrainShadowShader.getInstance()));
       coreEngine.start();
 
       //		renderEngine.getSceneGraph().getRoot().addChild(new Palm01ClusterGroup());
