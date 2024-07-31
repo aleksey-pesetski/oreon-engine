@@ -40,10 +40,6 @@ public class Image {
   public void bind() {
   }
 
-  ;
-
   public void unbind() {
   }
-
-  ;
 }

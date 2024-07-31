@@ -55,7 +55,7 @@ public class Node {
   }
 
   public void renderWireframe() {
-    children.forEach(child -> child.renderWireframe());
+    children.forEach(Node::renderWireframe);
   }
 
   public void renderShadows() {

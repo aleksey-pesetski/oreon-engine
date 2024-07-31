@@ -2,7 +2,6 @@ package org.oreon.core.scenegraph;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import lombok.Setter;
 
 public class Renderable extends Node {
@@ -23,6 +22,7 @@ public class Renderable extends Node {
     components.put(type, component);
   }
 
+  @Override
   public void update() {
     for (Map.Entry<NodeComponentType, NodeComponent> entry : components.entrySet()) {
       if (entry.getKey() != NodeComponentType.LIGHT) {
@@ -33,6 +33,7 @@ public class Renderable extends Node {
     super.update();
   }
 
+  @Override
   public void updateLights() {
     for (Map.Entry<NodeComponentType, NodeComponent> entry : components.entrySet()) {
       if (entry.getKey() == NodeComponentType.LIGHT) {
@@ -43,12 +44,14 @@ public class Renderable extends Node {
     super.update();
   }
 
+  @Override
   public void input() {
     components.values().forEach(component -> component.input());
 
     super.input();
   }
 
+  @Override
   public void render() {
 
     if (components.containsKey(NodeComponentType.MAIN_RENDERINFO)) {
@@ -58,6 +61,7 @@ public class Renderable extends Node {
     super.render();
   }
 
+  @Override
   public void renderWireframe() {
 
     if (components.containsKey(NodeComponentType.WIREFRAME_RENDERINFO)) {
@@ -67,6 +71,7 @@ public class Renderable extends Node {
     super.renderWireframe();
   }
 
+  @Override
   public void renderShadows() {
     if (components.containsKey(NodeComponentType.SHADOW_RENDERINFO)) {
       components.get(NodeComponentType.SHADOW_RENDERINFO).render();
@@ -75,6 +80,7 @@ public class Renderable extends Node {
     super.renderShadows();
   }
 
+  @Override
   public void record(RenderList renderList) {
 
     if (render) {
@@ -92,6 +98,7 @@ public class Renderable extends Node {
     super.record(renderList);
   }
 
+  @Override
   public void shutdown() {
 
     components.values().forEach(component -> component.shutdown());

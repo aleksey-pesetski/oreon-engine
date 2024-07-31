@@ -3,11 +3,16 @@ package org.oreon.core;
 import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
 import static org.lwjgl.glfw.GLFW.glfwTerminate;
 
+import java.util.concurrent.CompletableFuture;
+import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.io.IoBuilder;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.oreon.core.platform.Input;
 import org.oreon.core.platform.Window;
 import org.oreon.core.util.Constants;
 
+@Log4j2
 public class CoreEngine {
 
   private static int fps;
@@ -28,7 +33,12 @@ public class CoreEngine {
   }
 
   private void init() {
-    glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
+    var logErr = IoBuilder.forLogger(log)
+        .setLevel(Level.ERROR)
+        .buildPrintStream();
+
+    errorCallback = GLFWErrorCallback.createPrint(logErr);
+    glfwSetErrorCallback(errorCallback);
 
     input.create(window.getId());
     window.show();

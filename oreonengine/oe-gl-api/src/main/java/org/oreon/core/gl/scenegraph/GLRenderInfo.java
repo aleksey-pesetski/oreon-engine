@@ -18,6 +18,7 @@ public class GLRenderInfo extends NodeComponent {
 
   @Override
   public void render() {
+    super.render();
 
     config.enable();
     shader.bind();

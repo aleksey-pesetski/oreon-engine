@@ -4,7 +4,9 @@ import static org.lwjgl.vulkan.VK10.VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
 import static org.lwjgl.vulkan.VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
 
 import java.nio.ByteBuffer;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkPhysicalDeviceMemoryProperties;
 import org.lwjgl.vulkan.VkQueue;
@@ -15,10 +17,6 @@ import org.oreon.core.util.BufferUtil;
 import org.oreon.core.vk.command.CommandPool;
 import org.oreon.core.vk.memory.VkBuffer;
 import org.oreon.core.vk.wrapper.buffer.VkBufferHelper;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
 
 @Builder
 @AllArgsConstructor
@@ -52,7 +50,9 @@ public class VkMeshData extends NodeComponent {
         indexByteBuffer, VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
   }
 
+  @Override
   public void shutdown() {
+    super.shutdown();
 
     if (vertexBufferObject != null) {
       vertexBufferObject.destroy();

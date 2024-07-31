@@ -36,7 +36,7 @@ import static org.lwjgl.opengl.GL32.GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS;
 import static org.lwjgl.opengl.GL32.GL_TEXTURE_2D_MULTISAMPLE;
 import static org.lwjgl.opengl.GL32.glFramebufferTexture;
 
-import java.nio.IntBuffer;;
+import java.nio.IntBuffer;
 
 
 public class GLFramebuffer {

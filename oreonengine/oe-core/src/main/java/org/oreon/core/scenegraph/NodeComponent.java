@@ -1,7 +1,9 @@
 package org.oreon.core.scenegraph;
 
+import lombok.Data;
 import org.oreon.core.math.Transform;
 
+@Data
 public abstract class NodeComponent implements Cloneable {
 
   private Renderable parent;
@@ -9,29 +11,13 @@ public abstract class NodeComponent implements Cloneable {
   public void update() {
   }
 
-  ;
-
   public void input() {
   }
-
-  ;
 
   public void render() {
   }
 
-  ;
-
   public void shutdown() {
-  }
-
-  ;
-
-  public Renderable getParent() {
-    return parent;
-  }
-
-  public void setParent(Renderable parent) {
-    this.parent = parent;
   }
 
   public Transform getTransform() {

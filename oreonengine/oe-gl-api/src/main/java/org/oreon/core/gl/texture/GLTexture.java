@@ -45,7 +45,6 @@ public class GLTexture extends Image {
   private int target;
 
   public GLTexture(int target, int width, int height) {
-
     generate();
     this.target = target;
     metaData = new ImageMetaData();
@@ -54,7 +53,6 @@ public class GLTexture extends Image {
   }
 
   public GLTexture(String file) {
-
     generate();
     loadFromFile(file);
   }
@@ -65,13 +63,15 @@ public class GLTexture extends Image {
     metaData = GLImageLoader.loadImage(file, handle);
   }
 
+  @Override
   public void bind() {
-
+    super.bind();
     glBindTexture(target, handle);
   }
 
+  @Override
   public void unbind() {
-
+    super.unbind();
     glBindTexture(target, 0);
   }
 

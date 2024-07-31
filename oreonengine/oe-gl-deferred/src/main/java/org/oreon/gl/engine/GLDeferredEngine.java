@@ -176,10 +176,7 @@ public class GLDeferredEngine extends BaseOreonRenderEngine {
       pssmFbo.getConfig().enable();
       glViewport(0, 0, context.getConfig().getShadowMapResolution(),
           context.getConfig().getShadowMapResolution());
-      opaqueSceneRenderList.getValues().forEach(object ->
-      {
-        object.renderShadows();
-      });
+      opaqueSceneRenderList.getValues().forEach(Renderable::renderShadows);
       glViewport(0, 0, getConfig().getFrameWidth(), getConfig().getFrameHeight());
       pssmFbo.getConfig().disable();
       pssmFbo.getFbo().unbind();
@@ -191,14 +188,14 @@ public class GLDeferredEngine extends BaseOreonRenderEngine {
 
     primarySceneFbo.bind();
 
-    opaqueSceneRenderList.getValues().forEach(object ->
-    {
-      if (context.getConfig().isRenderWireframe()) {
-        object.renderWireframe();
-      } else {
-        object.render();
-      }
-    });
+    opaqueSceneRenderList.getValues()
+        .forEach(object -> {
+          if (context.getConfig().isRenderWireframe()) {
+            object.renderWireframe();
+          } else {
+            object.render();
+          }
+        });
 
     primarySceneFbo.unbind();
 
@@ -216,8 +213,10 @@ public class GLDeferredEngine extends BaseOreonRenderEngine {
     //-----------------------------------//
 
     if (context.getConfig().isSsaoEnabled()) {
-      ssao.render(primarySceneFbo.getAttachmentTexture(Attachment.POSITION),
-          primarySceneFbo.getAttachmentTexture(Attachment.NORMAL));
+      ssao.render(
+          primarySceneFbo.getAttachmentTexture(Attachment.POSITION),
+          primarySceneFbo.getAttachmentTexture(Attachment.NORMAL)
+      );
     }
 
     //---------------------------------------------------//
@@ -225,35 +224,41 @@ public class GLDeferredEngine extends BaseOreonRenderEngine {
     //---------------------------------------------------//
 
     if (context.getConfig().getMultisampling_sampleCount() > 1) {
-      sampleCoverage.render(primarySceneFbo.getAttachmentTexture(Attachment.POSITION),
+      sampleCoverage.render(
+          primarySceneFbo.getAttachmentTexture(Attachment.POSITION),
           primarySceneFbo.getAttachmentTexture(Attachment.LIGHT_SCATTERING),
-          primarySceneFbo.getAttachmentTexture(Attachment.SPECULAR_EMISSION_DIFFUSE_SSAO_BLOOM));
+          primarySceneFbo.getAttachmentTexture(Attachment.SPECULAR_EMISSION_DIFFUSE_SSAO_BLOOM)
+      );
     }
 
     //-----------------------------------------------------//
     //         render multisample deferred lighting        //
     //-----------------------------------------------------//
 
-    deferredLighting.render(sampleCoverage.getSampleCoverageMask(),
+    deferredLighting.render(
+        sampleCoverage.getSampleCoverageMask(),
         ssao.getSsaoBlurSceneTexture(),
         pssmFbo.getDepthMap(),
         primarySceneFbo.getAttachmentTexture(Attachment.COLOR),
         primarySceneFbo.getAttachmentTexture(Attachment.POSITION),
         primarySceneFbo.getAttachmentTexture(Attachment.NORMAL),
-        primarySceneFbo.getAttachmentTexture(Attachment.SPECULAR_EMISSION_DIFFUSE_SSAO_BLOOM));
+        primarySceneFbo.getAttachmentTexture(Attachment.SPECULAR_EMISSION_DIFFUSE_SSAO_BLOOM)
+    );
 
     //-----------------------------------------------//
     //         blend opaque/transparent scene        //
     //-----------------------------------------------//
 
     if (!transparencySceneRenderList.getObjectList().isEmpty()) {
-      opaqueTransparencyBlending.render(deferredLighting.getDeferredLightingSceneTexture(),
+      opaqueTransparencyBlending.render(
+          deferredLighting.getDeferredLightingSceneTexture(),
           primarySceneFbo.getAttachmentTexture(Attachment.DEPTH),
           sampleCoverage.getLightScatteringMaskSingleSample(),
           secondarySceneFbo.getAttachmentTexture(Attachment.COLOR),
           secondarySceneFbo.getAttachmentTexture(Attachment.DEPTH),
           secondarySceneFbo.getAttachmentTexture(Attachment.ALPHA),
-          secondarySceneFbo.getAttachmentTexture(Attachment.LIGHT_SCATTERING));
+          secondarySceneFbo.getAttachmentTexture(Attachment.LIGHT_SCATTERING)
+      );
     }
 
     // update Terrain Quadtree

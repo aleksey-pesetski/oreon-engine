@@ -1,7 +1,10 @@
 package org.oreon.core.vk.scenegraph;
 
 import java.util.List;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.oreon.core.scenegraph.NodeComponent;
 import org.oreon.core.vk.command.CommandBuffer;
 import org.oreon.core.vk.descriptor.DescriptorSet;
@@ -9,11 +12,6 @@ import org.oreon.core.vk.descriptor.DescriptorSetLayout;
 import org.oreon.core.vk.pipeline.ShaderPipeline;
 import org.oreon.core.vk.pipeline.VkPipeline;
 import org.oreon.core.vk.pipeline.VkVertexInput;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 
 @Builder
 @AllArgsConstructor
@@ -28,7 +26,9 @@ public class VkRenderInfo extends NodeComponent {
   private List<DescriptorSetLayout> descriptorSetLayouts;
   private List<DescriptorSet> descriptorSets;
 
+  @Override
   public void shutdown() {
+    super.shutdown();
 
     if (pipeline != null) {
       pipeline.destroy();

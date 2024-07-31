@@ -1,7 +1,14 @@
 package org.oreon.gl.components.filter.ssao;
 
-import lombok.Getter;
+import static org.lwjgl.opengl.GL15.GL_READ_ONLY;
+import static org.lwjgl.opengl.GL15.GL_WRITE_ONLY;
+import static org.lwjgl.opengl.GL30.GL_R16F;
+import static org.lwjgl.opengl.GL30.GL_RGBA16F;
+import static org.lwjgl.opengl.GL30.GL_RGBA32F;
+import static org.lwjgl.opengl.GL42.glBindImageTexture;
+import static org.lwjgl.opengl.GL43.glDispatchCompute;
 
+import lombok.Getter;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.gl.texture.GLTexture;
 import org.oreon.core.gl.wrapper.texture.TextureImage2D;
@@ -11,12 +18,6 @@ import org.oreon.core.image.Image.SamplerFilter;
 import org.oreon.core.image.Image.TextureWrapMode;
 import org.oreon.core.math.Vec3f;
 import org.oreon.core.util.Util;
-
-import static org.lwjgl.opengl.GL15.GL_READ_ONLY;
-import static org.lwjgl.opengl.GL15.GL_WRITE_ONLY;
-import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.opengl.GL42.glBindImageTexture;
-import static org.lwjgl.opengl.GL43.glDispatchCompute;
 
 public class SSAO {
 
@@ -73,14 +74,14 @@ public class SSAO {
     glDispatchCompute(1, 1, 1);
   }
 
-  public void render(GLTexture worldPositionSceneTexture,
-      GLTexture normalSceneTexture) {
-
+  public void render(final GLTexture worldPositionSceneTexture, final GLTexture normalSceneTexture) {
     ssaoShader.bind();
+
     glBindImageTexture(0, ssaoSceneTexture.getHandle(), 0, false, 0, GL_WRITE_ONLY, GL_R16F);
     glBindImageTexture(1, worldPositionSceneTexture.getHandle(), 0, false, 0, GL_READ_ONLY, GL_RGBA32F);
     glBindImageTexture(2, normalSceneTexture.getHandle(), 0, false, 0, GL_READ_ONLY, GL_RGBA16F);
     glBindImageTexture(3, noiseTexture.getHandle(), 0, false, 0, GL_READ_ONLY, GL_RGBA16F);
+
     ssaoShader.updateUniforms(
         ContextHolder.getContext().getCamera().getViewMatrix(),
         ContextHolder.getContext().getCamera().getProjectionMatrix(),
@@ -88,6 +89,7 @@ public class SSAO {
     glDispatchCompute(width / 16, height / 16, 1);
 
     blurShader.bind();
+
     glBindImageTexture(0, ssaoBlurSceneTexture.getHandle(), 0, false, 0, GL_WRITE_ONLY, GL_R16F);
     glBindImageTexture(1, ssaoSceneTexture.getHandle(), 0, false, 0, GL_READ_ONLY, GL_R16F);
     glDispatchCompute(width / 16, height / 16, 1);

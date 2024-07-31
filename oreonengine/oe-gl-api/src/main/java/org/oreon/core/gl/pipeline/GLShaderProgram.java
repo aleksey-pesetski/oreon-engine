@@ -33,7 +33,8 @@ import static org.lwjgl.opengl.GL40.GL_TESS_EVALUATION_SHADER;
 import static org.lwjgl.opengl.GL43.GL_COMPUTE_SHADER;
 
 import java.util.HashMap;
-
+import java.util.Map;
+import lombok.extern.log4j.Log4j2;
 import org.oreon.core.gl.texture.GLTexture;
 import org.oreon.core.math.Matrix4f;
 import org.oreon.core.math.Vec2f;
@@ -42,17 +43,18 @@ import org.oreon.core.math.Vec4f;
 import org.oreon.core.scenegraph.Renderable;
 import org.oreon.core.util.BufferUtil;
 
+@Log4j2
 public abstract class GLShaderProgram {
 
-  private int program;
-  private HashMap<String, Integer> uniforms;
+  private final int program;
+  private final Map<String, Integer> uniforms;
 
-  public GLShaderProgram() {
-    program = glCreateProgram();
-    uniforms = new HashMap<String, Integer>();
+  protected GLShaderProgram() {
+    this.program = glCreateProgram();
+    this.uniforms = new HashMap<>();
 
     if (program == 0) {
-      System.err.println("Shader creation failed");
+      log.error("Shader creation failed. {}", glGetProgramInfoLog(program));
       System.exit(1);
     }
   }
@@ -64,72 +66,44 @@ public abstract class GLShaderProgram {
   public void updateUniforms(Renderable object) {
   }
 
-  ;
-
   public <T> void updateUniforms(Class<T> clazz) {
   }
-
-  ;
 
   public void updateUniforms(Matrix4f matrix0, Matrix4f matrix1, Matrix4f matrix2) {
   }
 
-  ;
-
   public void updateUniforms(GLTexture texture, int i, float j) {
   }
-
-  ;
 
   public void updateUniforms(GLTexture texture, float j) {
   }
 
-  ;
-
   public void updateUniforms(GLTexture texture) {
   }
-
-  ;
 
   public void updateUniforms(Matrix4f matrix0, Matrix4f matrix1) {
   }
 
-  ;
-
   public void updateUniforms(Matrix4f matrix) {
   }
-
-  ;
 
   public void updateUniforms(Vec4f vec4) {
   }
 
-  ;
-
   public void updateUniforms(int value) {
   }
-
-  ;
 
   public void updateUniforms(float value) {
   }
 
-  ;
-
   public void updateUniforms(float value0, float value1) {
   }
-
-  ;
 
   public void updateUniforms(int l, int n, float t) {
   }
 
-  ;
-
   public void updateUniforms(int l, int n, int t) {
   }
-
-  ;
 
   public void updateUniforms(int n, int l, float a, Vec2f w, float j) {
   }
@@ -146,28 +120,23 @@ public abstract class GLShaderProgram {
   public void updateUniforms(int i, float j) {
   }
 
-
   public void addUniform(String uniform) {
     int uniformLocation = glGetUniformLocation(program, uniform);
-
-    if (uniformLocation == 0xFFFFFFFF) {
-      System.err.println(this.getClass().getName() + " Error: Could not find uniform: " + uniform);
-      new Exception().printStackTrace();
-      System.exit(1);
-    }
-
+    checkIfUniformExist(uniform, uniformLocation);
     uniforms.put(uniform, uniformLocation);
   }
 
   public void addUniformBlock(String uniform) {
     int uniformLocation = glGetUniformBlockIndex(program, uniform);
+    checkIfUniformExist(uniform, uniformLocation);
+    uniforms.put(uniform, uniformLocation);
+  }
+
+  private void checkIfUniformExist(String uniform, int uniformLocation) {
     if (uniformLocation == 0xFFFFFFFF) {
-      System.err.println(this.getClass().getName() + " Error: Could not find uniform: " + uniform);
-      new Exception().printStackTrace();
+      log.error("{} Error: Could not find uniform: {}", this.getClass().getName(), uniform);
       System.exit(1);
     }
-
-    uniforms.put(uniform, uniformLocation);
   }
 
   public void addVertexShader(String text) {
