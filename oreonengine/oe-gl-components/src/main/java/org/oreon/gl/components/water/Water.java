@@ -189,8 +189,10 @@ public class Water extends Renderable {
       //-----------------------------------//
       int tempScreenResolutionX = ContextHolder.getContext().getConfig().getFrameWidth();
       int tempScreenResolutionY = ContextHolder.getContext().getConfig().getFrameHeight();
+
       ContextHolder.getContext().getConfig().setFrameWidth(tempScreenResolutionX / 2);
       ContextHolder.getContext().getConfig().setFrameHeight(tempScreenResolutionY / 2);
+
       glViewport(0, 0, tempScreenResolutionX / 2, tempScreenResolutionY / 2);
 
       ContextHolder.getContext().getConfig().setRenderReflection(true);

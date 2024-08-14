@@ -19,7 +19,7 @@ public abstract class ContextHolder<I extends Input, C extends BaseOreonCamera, 
     return Optional.ofNullable(CONTEXT_THREAD_LOCAL.get())
         .orElseThrow(() -> {
           log.info("ContextHolder : {}", CONTEXT_THREAD_LOCAL.toString());
-          throw new IllegalStateException("No OreonContext available");
+          return new IllegalStateException("No OreonContext available");
         });
   }
 
