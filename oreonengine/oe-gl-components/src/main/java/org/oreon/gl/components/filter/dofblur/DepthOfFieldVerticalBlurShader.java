@@ -5,7 +5,7 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.gl.texture.GLTexture;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class DepthOfFieldVerticalBlurShader extends GLShaderProgram {
 
@@ -21,7 +21,7 @@ public class DepthOfFieldVerticalBlurShader extends GLShaderProgram {
   protected DepthOfFieldVerticalBlurShader() {
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/filter/depth_of_field/depthOfField_verticalGaussianBlur.comp"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/depth_of_field/depthOfField_verticalGaussianBlur.comp"));
 
     compileShader();
 

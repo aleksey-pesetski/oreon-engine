@@ -2,7 +2,7 @@ package org.oreon.gl.components.ui;
 
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.math.Matrix4f;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class UITexturePanelShader extends GLShaderProgram {
 
@@ -18,8 +18,8 @@ public class UITexturePanelShader extends GLShaderProgram {
   protected UITexturePanelShader() {
     super();
 
-    addVertexShader(ResourceLoader.loadShader("shaders/ui/texturePanel.vert"));
-    addFragmentShader(ResourceLoader.loadShader("shaders/ui/texturePanel.frag"));
+    addVertexShader(ResourceLoaderUtils.loadShader("shaders/ui/texturePanel.vert"));
+    addFragmentShader(ResourceLoaderUtils.loadShader("shaders/ui/texturePanel.frag"));
     compileShader();
 
     addUniform("orthographicMatrix");

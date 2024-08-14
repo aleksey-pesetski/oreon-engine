@@ -1,7 +1,7 @@
 package org.oreon.gl.components.filter.lightscattering;
 
 import org.oreon.core.gl.pipeline.GLShaderProgram;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class SunLightScatteringAdditiveBlendShader extends GLShaderProgram {
 
@@ -17,7 +17,7 @@ public class SunLightScatteringAdditiveBlendShader extends GLShaderProgram {
   protected SunLightScatteringAdditiveBlendShader() {
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/filter/light_scattering/lightScattering_additiveBlend.comp"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/light_scattering/lightScattering_additiveBlend.comp"));
 
     compileShader();
   }

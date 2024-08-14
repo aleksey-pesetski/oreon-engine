@@ -4,7 +4,7 @@ import org.oreon.core.context.ContextHolder;
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.scenegraph.Renderable;
 import org.oreon.core.util.Constants;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class AtmosphereShader extends GLShaderProgram {
 
@@ -20,8 +20,8 @@ public class AtmosphereShader extends GLShaderProgram {
   protected AtmosphereShader() {
     super();
 
-    addVertexShader(ResourceLoader.loadShader("shaders/atmosphere/atmosphere.vert"));
-    addFragmentShader(ResourceLoader.loadShader("shaders/atmosphere/atmosphere.frag"));
+    addVertexShader(ResourceLoaderUtils.loadShader("shaders/atmosphere/atmosphere.vert"));
+    addFragmentShader(ResourceLoaderUtils.loadShader("shaders/atmosphere/atmosphere.frag"));
     compileShader();
 
     addUniform("modelViewProjectionMatrix");

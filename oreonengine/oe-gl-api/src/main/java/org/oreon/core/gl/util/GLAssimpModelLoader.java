@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
+import lombok.extern.log4j.Log4j2;
 import org.lwjgl.assimp.AIColor4D;
 import org.lwjgl.assimp.AIFace;
 import org.lwjgl.assimp.AIMaterial;
@@ -38,19 +38,24 @@ import org.oreon.core.model.Model;
 import org.oreon.core.model.Vertex;
 import org.oreon.core.util.Util;
 
+@Log4j2
 public class GLAssimpModelLoader {
+
+  public static final String SEPARATOR = "/";
 
   private static FileSystem tempFileSystem = null;
 
-  public static List<Model> loadModel(String path, String file) {
+  private GLAssimpModelLoader() {
+  }
 
-    List<Model> models = new ArrayList<>();
-    List<Material> materials = new ArrayList<>();
+  public static List<Model> loadModel(String path, String file) {
+    final List<Model> models = new ArrayList<>();
+    final List<Material> materials = new ArrayList<>();
 
     String tmpPath;
 
     boolean fromJar = false;
-    URL vPathUrl = GLAssimpModelLoader.class.getResource("/" + path);
+    URL vPathUrl = GLAssimpModelLoader.class.getResource(SEPARATOR + path);
 
     if (vPathUrl.getProtocol().equals("jar")) {
       fromJar = true;
@@ -58,7 +63,6 @@ public class GLAssimpModelLoader {
 
     // if jar, copy directory to temp folder
     if (fromJar) {
-
       Path currentRelativePath = Paths.get("");
       String currentAbsolutePath = currentRelativePath.toAbsolutePath().toString();
 
@@ -73,17 +77,17 @@ public class GLAssimpModelLoader {
 
       URI uri = null;
       try {
-        uri = GLAssimpModelLoader.class.getResource("/" + path).toURI();
+        uri = GLAssimpModelLoader.class.getResource(SEPARATOR + path).toURI();
       } catch (URISyntaxException e) {
-        e.printStackTrace();
+        log.error(e);
       }
 
       try {
         if (tempFileSystem == null) {
-          tempFileSystem = FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
+          tempFileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap());
         }
 
-        Path myPath = tempFileSystem.getPath("/" + path);
+        Path myPath = tempFileSystem.getPath(SEPARATOR + path);
 
         for (Iterator<Path> it = Files.walk(myPath, 1).iterator(); it.hasNext(); ) {
           Path p = it.next();
@@ -93,15 +97,14 @@ public class GLAssimpModelLoader {
         }
 
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error(e);
       }
     } else {
-
-      tmpPath = GLAssimpModelLoader.class.getClassLoader().getResource(path + "/" + file).getPath().toString();
+      tmpPath = GLAssimpModelLoader.class.getClassLoader().getResource(path + SEPARATOR + file).getPath();
 
       // For Linux need to keep '/' or else the Assimp.aiImportFile(...) call below returns null!
       if (System.getProperty("os.name").contains("Windows")) {
-        if (tmpPath.startsWith("/")) {
+        if (tmpPath.startsWith(SEPARATOR)) {
           tmpPath = tmpPath.substring(1);
         }
       }
@@ -131,7 +134,6 @@ public class GLAssimpModelLoader {
   }
 
   private static Mesh processMesh(AIMesh aiMesh) {
-
     List<Vertex> vertexList = new ArrayList<>();
     List<Integer> indices = new ArrayList<>();
 
@@ -232,7 +234,6 @@ public class GLAssimpModelLoader {
   }
 
   private static Material processMaterial(AIMaterial aiMaterial, String texturesDir) {
-
     // diffuse Texture
     AIString diffPath = AIString.calloc();
     Assimp.aiGetMaterialTexture(aiMaterial, Assimp.aiTextureType_DIFFUSE, 0, diffPath, (IntBuffer) null, null, null,
@@ -241,7 +242,7 @@ public class GLAssimpModelLoader {
 
     GLTexture diffuseTexture = null;
     if (diffTexPath != null && diffTexPath.length() > 0) {
-      diffuseTexture = new TextureImage2D(texturesDir + "/" + diffTexPath, SamplerFilter.Trilinear);
+      diffuseTexture = new TextureImage2D(texturesDir + SEPARATOR + diffTexPath, SamplerFilter.Trilinear);
     }
 
     // normal Texture
@@ -252,7 +253,7 @@ public class GLAssimpModelLoader {
 
     GLTexture normalTexture = null;
     if (normalTexPath != null && normalTexPath.length() > 0) {
-      normalTexture = new TextureImage2D(texturesDir + "/" + normalTexPath, SamplerFilter.Trilinear);
+      normalTexture = new TextureImage2D(texturesDir + SEPARATOR + normalTexPath, SamplerFilter.Trilinear);
     }
 
     AIColor4D color = AIColor4D.create();
@@ -272,15 +273,14 @@ public class GLAssimpModelLoader {
     return material;
   }
 
-  public static String createTempFile(String path, String file, String p) {
-
-    System.out.println("Path " + path);
-    System.out.println("File " + file);
-    System.out.println("p " + p);
+  private static String createTempFile(String path, String file, String absolutePath) {
+    log.info("Path {}", path);
+    log.info("File {}", file);
+    log.info("absolutePath {}", file);
 
     try {
-      InputStream input = GLAssimpModelLoader.class.getResourceAsStream("/" + path + "/" + file);
-      File tmpFile = new File(p + "/temp/" + file);
+      InputStream input = GLAssimpModelLoader.class.getResourceAsStream(SEPARATOR + path + SEPARATOR + file);
+      File tmpFile = new File(absolutePath + "/temp/" + file);
 
       OutputStream out = new FileOutputStream(tmpFile);
 
@@ -296,7 +296,7 @@ public class GLAssimpModelLoader {
       return tmpFile.getAbsolutePath();
 
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error(e);
     }
 
     return "";

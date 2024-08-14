@@ -1,6 +1,5 @@
 package org.oreon.vk.engine;
 
-import static org.lwjgl.system.MemoryUtil.memAllocLong;
 import static org.lwjgl.vulkan.VK10.VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
 import static org.lwjgl.vulkan.VK10.VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 import static org.lwjgl.vulkan.VK10.VK_ACCESS_MEMORY_READ_BIT;
@@ -15,42 +14,38 @@ import static org.lwjgl.vulkan.VK10.VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
 import static org.lwjgl.vulkan.VK10.VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 import static org.lwjgl.vulkan.VK10.VK_SUBPASS_EXTERNAL;
 
-import java.nio.LongBuffer;
+import java.util.Map;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkPhysicalDeviceMemoryProperties;
 import org.oreon.core.context.ContextHolder;
+import org.oreon.core.target.Attachment;
 import org.oreon.core.vk.framebuffer.FrameBufferColorAttachment;
 import org.oreon.core.vk.framebuffer.FrameBufferDepthAttachment;
-import org.oreon.core.vk.framebuffer.VkFrameBuffer;
 import org.oreon.core.vk.framebuffer.VkFrameBufferObject;
 import org.oreon.core.vk.pipeline.RenderPass;
-import org.oreon.core.vk.wrapper.image.VkImageBundle;
 
 public class TransparencyFbo extends VkFrameBufferObject {
 
   public TransparencyFbo(VkDevice device, VkPhysicalDeviceMemoryProperties memoryProperties) {
+    super(
+        ContextHolder.getContext().getConfig().getFrameWidth(),
+        ContextHolder.getContext().getConfig().getFrameHeight(),
+        1,
+        device,
+        (width, height) -> Map.of(
+            Attachment.COLOR, new FrameBufferColorAttachment(device, memoryProperties,
+                width, height, VK_FORMAT_R16G16B16A16_SFLOAT, 1),
+            Attachment.ALPHA, new FrameBufferColorAttachment(device, memoryProperties,
+                width, height, VK_FORMAT_R16G16B16A16_SFLOAT, 1),
+            Attachment.LIGHT_SCATTERING, new FrameBufferColorAttachment(device, memoryProperties,
+                width, height, VK_FORMAT_R16G16B16A16_SFLOAT, 1),
+            Attachment.DEPTH, new FrameBufferDepthAttachment(device, memoryProperties,
+                width, height, VK_FORMAT_D32_SFLOAT, 1)
+        ));
+  }
 
-    width = ContextHolder.getContext().getConfig().getFrameWidth();
-    height = ContextHolder.getContext().getConfig().getFrameHeight();
-
-    VkImageBundle albedoAttachment = new FrameBufferColorAttachment(device, memoryProperties,
-        width, height, VK_FORMAT_R16G16B16A16_SFLOAT, 1);
-
-    VkImageBundle alphaAttachment = new FrameBufferColorAttachment(device, memoryProperties,
-        width, height, VK_FORMAT_R16G16B16A16_SFLOAT, 1);
-
-    VkImageBundle lightScatteringAttachment = new FrameBufferColorAttachment(device, memoryProperties,
-        width, height, VK_FORMAT_R16G16B16A16_SFLOAT, 1);
-
-    VkImageBundle depthBuffer = new FrameBufferDepthAttachment(device, memoryProperties,
-        width, height, VK_FORMAT_D32_SFLOAT, 1);
-
-    attachments.put(Attachment.COLOR, albedoAttachment);
-    attachments.put(Attachment.ALPHA, alphaAttachment);
-    attachments.put(Attachment.LIGHT_SCATTERING, lightScatteringAttachment);
-    attachments.put(Attachment.DEPTH, depthBuffer);
-
-    renderPass = new RenderPass(device);
+  @Override
+  protected RenderPass configureRenderPass(final RenderPass renderPass) {
     renderPass.addColorAttachment(0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
         VK_FORMAT_R16G16B16A16_SFLOAT, 1, VK_IMAGE_LAYOUT_UNDEFINED,
         VK_IMAGE_LAYOUT_GENERAL);
@@ -78,17 +73,6 @@ public class TransparencyFbo extends VkFrameBufferObject {
         VK_DEPENDENCY_BY_REGION_BIT);
     renderPass.createSubpass();
     renderPass.createRenderPass();
-
-    depthAttachmentCount = 1;
-    colorAttachmentCount = renderPass.getAttachmentCount() - depthAttachmentCount;
-
-    LongBuffer pImageViews = memAllocLong(renderPass.getAttachmentCount());
-    pImageViews.put(0, attachments.get(Attachment.COLOR).getImageView().getHandle());
-    pImageViews.put(1, attachments.get(Attachment.ALPHA).getImageView().getHandle());
-    pImageViews.put(2, attachments.get(Attachment.LIGHT_SCATTERING).getImageView().getHandle());
-    pImageViews.put(3, attachments.get(Attachment.DEPTH).getImageView().getHandle());
-
-    frameBuffer = new VkFrameBuffer(device, width, height, 1, pImageViews, renderPass.getHandle());
+    return renderPass;
   }
-
 }

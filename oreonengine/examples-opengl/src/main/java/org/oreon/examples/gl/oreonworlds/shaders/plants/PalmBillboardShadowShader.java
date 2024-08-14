@@ -12,7 +12,7 @@ import org.oreon.core.model.Material;
 import org.oreon.core.scenegraph.NodeComponentType;
 import org.oreon.core.scenegraph.Renderable;
 import org.oreon.core.util.Constants;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class PalmBillboardShadowShader extends GLShaderProgram {
 
@@ -28,11 +28,11 @@ public class PalmBillboardShadowShader extends GLShaderProgram {
   protected PalmBillboardShadowShader() {
     super();
 
-    addVertexShader(ResourceLoader.loadShader("oreonworlds/shaders/assets/Palm_Shader/Palm01_VS.glsl"));
+    addVertexShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Palm_Shader/Palm01_VS.glsl"));
     addGeometryShader(
-        ResourceLoader.loadShader("oreonworlds/shaders/assets/Palm_Shader/Palm01BillboardShadow_GS.glsl"));
+        ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Palm_Shader/Palm01BillboardShadow_GS.glsl"));
     addFragmentShader(
-        ResourceLoader.loadShader("oreonworlds/shaders/assets/Palm_Shader/Palm01BillboardShadow_FS.glsl"));
+        ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Palm_Shader/Palm01BillboardShadow_FS.glsl"));
     compileShader();
 
     addUniformBlock("InstancedMatrices");

@@ -1,11 +1,21 @@
 package org.oreon.gl.components.water;
 
-import lombok.Getter;
-import lombok.Setter;
+import static org.lwjgl.opengl.GL11.GL_CCW;
+import static org.lwjgl.opengl.GL11.GL_CW;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glFinish;
+import static org.lwjgl.opengl.GL11.glFrontFace;
+import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL30.GL_CLIP_DISTANCE6;
+import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT0;
+import static org.lwjgl.system.MemoryUtil.memAlloc;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 import org.oreon.common.water.WaterConfig;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.gl.context.GLOreonContext;
@@ -31,48 +41,40 @@ import org.oreon.gl.components.fft.FFT;
 import org.oreon.gl.components.terrain.GLTerrain;
 import org.oreon.gl.components.util.NormalRenderer;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL30.GL_CLIP_DISTANCE6;
-import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT0;
-import static org.lwjgl.system.MemoryUtil.memAlloc;
-
+@Log4j2
 public class Water extends Renderable {
 
-  @Setter
-  private Vec4f clipplane;
-  @Setter
-  private int clip_offset;
   @Getter
-  private float motion;
+  private final GLTexture dudv;
+  private final GLFramebuffer reflection_fbo;
+  private final GLFramebuffer refraction_fbo;
   @Getter
-  private GLTexture dudv;
-
-  private GLFramebuffer reflection_fbo;
-  private GLFramebuffer refraction_fbo;
+  private final GLTexture reflection_texture;
   @Getter
-  private GLTexture reflection_texture;
+  private final GLTexture refraction_texture;
+  private final RenderList reflectionRenderList;
+  private final RenderList refractionRenderList;
   @Getter
-  private GLTexture refraction_texture;
-  private RenderList reflectionRenderList;
-  private RenderList refractionRenderList;
-
+  private final FFT fft;
   @Getter
-  private FFT fft;
+  private final NormalRenderer normalmapRenderer;
+  private final WaterRenderParameter renderConfig;
   @Getter
-  private NormalRenderer normalmapRenderer;
-  private boolean isCameraUnderwater;
-
-  private WaterRenderParameter renderConfig;
-
-  @Getter
-  private WaterConfig config;
-
-  private GLShaderStorageBuffer ssbo;
+  private final WaterConfig config;
 
   @Getter
   private float t_motion;
   @Getter
   private float t_distortion;
+  @Getter
+  private float motion;
+  @Setter
+  private Vec4f clipplane;
+  @Setter
+  private int clipOffset;
+
+  private GLShaderStorageBuffer ssbo;
+  private boolean isCameraUnderwater;
   private long systemTime = System.currentTimeMillis();
 
   public Water(int patches, GLShaderProgram shader, GLShaderProgram wireframeShader) {
@@ -143,25 +145,24 @@ public class Water extends Renderable {
     reflectionRenderList = new RenderList();
   }
 
+  @Override
   public void update() {
-    isCameraUnderwater =
-        ContextHolder.getContext().getCamera().getPosition().getY() < (getWorldTransform().getTranslation().getY());
-    t_motion += (System.currentTimeMillis() - systemTime) * config.getWaveMotion();
-    t_distortion += (System.currentTimeMillis() - systemTime) * config.getDistortion();
-    systemTime = System.currentTimeMillis();
+    this.isCameraUnderwater =
+        ContextHolder.getContext().getCamera().getPosition().getY() < getWorldTransform().getTranslation().getY();
+    this.t_motion += (System.currentTimeMillis() - systemTime) * config.getWaveMotion();
+    this.t_distortion += (System.currentTimeMillis() - systemTime) * config.getDistortion();
+    this.systemTime = System.currentTimeMillis();
   }
 
+  @Override
   public void renderWireframe() {
-
     fft.render();
-
     ssbo.bindBufferBase(1);
-
     super.renderWireframe();
-
     glFinish();
   }
 
+  @Override
   public void render() {
     if (!isCameraUnderwater) {
       glEnable(GL_CLIP_DISTANCE6);
@@ -170,127 +171,97 @@ public class Water extends Renderable {
       ContextHolder.getContext().getConfig().setRenderUnderwater(true);
     }
 
-    Scenegraph scenegraph = ((Scenegraph) getParentNode());
+    if (getParentNode() instanceof Scenegraph scenegraph) {
+      ContextHolder.getContext().getConfig().setClipplane(clipplane);
 
-    ContextHolder.getContext().getConfig().setClipplane(clipplane);
+      //-----------------------------------//
+      //     mirror scene to clipplane     //
+      //-----------------------------------//
+      scenegraph.getWorldTransform().setScaling(1, -1, 1);
+      if (scenegraph.hasTerrain()) {
+        GLTerrain.getConfig().setVerticalScaling(GLTerrain.getConfig().getVerticalScaling() * -1f);
+        GLTerrain.getConfig().setReflectionOffset(clipOffset * 2);
+      }
+      scenegraph.update();
 
-    //-----------------------------------//
-    //     mirror scene to clipplane     //
-    //-----------------------------------//
+      //-----------------------------------//
+      //    render reflection to texture   //
+      //-----------------------------------//
+      int tempScreenResolutionX = ContextHolder.getContext().getConfig().getFrameWidth();
+      int tempScreenResolutionY = ContextHolder.getContext().getConfig().getFrameHeight();
+      ContextHolder.getContext().getConfig().setFrameWidth(tempScreenResolutionX / 2);
+      ContextHolder.getContext().getConfig().setFrameHeight(tempScreenResolutionY / 2);
+      glViewport(0, 0, tempScreenResolutionX / 2, tempScreenResolutionY / 2);
 
-    scenegraph.getWorldTransform().setScaling(1, -1, 1);
+      ContextHolder.getContext().getConfig().setRenderReflection(true);
+      reflection_fbo.bind();
+      renderConfig.clearScreenDeepOcean();
+      glFrontFace(GL_CCW);
 
-    if (scenegraph.hasTerrain()) {
+      if (!isCameraUnderwater) {
+        scenegraph.record(reflectionRenderList);
+        reflectionRenderList.remove(this.id);
+        reflectionRenderList.getValues().forEach(Renderable::render);
+      }
 
-      GLTerrain.getConfig().setVerticalScaling(
-          GLTerrain.getConfig().getVerticalScaling() * -1f);
-      GLTerrain.getConfig().setReflectionOffset(
-          clip_offset * 2);
+      // glFinish() important, to prevent conflicts with following compute shaders
+      glFinish();
+      glFrontFace(GL_CW);
+      reflection_fbo.unbind();
+
+      ContextHolder.getContext().getConfig().setRenderReflection(false);
+
+      //-----------------------------------//
+      //   antimirror scene to clipplane   //
+      //-----------------------------------//
+      scenegraph.getWorldTransform().setScaling(1, 1, 1);
+      if (scenegraph.hasTerrain()) {
+        GLTerrain.getConfig().setVerticalScaling(GLTerrain.getConfig().getVerticalScaling() / -1f);
+        GLTerrain.getConfig().setReflectionOffset(0);
+      }
+
+      scenegraph.update();
+
+      //-----------------------------------//
+      //    render refraction to texture   //
+      //-----------------------------------//
+      ContextHolder.getContext().getConfig().setRenderRefraction(true);
+      refraction_fbo.bind();
+      renderConfig.clearScreenDeepOcean();
+      scenegraph.record(refractionRenderList);
+      refractionRenderList.remove(this.id);
+      refractionRenderList.getValues().forEach(Renderable::render);
+
+      // glFinish() important, to prevent conflicts with following compute shaders
+      glFinish();
+      refraction_fbo.unbind();
+
+      //-----------------------------------//
+      //     reset rendering settings      //
+      //-----------------------------------//
+      ContextHolder.getContext().getConfig().setRenderRefraction(false);
+      glDisable(GL_CLIP_DISTANCE6);
+      ContextHolder.getContext().getConfig().setClipplane(Constants.ZEROPLANE);
+      glViewport(0, 0, tempScreenResolutionX, tempScreenResolutionY);
+      ContextHolder.getContext().getConfig().setFrameWidth(tempScreenResolutionX);
+      ContextHolder.getContext().getConfig().setFrameHeight(tempScreenResolutionY);
+      ((GLOreonContext) ContextHolder.getContext()).getResources().getPrimaryFbo().bind();
+
+      //-----------------------------------//
+      //            render FFT'S           //
+      //-----------------------------------//
+      fft.render();
+      normalmapRenderer.render(fft.getDy());
+      ssbo.bindBufferBase(1);
+
+      super.render();
+
+      // glFinish() important, to prevent conflicts with following compute shaders
+      glFinish();
     }
-    scenegraph.update();
-
-    //-----------------------------------//
-    //    render reflection to texture   //
-    //-----------------------------------//
-
-    int tempScreenResolutionX = ContextHolder.getContext().getConfig().getFrameWidth();
-    int tempScreenResolutionY = ContextHolder.getContext().getConfig().getFrameHeight();
-    ContextHolder.getContext().getConfig().setFrameWidth(tempScreenResolutionX / 2);
-    ContextHolder.getContext().getConfig().setFrameHeight(tempScreenResolutionY / 2);
-    glViewport(0, 0, tempScreenResolutionX / 2, tempScreenResolutionY / 2);
-
-    ContextHolder.getContext().getConfig().setRenderReflection(true);
-
-    reflection_fbo.bind();
-    renderConfig.clearScreenDeepOcean();
-    glFrontFace(GL_CCW);
-
-    if (!isCameraUnderwater) {
-
-      scenegraph.record(reflectionRenderList);
-
-      reflectionRenderList.remove(this.id);
-
-      reflectionRenderList.getValues().forEach(object ->
-      {
-        object.render();
-      });
-    }
-
-    // glFinish() important, to prevent conflicts with following compute shaders
-    glFinish();
-    glFrontFace(GL_CW);
-    reflection_fbo.unbind();
-
-    ContextHolder.getContext().getConfig().setRenderReflection(false);
-
-    //-----------------------------------//
-    //   antimirror scene to clipplane   //
-    //-----------------------------------//
-
-    scenegraph.getWorldTransform().setScaling(1, 1, 1);
-
-    if (scenegraph.hasTerrain()) {
-      GLTerrain.getConfig().setVerticalScaling(
-          GLTerrain.getConfig().getVerticalScaling() / -1f);
-      GLTerrain.getConfig().setReflectionOffset(0);
-    }
-
-    scenegraph.update();
-
-    //-----------------------------------//
-    //    render refraction to texture   //
-    //-----------------------------------//
-
-    ContextHolder.getContext().getConfig().setRenderRefraction(true);
-
-    refraction_fbo.bind();
-    renderConfig.clearScreenDeepOcean();
-
-    scenegraph.record(refractionRenderList);
-
-    refractionRenderList.remove(this.id);
-
-    refractionRenderList.getValues().forEach(object ->
-    {
-      object.render();
-    });
-
-    // glFinish() important, to prevent conflicts with following compute shaders
-    glFinish();
-    refraction_fbo.unbind();
-
-    //-----------------------------------//
-    //     reset rendering settings      //
-    //-----------------------------------//
-
-    ContextHolder.getContext().getConfig().setRenderRefraction(false);
-
-    glDisable(GL_CLIP_DISTANCE6);
-    ContextHolder.getContext().getConfig().setClipplane(Constants.ZEROPLANE);
-
-    glViewport(0, 0, tempScreenResolutionX, tempScreenResolutionY);
-    ContextHolder.getContext().getConfig().setFrameWidth(tempScreenResolutionX);
-    ContextHolder.getContext().getConfig().setFrameHeight(tempScreenResolutionY);
-
-    ((GLOreonContext) ContextHolder.getContext()).getResources().getPrimaryFbo().bind();
-
-    //-----------------------------------//
-    //            render FFT'S           //
-    //-----------------------------------//
-    fft.render();
-    normalmapRenderer.render(fft.getDy());
-
-    ssbo.bindBufferBase(1);
-
-    super.render();
-
-    // glFinish() important, to prevent conflicts with following compute shaders
-    glFinish();
   }
 
   public void initShaderBuffer() {
-
     ssbo = new GLShaderStorageBuffer();
     ByteBuffer byteBuffer = memAlloc(Float.BYTES * 33 + Integer.BYTES * 6);
     byteBuffer.put(BufferUtil.createByteBuffer(getWorldTransform().getWorldMatrix()));

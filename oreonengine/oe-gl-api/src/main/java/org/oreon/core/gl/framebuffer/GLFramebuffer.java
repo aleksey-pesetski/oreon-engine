@@ -37,14 +37,17 @@ import static org.lwjgl.opengl.GL32.GL_TEXTURE_2D_MULTISAMPLE;
 import static org.lwjgl.opengl.GL32.glFramebufferTexture;
 
 import java.nio.IntBuffer;
+import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 
 
+@Getter
+@Log4j2
 public class GLFramebuffer {
 
-  private int id;
+  private final int id;
 
   public GLFramebuffer() {
-
     id = glGenFramebuffers();
   }
 
@@ -61,25 +64,29 @@ public class GLFramebuffer {
   }
 
   public void setDrawBuffers(IntBuffer buffer) {
-
     glDrawBuffers(buffer);
   }
 
   public void createColorBufferAttachment(int x, int y, int i, int internalformat) {
-    int colorbuffer = glGenRenderbuffers();
+    final int colorbuffer = glGenRenderbuffers();
     glBindRenderbuffer(GL_RENDERBUFFER, colorbuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, internalformat, x, y);
     glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_RENDERBUFFER, colorbuffer);
   }
-
 
   public void createColorTextureAttachment(int texture, int i) {
     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, texture, 0);
   }
 
   public void createColorTextureAttachment(int texture, int i, boolean isMultisample) {
-    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i,
-        isMultisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D, texture, 0);
+    glFramebufferTexture2D(
+        GL_DRAW_FRAMEBUFFER,
+        GL_COLOR_ATTACHMENT0 + i,
+        isMultisample
+            ? GL_TEXTURE_2D_MULTISAMPLE
+            : GL_TEXTURE_2D,
+        texture,
+        0);
   }
 
   public void createDepthBufferAttachment(int x, int y) {
@@ -135,36 +142,25 @@ public class GLFramebuffer {
   }
 
   public void checkStatus() {
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
-      return;
-    } else if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_UNDEFINED) {
-      System.err.println("Framebuffer creation failed with GL_FRAMEBUFFER_UNDEFINED error");
-      System.exit(1);
-    } else if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT) {
-      System.err.println("Framebuffer creation failed with GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT error");
-      System.exit(1);
-    } else if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT) {
-      System.err.println("Framebuffer creation failed with GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT error");
-      System.exit(1);
-    } else if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER) {
-      System.err.println("Framebuffer creation failed with GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER error");
-      System.exit(1);
-    } else if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER) {
-      System.err.println("Framebuffer creation failed with GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER error");
-      System.exit(1);
-    } else if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_UNSUPPORTED) {
-      System.err.println("Framebuffer creation failed with GL_FRAMEBUFFER_UNSUPPORTED error");
-      System.exit(1);
-    } else if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE) {
-      System.err.println("Framebuffer creation failed with GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE error");
-      System.exit(1);
-    } else if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS) {
-      System.err.println("Framebuffer creation failed with GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS error");
-      System.exit(1);
+    int framebufferStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+    switch (framebufferStatus) {
+      case GL_FRAMEBUFFER_COMPLETE -> log.info("Framebuffer creation successful with GL_FRAMEBUFFER_COMPLETE status");
+      case GL_FRAMEBUFFER_UNDEFINED -> logAndExit("GL_FRAMEBUFFER_UNDEFINED");
+      case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT -> logAndExit("GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
+      case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT -> logAndExit("GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
+      case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER -> logAndExit("GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER");
+      case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER -> logAndExit("GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER");
+      case GL_FRAMEBUFFER_UNSUPPORTED -> logAndExit("GL_FRAMEBUFFER_UNSUPPORTED");
+      case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE -> logAndExit("GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE");
+      case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS -> logAndExit("GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS");
+      default -> logAndExit("unknown error: " + framebufferStatus);
     }
   }
 
-  public int getId() {
-    return id;
+  private void logAndExit(String error) {
+    log.error("Framebuffer creation failed with {} error", error);
+    System.exit(1);
   }
+
 }

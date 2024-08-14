@@ -1,12 +1,15 @@
 package org.oreon.core.scenegraph;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
+import lombok.Getter;
 import lombok.Setter;
 
 public class Renderable extends Node {
 
-  private HashMap<NodeComponentType, NodeComponent> components;
+  @Getter
+  private final Map<NodeComponentType, NodeComponent> components;
+
   @Setter
   protected boolean render;
 
@@ -14,7 +17,7 @@ public class Renderable extends Node {
     super();
 
     render = true;
-    components = new HashMap<NodeComponentType, NodeComponent>();
+    components = new EnumMap<>(NodeComponentType.class);
   }
 
   public void addComponent(NodeComponentType type, NodeComponent component) {
@@ -82,7 +85,6 @@ public class Renderable extends Node {
 
   @Override
   public void record(RenderList renderList) {
-
     if (render) {
       if (!renderList.contains(id)) {
         renderList.add(this);
@@ -100,14 +102,9 @@ public class Renderable extends Node {
 
   @Override
   public void shutdown() {
-
-    components.values().forEach(component -> component.shutdown());
+    components.values().forEach(NodeComponent::shutdown);
 
     super.shutdown();
-  }
-
-  public Map<NodeComponentType, NodeComponent> getComponents() {
-    return components;
   }
 
   @SuppressWarnings("unchecked")

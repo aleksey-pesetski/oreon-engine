@@ -6,7 +6,7 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.gl.texture.GLTexture;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class DepthOfFieldHorizontalBlurShader extends GLShaderProgram {
 
@@ -23,7 +23,7 @@ public class DepthOfFieldHorizontalBlurShader extends GLShaderProgram {
     super();
 
     addComputeShader(
-        ResourceLoader.loadShader("shaders/filter/depth_of_field/depthOfField_horizontalGaussianBlur.comp"));
+        ResourceLoaderUtils.loadShader("shaders/filter/depth_of_field/depthOfField_horizontalGaussianBlur.comp"));
 
     compileShader();
 

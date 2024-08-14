@@ -5,7 +5,7 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.gl.texture.GLTexture;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class MotionBlurShader extends GLShaderProgram {
 
@@ -21,7 +21,7 @@ public class MotionBlurShader extends GLShaderProgram {
   protected MotionBlurShader() {
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/filter/motion_blur/motionBlur.comp"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/motion_blur/motionBlur.comp"));
 
     compileShader();
 

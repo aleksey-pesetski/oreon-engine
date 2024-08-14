@@ -1,7 +1,6 @@
 package org.oreon.vk.components.ui;
 
 import static org.lwjgl.system.MemoryUtil.memAllocInt;
-import static org.lwjgl.system.MemoryUtil.memAllocLong;
 import static org.lwjgl.vulkan.VK10.VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
 import static org.lwjgl.vulkan.VK10.VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 import static org.lwjgl.vulkan.VK10.VK_ACCESS_MEMORY_READ_BIT;
@@ -36,6 +35,7 @@ import java.nio.LongBuffer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkPhysicalDeviceMemoryProperties;
@@ -47,7 +47,7 @@ import org.oreon.core.model.Mesh;
 import org.oreon.core.model.Vertex.VertexLayout;
 import org.oreon.core.scenegraph.NodeComponentType;
 import org.oreon.core.scenegraph.RenderList;
-import org.oreon.core.target.FrameBufferObject.Attachment;
+import org.oreon.core.target.Attachment;
 import org.oreon.core.util.BufferUtil;
 import org.oreon.core.util.MeshGenerator;
 import org.oreon.core.vk.command.CommandBuffer;
@@ -58,7 +58,6 @@ import org.oreon.core.vk.descriptor.DescriptorSet;
 import org.oreon.core.vk.descriptor.DescriptorSetLayout;
 import org.oreon.core.vk.device.LogicalDevice;
 import org.oreon.core.vk.framebuffer.FrameBufferColorAttachment;
-import org.oreon.core.vk.framebuffer.VkFrameBuffer;
 import org.oreon.core.vk.framebuffer.VkFrameBufferObject;
 import org.oreon.core.vk.image.VkImage;
 import org.oreon.core.vk.image.VkImageView;
@@ -250,20 +249,42 @@ public class VkGUI extends GUI {
     }
   }
 
-  private class SingleAttachmentFbo extends VkFrameBufferObject {
+  public VkImageView getImageView() {
+    return guiOverlayFbo.getAttachmentImageView(Attachment.COLOR);
+  }
+
+  public void shutdown() {
+
+    super.shutdown();
+
+    signalSemaphore.destroy();
+    fontsImageBundle.destroy();
+    panelMeshBuffer.shutdown();
+    guiPrimaryCmdBuffer.destroy();
+    underlayImageCmdBuffer.destroy();
+    underlayImagePipeline.destroy();
+    underlayImageDescriptorSet.destroy();
+    underlayImageDescriptorSetLayout.destroy();
+    underlayImageSampler.destroy();
+  }
+
+  private static class SingleAttachmentFbo extends VkFrameBufferObject {
 
     public SingleAttachmentFbo(VkDevice device,
         VkPhysicalDeviceMemoryProperties memoryProperties) {
+      super(
+          ContextHolder.getContext().getConfig().getFrameWidth(),
+          ContextHolder.getContext().getConfig().getFrameHeight(),
+          0,
+          device,
+          (width, height) -> Map.of(
+              Attachment.COLOR, new FrameBufferColorAttachment(device, memoryProperties,
+                  width, height, VK_FORMAT_R16G16B16A16_SFLOAT, 1)
+          ));
+    }
 
-      width = ContextHolder.getContext().getConfig().getFrameWidth();
-      height = ContextHolder.getContext().getConfig().getFrameHeight();
-
-      VkImageBundle colorAttachment = new FrameBufferColorAttachment(device, memoryProperties,
-          width, height, VK_FORMAT_R16G16B16A16_SFLOAT, 1);
-
-      attachments.put(Attachment.COLOR, colorAttachment);
-
-      renderPass = new RenderPass(device);
+    @Override
+    protected RenderPass configureRenderPass(final RenderPass renderPass) {
       renderPass.addColorAttachment(0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
           VK_FORMAT_R16G16B16A16_SFLOAT, 1, VK_IMAGE_LAYOUT_UNDEFINED,
           VK_IMAGE_LAYOUT_GENERAL);
@@ -282,34 +303,8 @@ public class VkGUI extends GUI {
           VK_DEPENDENCY_BY_REGION_BIT);
       renderPass.createSubpass();
       renderPass.createRenderPass();
-
-      depthAttachmentCount = 0;
-      colorAttachmentCount = renderPass.getAttachmentCount() - depthAttachmentCount;
-
-      LongBuffer pImageViews = memAllocLong(renderPass.getAttachmentCount());
-      pImageViews.put(0, attachments.get(Attachment.COLOR).getImageView().getHandle());
-
-      frameBuffer = new VkFrameBuffer(device, width, height, 1, pImageViews, renderPass.getHandle());
+      return renderPass;
     }
-  }
-
-  public VkImageView getImageView() {
-    return guiOverlayFbo.getAttachmentImageView(Attachment.COLOR);
-  }
-
-  public void shutdown() {
-
-    super.shutdown();
-
-    signalSemaphore.destroy();
-    fontsImageBundle.destroy();
-    panelMeshBuffer.shutdown();
-    guiPrimaryCmdBuffer.destroy();
-    underlayImageCmdBuffer.destroy();
-    underlayImagePipeline.destroy();
-    underlayImageDescriptorSet.destroy();
-    underlayImageDescriptorSetLayout.destroy();
-    underlayImageSampler.destroy();
   }
 
 }

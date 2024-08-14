@@ -23,7 +23,6 @@ public class VkImageBundle {
   }
 
   public void destroy() {
-
     if (sampler != null) {
       sampler.destroy();
     }

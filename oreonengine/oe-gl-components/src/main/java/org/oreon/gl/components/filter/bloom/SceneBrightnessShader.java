@@ -1,7 +1,7 @@
 package org.oreon.gl.components.filter.bloom;
 
 import org.oreon.core.gl.pipeline.GLShaderProgram;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class SceneBrightnessShader extends GLShaderProgram {
 
@@ -17,7 +17,7 @@ public class SceneBrightnessShader extends GLShaderProgram {
   protected SceneBrightnessShader() {
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/filter/bloom/brightness.comp"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/bloom/brightness.comp"));
     compileShader();
   }
 }

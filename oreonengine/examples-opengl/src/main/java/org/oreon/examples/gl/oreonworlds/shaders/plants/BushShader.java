@@ -13,7 +13,7 @@ import org.oreon.core.model.Material;
 import org.oreon.core.scenegraph.NodeComponentType;
 import org.oreon.core.scenegraph.Renderable;
 import org.oreon.core.util.Constants;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class BushShader extends GLShaderProgram {
 
@@ -29,9 +29,9 @@ public class BushShader extends GLShaderProgram {
   protected BushShader() {
     super();
 
-    addVertexShader(ResourceLoader.loadShader("oreonworlds/shaders/assets/Bush_Shader/Bush01_VS.glsl"));
-    addGeometryShader(ResourceLoader.loadShader("oreonworlds/shaders/assets/Bush_Shader/Bush01_GS.glsl"));
-    addFragmentShader(ResourceLoader.loadShader("oreonworlds/shaders/assets/Bush_Shader/Bush01_FS.glsl"));
+    addVertexShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Bush_Shader/Bush01_VS.glsl"));
+    addGeometryShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Bush_Shader/Bush01_GS.glsl"));
+    addFragmentShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Bush_Shader/Bush01_FS.glsl"));
     compileShader();
 
     addUniform("material.diffusemap");

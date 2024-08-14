@@ -19,6 +19,8 @@ import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 import static org.lwjgl.opengl.GL31.glDrawElementsInstanced;
 
+import lombok.Setter;
+import org.oreon.core.math.Vec3f;
 import org.oreon.core.model.Mesh;
 import org.oreon.core.model.Vertex;
 import org.oreon.core.util.BufferUtil;
@@ -26,12 +28,15 @@ import org.oreon.core.util.IntegerReference;
 
 public class GLMeshVBO implements VBO {
 
-  private int vbo;
-  private int ibo;
-  private int vaoId;
+  private final int vaoId;
+  private final int vbo;
+  private final int ibo;
+
   private int size;
-  private boolean hasTangentsBitangents;
+  private boolean hasTangentsBitAngents;
+  @Setter
   private IntegerReference instances;
+  @Setter
   private boolean drawInstanced;
 
   public GLMeshVBO() {
@@ -44,7 +49,7 @@ public class GLMeshVBO implements VBO {
 
   public void addData(Mesh mesh) {
     size = mesh.getIndices().length;
-    hasTangentsBitangents = mesh.isTangentSpace();
+    hasTangentsBitAngents = mesh.isTangentSpace();
 
     glBindVertexArray(vaoId);
 
@@ -69,14 +74,14 @@ public class GLMeshVBO implements VBO {
     glBindVertexArray(0);
   }
 
-
+  @Override
   public void draw() {
     glBindVertexArray(vaoId);
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
-    if (hasTangentsBitangents) {
+    if (hasTangentsBitAngents) {
       glEnableVertexAttribArray(3);
       glEnableVertexAttribArray(4);
     }
@@ -92,7 +97,7 @@ public class GLMeshVBO implements VBO {
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(2);
-    if (hasTangentsBitangents) {
+    if (hasTangentsBitAngents) {
       glDisableVertexAttribArray(3);
       glDisableVertexAttribArray(4);
     }
@@ -100,6 +105,12 @@ public class GLMeshVBO implements VBO {
     glBindVertexArray(0);
   }
 
+  @Override
+  public void update(Vec3f[] vertices) {
+    //omit
+  }
+
+  @Override
   public void delete() {
     glBindVertexArray(vaoId);
     glDeleteBuffers(vbo);
@@ -107,15 +118,8 @@ public class GLMeshVBO implements VBO {
     glBindVertexArray(0);
   }
 
-  public void setInstances(IntegerReference instances) {
-    this.instances = instances;
-  }
-
-  public void setInstances(int instances) {
+  public void setInstancesValue(int instances) {
     this.instances.setValue(instances);
   }
 
-  public void setDrawInstanced(boolean vDrawInstanced) {
-    drawInstanced = vDrawInstanced;
-  }
 }

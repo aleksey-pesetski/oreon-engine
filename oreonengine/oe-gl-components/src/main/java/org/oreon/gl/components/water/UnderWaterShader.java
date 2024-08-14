@@ -4,7 +4,7 @@ import org.oreon.core.context.ContextHolder;
 import org.oreon.core.gl.context.GLOreonContext;
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.gl.texture.GLTexture;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
@@ -23,7 +23,7 @@ public class UnderWaterShader extends GLShaderProgram {
   protected UnderWaterShader() {
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/water/underwater.comp"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/water/underwater.comp"));
 
     compileShader();
 

@@ -7,42 +7,36 @@ import static org.lwjgl.opengl.GL15.glGenBuffers;
 import static org.lwjgl.opengl.GL30.glBindBufferBase;
 
 import java.nio.ByteBuffer;
-
 import lombok.Getter;
 
 public abstract class VertexInputBuffer {
 
   @Getter
-  private int handle;
-  private int target;
+  private final int handle;
+  private final int target;
 
-  public VertexInputBuffer(int target) {
-
-    handle = glGenBuffers();
+  protected VertexInputBuffer(int target) {
+    this.handle = glGenBuffers();
+    this.target = target;
   }
 
   public void bind() {
-
     glBindBuffer(target, handle);
   }
 
   public void unbind() {
-
     glBindBuffer(target, 0);
   }
 
   public void bindBufferBase(int binding) {
-
     glBindBufferBase(target, binding, handle);
   }
 
   public void allocate(ByteBuffer data, int usage) {
-
     glBufferData(target, data, usage);
   }
 
   public void delete() {
-
     glDeleteBuffers(handle);
   }
 }

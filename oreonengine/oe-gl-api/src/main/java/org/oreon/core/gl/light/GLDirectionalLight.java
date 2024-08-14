@@ -15,20 +15,18 @@ public class GLDirectionalLight extends DirectionalLight {
   private GLUniformBuffer ubo_matrices;
 
   public GLDirectionalLight() {
-
     super();
 
     ubo_light = new GLUniformBuffer();
-    getUbo_light().setBinding_point_index(Constants.DirectionalLightUniformBlockBinding);
+    getUbo_light().setBindingPointIndex(Constants.DirectionalLightUniformBlockBinding);
     getUbo_light().bindBufferBase();
     getUbo_light().allocate(getLightBufferSize());
     getUbo_light().updateData(getFloatBufferLight(), getLightBufferSize());
 
     ubo_matrices = new GLUniformBuffer();
-    getUbo_matrices().setBinding_point_index(Constants.LightMatricesUniformBlockBinding);
+    getUbo_matrices().setBindingPointIndex(Constants.LightMatricesUniformBlockBinding);
     getUbo_matrices().bindBufferBase();
     getUbo_matrices().allocate(getMatricesBufferSize());
-
     getUbo_matrices().updateData(getFloatBufferMatrices(), getMatricesBufferSize());
 
     setOcclusionQuery(new GLOcclusionQuery());
@@ -37,7 +35,6 @@ public class GLDirectionalLight extends DirectionalLight {
   }
 
   public void updateLightUbo() {
-
     getUbo_light().updateData(getFloatBufferLight(), getLightBufferSize());
   }
 

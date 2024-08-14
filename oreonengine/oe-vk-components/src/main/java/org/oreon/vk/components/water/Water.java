@@ -1,7 +1,6 @@
 package org.oreon.vk.components.water;
 
 import static org.lwjgl.system.MemoryUtil.memAlloc;
-import static org.lwjgl.system.MemoryUtil.memAllocLong;
 import static org.lwjgl.vulkan.VK10.VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
 import static org.lwjgl.vulkan.VK10.VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 import static org.lwjgl.vulkan.VK10.VK_ACCESS_MEMORY_READ_BIT;
@@ -34,10 +33,10 @@ import static org.lwjgl.vulkan.VK10.VK_SHADER_STAGE_GEOMETRY_BIT;
 import static org.lwjgl.vulkan.VK10.VK_SUBPASS_EXTERNAL;
 
 import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkPhysicalDeviceMemoryProperties;
@@ -52,7 +51,7 @@ import org.oreon.core.scenegraph.NodeComponentType;
 import org.oreon.core.scenegraph.RenderList;
 import org.oreon.core.scenegraph.Renderable;
 import org.oreon.core.scenegraph.Scenegraph;
-import org.oreon.core.target.FrameBufferObject.Attachment;
+import org.oreon.core.target.Attachment;
 import org.oreon.core.util.BufferUtil;
 import org.oreon.core.util.Constants;
 import org.oreon.core.util.MeshGenerator;
@@ -68,7 +67,6 @@ import org.oreon.core.vk.device.LogicalDevice;
 import org.oreon.core.vk.device.VkDeviceBundle;
 import org.oreon.core.vk.framebuffer.FrameBufferColorAttachment;
 import org.oreon.core.vk.framebuffer.FrameBufferDepthAttachment;
-import org.oreon.core.vk.framebuffer.VkFrameBuffer;
 import org.oreon.core.vk.framebuffer.VkFrameBufferObject;
 import org.oreon.core.vk.image.VkImage;
 import org.oreon.core.vk.image.VkImageView;
@@ -95,46 +93,48 @@ import org.oreon.vk.components.util.NormalRenderer;
 public class Water extends Renderable {
 
   @Getter
-  private WaterConfig waterConfig;
+  private final WaterConfig waterConfig;
 
-  private long systemTime = System.currentTimeMillis();
-  private FFT fft;
-  private NormalRenderer normalRenderer;
-  private Vec4f clipplane;
-  private float clip_offset;
-  private float motion;
-  private float distortion;
-  private VkImage image_dudv;
-  private VkImageView imageView_dudv;
+  private final FFT fft;
+  private final NormalRenderer normalRenderer;
+  private final Vec4f clipplane;
+  private final float clip_offset;
+  private final VkImage image_dudv;
+  private final VkImageView imageView_dudv;
 
-  private VkUniformBuffer uniformBuffer;
+  private final VkUniformBuffer uniformBuffer;
 
-  private VkSampler dxSampler;
-  private VkSampler dySampler;
-  private VkSampler dzSampler;
-  private VkSampler dudvSampler;
-  private VkSampler normalSampler;
-  private VkSampler reflectionSampler;
-  private VkSampler refractionSampler;
+  private final VkSampler dxSampler;
+  private final VkSampler dySampler;
+  private final VkSampler dzSampler;
+  private final VkSampler dudvSampler;
+  private final VkSampler normalSampler;
+  private final VkSampler reflectionSampler;
+  private final VkSampler refractionSampler;
 
   // Reflection/Refraction Resources
-  private VkFrameBufferObject reflectionFbo;
-  private VkFrameBufferObject refractionFbo;
+  private final VkFrameBufferObject reflectionFbo;
+  private final VkFrameBufferObject refractionFbo;
 
-  private RenderList offScreenReflectionRenderList;
-  private LinkedHashMap<String, CommandBuffer> reflectionSecondaryCmdBuffers;
-  private PrimaryCmdBuffer offscreenReflectionCmdBuffer;
-  private SubmitInfo offScreenReflectionSubmitInfo;
-  private Fence reflectionFence;
+  private final RenderList offScreenReflectionRenderList;
+  private final Map<String, CommandBuffer> reflectionSecondaryCmdBuffers;
+  private final PrimaryCmdBuffer offscreenReflectionCmdBuffer;
+  private final SubmitInfo offScreenReflectionSubmitInfo;
+  private final Fence reflectionFence;
 
-  private RenderList offScreenRefractionRenderList;
-  private LinkedHashMap<String, CommandBuffer> refractionSecondaryCmdBuffers;
-  private PrimaryCmdBuffer offscreenRefractionCmdBuffer;
-  private SubmitInfo offScreenRefractionSubmitInfo;
-  private Fence refractionFence;
+  private final RenderList offScreenRefractionRenderList;
+  private final LinkedHashMap<String, CommandBuffer> refractionSecondaryCmdBuffers;
+  private final PrimaryCmdBuffer offscreenRefractionCmdBuffer;
+  private final SubmitInfo offScreenRefractionSubmitInfo;
+  private final Fence refractionFence;
 
   // queues for render reflection/refraction
-  private VkQueue graphicsQueue;
+  private final VkQueue graphicsQueue;
+
+  private float motion;
+  private float distortion;
+
+  private long systemTime = System.currentTimeMillis();
 
   public Water() {
     final VkOreonContext context = (VkOreonContext) ContextHolder.getContext();
@@ -148,8 +148,8 @@ public class Water extends Renderable {
 
     offScreenReflectionRenderList = new RenderList();
     offScreenRefractionRenderList = new RenderList();
-    reflectionSecondaryCmdBuffers = new LinkedHashMap<String, CommandBuffer>();
-    refractionSecondaryCmdBuffers = new LinkedHashMap<String, CommandBuffer>();
+    reflectionSecondaryCmdBuffers = new LinkedHashMap<>();
+    refractionSecondaryCmdBuffers = new LinkedHashMap<>();
     reflectionFbo = new ReflectionRefractionFbo(device.getHandle(), memoryProperties);
     refractionFbo = new ReflectionRefractionFbo(device.getHandle(), memoryProperties);
     context.getResources().setReflectionFbo(reflectionFbo);
@@ -513,7 +513,6 @@ public class Water extends Renderable {
 
   @Override
   public void shutdown() {
-
     super.shutdown();
 
     fft.destroy();
@@ -537,23 +536,30 @@ public class Water extends Renderable {
   }
 
 
-  public class ReflectionRefractionFbo extends VkFrameBufferObject {
+  public static class ReflectionRefractionFbo extends VkFrameBufferObject {
 
     public ReflectionRefractionFbo(VkDevice device,
         VkPhysicalDeviceMemoryProperties memoryProperties) {
+      super(
+          ContextHolder.getContext().getConfig().getFrameWidth() / 2,
+          ContextHolder.getContext().getConfig().getFrameHeight() / 2,
+          1,
+          device,
+          (width, height) -> Map.of(
+              Attachment.COLOR, new FrameBufferColorAttachment(device, memoryProperties,
+                  width, height, VK_FORMAT_R16G16B16A16_SFLOAT, 1),
+              Attachment.DEPTH, new FrameBufferDepthAttachment(device, memoryProperties,
+                  width, height, VK_FORMAT_D16_UNORM, 1)
+          ));
+    }
 
-      width = ContextHolder.getContext().getConfig().getFrameWidth() / 2;
-      height = ContextHolder.getContext().getConfig().getFrameHeight() / 2;
+    @Override
+    protected Map<Attachment, VkImageBundle> configureAttachments(int width, int height) {
+      return Map.of();
+    }
 
-      VkImageBundle albedoBuffer = new FrameBufferColorAttachment(device, memoryProperties, width, height,
-          VK_FORMAT_R16G16B16A16_SFLOAT, 1);
-      VkImageBundle depthBuffer = new FrameBufferDepthAttachment(device, memoryProperties, width, height,
-          VK_FORMAT_D16_UNORM, 1);
-
-      attachments.put(Attachment.COLOR, albedoBuffer);
-      attachments.put(Attachment.DEPTH, depthBuffer);
-
-      renderPass = new RenderPass(device);
+    @Override
+    protected RenderPass configureRenderPass(final RenderPass renderPass) {
       renderPass.addColorAttachment(0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
           VK_FORMAT_R16G16B16A16_SFLOAT, 1, VK_IMAGE_LAYOUT_UNDEFINED,
           VK_IMAGE_LAYOUT_GENERAL);
@@ -576,16 +582,7 @@ public class Water extends Renderable {
 
       renderPass.createSubpass();
       renderPass.createRenderPass();
-
-      depthAttachmentCount = 1;
-      colorAttachmentCount = renderPass.getAttachmentCount() - depthAttachmentCount;
-
-      LongBuffer pImageViews = memAllocLong(renderPass.getAttachmentCount());
-      pImageViews.put(0, attachments.get(Attachment.COLOR).getImageView().getHandle());
-      pImageViews.put(1, attachments.get(Attachment.DEPTH).getImageView().getHandle());
-
-      frameBuffer = new VkFrameBuffer(device, width, height, 1,
-          pImageViews, renderPass.getHandle());
+      return null;
     }
   }
 }

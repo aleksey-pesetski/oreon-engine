@@ -9,11 +9,11 @@ import org.oreon.core.scenegraph.Scenegraph;
 @Getter
 public abstract class BaseOreonRenderEngine implements OreonRenderEngine {
 
-  private Scenegraph sceneGraph;
-  private Config config;
-  private BaseOreonCamera camera;
+  private final Scenegraph sceneGraph;
+  private final Config config;
+  private final BaseOreonCamera camera;
 
-  public BaseOreonRenderEngine(Config config, BaseOreonCamera camera) {
+  protected BaseOreonRenderEngine(Config config, BaseOreonCamera camera) {
     this.config = config;
     this.camera = camera;
     this.sceneGraph = new Scenegraph();
@@ -33,7 +33,6 @@ public abstract class BaseOreonRenderEngine implements OreonRenderEngine {
 
   @Override
   public void shutdown() {
-
     // important to shutdown scenegraph before render-engine, since
     // thread safety of instancing clusters.
     // scenegraph sets isRunning to false, render-engine signals all

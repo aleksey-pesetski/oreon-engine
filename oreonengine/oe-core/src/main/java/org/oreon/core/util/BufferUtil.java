@@ -1,13 +1,20 @@
 package org.oreon.core.util;
 
 import static org.lwjgl.system.MemoryUtil.memAlloc;
+import static org.oreon.core.model.Vertex.VertexLayout.POS2D;
+import static org.oreon.core.model.Vertex.VertexLayout.POS2D_UV;
+import static org.oreon.core.model.Vertex.VertexLayout.POS_NORMAL;
+import static org.oreon.core.model.Vertex.VertexLayout.POS_NORMAL_UV;
+import static org.oreon.core.model.Vertex.VertexLayout.POS_NORMAL_UV_TAN_BITAN;
+import static org.oreon.core.model.Vertex.VertexLayout.POS_UV;
 
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.List;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
 import org.oreon.core.math.Matrix4f;
 import org.oreon.core.math.Vec2f;
@@ -17,6 +24,11 @@ import org.oreon.core.model.Vertex;
 import org.oreon.core.model.Vertex.VertexLayout;
 
 public class BufferUtil {
+
+  private static final Logger log = LogManager.getLogger(BufferUtil.class);
+
+  private BufferUtil() {
+  }
 
   public static FloatBuffer createFloatBuffer(int size) {
     return BufferUtils.createFloatBuffer(size);
@@ -31,7 +43,7 @@ public class BufferUtil {
   }
 
   public static IntBuffer createFlippedBuffer(int... values) {
-    IntBuffer buffer = createIntBuffer(values.length);
+    final IntBuffer buffer = createIntBuffer(values.length);
     buffer.put(values);
     buffer.flip();
 
@@ -39,7 +51,7 @@ public class BufferUtil {
   }
 
   public static FloatBuffer createFlippedBuffer(float... values) {
-    FloatBuffer buffer = createFloatBuffer(values.length);
+    final FloatBuffer buffer = createFloatBuffer(values.length);
     buffer.put(values);
     buffer.flip();
 
@@ -47,7 +59,7 @@ public class BufferUtil {
   }
 
   public static DoubleBuffer createFlippedBuffer(double... values) {
-    DoubleBuffer buffer = createDoubleBuffer(values.length);
+    final DoubleBuffer buffer = createDoubleBuffer(values.length);
     buffer.put(values);
     buffer.flip();
 
@@ -55,25 +67,28 @@ public class BufferUtil {
   }
 
   public static FloatBuffer createFlippedBufferAOS(Vertex[] vertices) {
-    FloatBuffer buffer = createFloatBuffer(vertices.length * Vertex.FLOATS);
+    final FloatBuffer buffer = createFloatBuffer(vertices.length * Vertex.FLOATS);
 
-    for (int i = 0; i < vertices.length; i++) {
-      buffer.put(vertices[i].getPosition().getX());
-      buffer.put(vertices[i].getPosition().getY());
-      buffer.put(vertices[i].getPosition().getZ());
-      buffer.put(vertices[i].getNormal().getX());
-      buffer.put(vertices[i].getNormal().getY());
-      buffer.put(vertices[i].getNormal().getZ());
-      buffer.put(vertices[i].getUVCoord().getX());
-      buffer.put(vertices[i].getUVCoord().getY());
+    for (Vertex vertex : vertices) {
+      buffer.put(vertex.getPosition().getX());
+      buffer.put(vertex.getPosition().getY());
+      buffer.put(vertex.getPosition().getZ());
 
-      if (vertices[i].getTangent() != null && vertices[i].getBitangent() != null) {
-        buffer.put(vertices[i].getTangent().getX());
-        buffer.put(vertices[i].getTangent().getY());
-        buffer.put(vertices[i].getTangent().getZ());
-        buffer.put(vertices[i].getBitangent().getX());
-        buffer.put(vertices[i].getBitangent().getY());
-        buffer.put(vertices[i].getBitangent().getZ());
+      buffer.put(vertex.getNormal().getX());
+      buffer.put(vertex.getNormal().getY());
+      buffer.put(vertex.getNormal().getZ());
+
+      buffer.put(vertex.getUVCoord().getX());
+      buffer.put(vertex.getUVCoord().getY());
+
+      if (vertex.getTangent() != null && vertex.getBitangent() != null) {
+        buffer.put(vertex.getTangent().getX());
+        buffer.put(vertex.getTangent().getY());
+        buffer.put(vertex.getTangent().getZ());
+
+        buffer.put(vertex.getBitangent().getX());
+        buffer.put(vertex.getBitangent().getY());
+        buffer.put(vertex.getBitangent().getZ());
       }
     }
 
@@ -83,23 +98,19 @@ public class BufferUtil {
   }
 
   public static FloatBuffer createFlippedBufferSOA(Vertex[] vertices) {
-    FloatBuffer buffer = createFloatBuffer(vertices.length * Vertex.FLOATS);
+    final FloatBuffer buffer = createFloatBuffer(vertices.length * Vertex.FLOATS);
 
-    for (int i = 0; i < vertices.length; i++) {
-      buffer.put(vertices[i].getPosition().getX());
-      buffer.put(vertices[i].getPosition().getY());
-      buffer.put(vertices[i].getPosition().getZ());
-    }
+    for (Vertex vertex : vertices) {
+      buffer.put(vertex.getPosition().getX());
+      buffer.put(vertex.getPosition().getY());
+      buffer.put(vertex.getPosition().getZ());
 
-    for (int i = 0; i < vertices.length; i++) {
-      buffer.put(vertices[i].getNormal().getX());
-      buffer.put(vertices[i].getNormal().getY());
-      buffer.put(vertices[i].getNormal().getZ());
-    }
+      buffer.put(vertex.getNormal().getX());
+      buffer.put(vertex.getNormal().getY());
+      buffer.put(vertex.getNormal().getZ());
 
-    for (int i = 0; i < vertices.length; i++) {
-      buffer.put(vertices[i].getUVCoord().getX());
-      buffer.put(vertices[i].getUVCoord().getY());
+      buffer.put(vertex.getUVCoord().getX());
+      buffer.put(vertex.getUVCoord().getY());
     }
 
     buffer.flip();
@@ -108,12 +119,12 @@ public class BufferUtil {
   }
 
   public static FloatBuffer createFlippedBuffer(Vec3f[] vector) {
-    FloatBuffer buffer = createFloatBuffer(vector.length * Float.BYTES * 3);
+    final FloatBuffer buffer = createFloatBuffer(vector.length * Float.BYTES * 3);
 
-    for (int i = 0; i < vector.length; i++) {
-      buffer.put(vector[i].getX());
-      buffer.put(vector[i].getY());
-      buffer.put(vector[i].getZ());
+    for (Vec3f vec3f : vector) {
+      buffer.put(vec3f.getX());
+      buffer.put(vec3f.getY());
+      buffer.put(vec3f.getZ());
     }
 
     buffer.flip();
@@ -122,13 +133,13 @@ public class BufferUtil {
   }
 
   public static FloatBuffer createFlippedBuffer(Vec4f[] vector) {
-    FloatBuffer buffer = createFloatBuffer(vector.length * Float.BYTES * 4);
+    final FloatBuffer buffer = createFloatBuffer(vector.length * Float.BYTES * 4);
 
-    for (int i = 0; i < vector.length; i++) {
-      buffer.put(vector[i].getX());
-      buffer.put(vector[i].getY());
-      buffer.put(vector[i].getZ());
-      buffer.put(vector[i].getW());
+    for (Vec4f vec4f : vector) {
+      buffer.put(vec4f.getX());
+      buffer.put(vec4f.getY());
+      buffer.put(vec4f.getZ());
+      buffer.put(vec4f.getW());
     }
 
     buffer.flip();
@@ -137,7 +148,7 @@ public class BufferUtil {
   }
 
   public static FloatBuffer createFlippedBuffer(Vec3f vector) {
-    FloatBuffer buffer = createFloatBuffer(Float.BYTES * 3);
+    final FloatBuffer buffer = createFloatBuffer(Float.BYTES * 3);
 
     buffer.put(vector.getX());
     buffer.put(vector.getY());
@@ -149,7 +160,7 @@ public class BufferUtil {
   }
 
   public static FloatBuffer createFlippedBuffer(Vec2f vector) {
-    FloatBuffer buffer = createFloatBuffer(Float.BYTES * 2);
+    final FloatBuffer buffer = createFloatBuffer(Float.BYTES * 2);
 
     buffer.put(vector.getX());
     buffer.put(vector.getY());
@@ -160,7 +171,7 @@ public class BufferUtil {
   }
 
   public static FloatBuffer createFlippedBuffer(Vec4f vector) {
-    FloatBuffer buffer = createFloatBuffer(Float.BYTES * 4);
+    final FloatBuffer buffer = createFloatBuffer(Float.BYTES * 4);
 
     buffer.put(vector.getX());
     buffer.put(vector.getY());
@@ -173,11 +184,11 @@ public class BufferUtil {
   }
 
   public static FloatBuffer createFlippedBuffer(Vec2f[] vector) {
-    FloatBuffer buffer = createFloatBuffer(vector.length * Float.BYTES * 2);
+    final FloatBuffer buffer = createFloatBuffer(vector.length * Float.BYTES * 2);
 
-    for (int i = 0; i < vector.length; i++) {
-      buffer.put(vector[i].getX());
-      buffer.put(vector[i].getY());
+    for (Vec2f vec2f : vector) {
+      buffer.put(vec2f.getX());
+      buffer.put(vec2f.getY());
     }
 
     buffer.flip();
@@ -186,7 +197,7 @@ public class BufferUtil {
   }
 
   public static FloatBuffer createFlippedBuffer(List<Vec2f> vector) {
-    FloatBuffer buffer = createFloatBuffer(vector.size() * Float.BYTES * 2);
+    final FloatBuffer buffer = createFloatBuffer(vector.size() * Float.BYTES * 2);
 
     for (Vec2f v : vector) {
       buffer.put(v.getX());
@@ -199,7 +210,7 @@ public class BufferUtil {
   }
 
   public static FloatBuffer createFlippedBuffer(Matrix4f matrix) {
-    FloatBuffer buffer = createFloatBuffer(4 * 4);
+    final FloatBuffer buffer = createFloatBuffer(4 * 4);
 
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
@@ -229,106 +240,93 @@ public class BufferUtil {
   }
 
   public static ByteBuffer createByteBuffer(Matrix4f matrix) {
-
-    ByteBuffer byteBuffer = memAlloc(Float.BYTES * 16);
-    FloatBuffer floatBuffer = byteBuffer.asFloatBuffer();
+    final ByteBuffer byteBuffer = memAlloc(Float.BYTES * 16);
+    final FloatBuffer floatBuffer = byteBuffer.asFloatBuffer();
     floatBuffer.put(BufferUtil.createFlippedBuffer(matrix));
 
     return byteBuffer;
   }
 
   public static ByteBuffer createByteBuffer(Vec3f vector) {
-
-    ByteBuffer byteBuffer = memAlloc(Float.BYTES * 3);
-    FloatBuffer floatBuffer = byteBuffer.asFloatBuffer();
+    final ByteBuffer byteBuffer = memAlloc(Float.BYTES * 3);
+    final FloatBuffer floatBuffer = byteBuffer.asFloatBuffer();
     floatBuffer.put(BufferUtil.createFlippedBuffer(vector));
 
     return byteBuffer;
   }
 
   public static ByteBuffer createByteBuffer(Vec2f[] vertices) {
-
     ByteBuffer byteBuffer = memAlloc(Float.BYTES * 2 * vertices.length);
     FloatBuffer floatBuffer = byteBuffer.asFloatBuffer();
 
-    for (int i = 0; i < vertices.length; i++) {
-      floatBuffer.put(vertices[i].getX());
-      floatBuffer.put(vertices[i].getY());
+    for (Vec2f vertex : vertices) {
+      floatBuffer.put(vertex.getX());
+      floatBuffer.put(vertex.getY());
     }
 
     return byteBuffer;
   }
 
   public static ByteBuffer createByteBuffer(Vec3f[] vertices) {
+    final ByteBuffer byteBuffer = memAlloc(Float.BYTES * 3 * vertices.length);
+    final FloatBuffer floatBuffer = byteBuffer.asFloatBuffer();
 
-    ByteBuffer byteBuffer = memAlloc(Float.BYTES * 3 * vertices.length);
-    FloatBuffer floatBuffer = byteBuffer.asFloatBuffer();
-
-    for (int i = 0; i < vertices.length; i++) {
-      floatBuffer.put(vertices[i].getX());
-      floatBuffer.put(vertices[i].getY());
-      floatBuffer.put(vertices[i].getZ());
+    for (Vec3f vertex : vertices) {
+      floatBuffer.put(vertex.getX());
+      floatBuffer.put(vertex.getY());
+      floatBuffer.put(vertex.getZ());
     }
 
     return byteBuffer;
   }
 
   public static ByteBuffer createByteBuffer(Vec4f[] vertices) {
+    final ByteBuffer byteBuffer = memAlloc(Float.BYTES * 4 * vertices.length);
+    final FloatBuffer floatBuffer = byteBuffer.asFloatBuffer();
 
-    ByteBuffer byteBuffer = memAlloc(Float.BYTES * 4 * vertices.length);
-    FloatBuffer floatBuffer = byteBuffer.asFloatBuffer();
-
-    for (int i = 0; i < vertices.length; i++) {
-      floatBuffer.put(vertices[i].getX());
-      floatBuffer.put(vertices[i].getY());
-      floatBuffer.put(vertices[i].getZ());
-      floatBuffer.put(vertices[i].getW());
+    for (Vec4f vertex : vertices) {
+      floatBuffer.put(vertex.getX());
+      floatBuffer.put(vertex.getY());
+      floatBuffer.put(vertex.getZ());
+      floatBuffer.put(vertex.getW());
     }
 
     return byteBuffer;
   }
 
   public static ByteBuffer createByteBuffer(Vertex[] vertices, VertexLayout layout) {
+    final ByteBuffer byteBuffer = allocateVertexByteBuffer(layout, vertices.length);
+    final FloatBuffer floatBuffer = byteBuffer.asFloatBuffer();
 
-    ByteBuffer byteBuffer = allocateVertexByteBuffer(layout, vertices.length);
-    FloatBuffer floatBuffer = byteBuffer.asFloatBuffer();
-
-    for (int i = 0; i < vertices.length; i++) {
-      if (layout == VertexLayout.POS2D ||
-          layout == VertexLayout.POS2D_UV) {
-        floatBuffer.put(vertices[i].getPosition().getX());
-        floatBuffer.put(vertices[i].getPosition().getY());
+    for (Vertex vertex : vertices) {
+      if (layout == POS2D || layout == POS2D_UV) {
+        floatBuffer.put(vertex.getPosition().getX());
+        floatBuffer.put(vertex.getPosition().getY());
       } else {
-        floatBuffer.put(vertices[i].getPosition().getX());
-        floatBuffer.put(vertices[i].getPosition().getY());
-        floatBuffer.put(vertices[i].getPosition().getZ());
+        floatBuffer.put(vertex.getPosition().getX());
+        floatBuffer.put(vertex.getPosition().getY());
+        floatBuffer.put(vertex.getPosition().getZ());
       }
 
-      if (layout == VertexLayout.POS_NORMAL ||
-          layout == VertexLayout.POS_NORMAL_UV ||
-          layout == VertexLayout.POS_NORMAL_UV_TAN_BITAN) {
-
-        floatBuffer.put(vertices[i].getNormal().getX());
-        floatBuffer.put(vertices[i].getNormal().getY());
-        floatBuffer.put(vertices[i].getNormal().getZ());
+      if (layout == POS_NORMAL || layout == POS_NORMAL_UV || layout == POS_NORMAL_UV_TAN_BITAN) {
+        floatBuffer.put(vertex.getNormal().getX());
+        floatBuffer.put(vertex.getNormal().getY());
+        floatBuffer.put(vertex.getNormal().getZ());
       }
 
-      if (layout == VertexLayout.POS_NORMAL_UV ||
-          layout == VertexLayout.POS_UV ||
-          layout == VertexLayout.POS_NORMAL_UV_TAN_BITAN ||
-          layout == VertexLayout.POS2D_UV) {
-        floatBuffer.put(vertices[i].getUVCoord().getX());
-        floatBuffer.put(vertices[i].getUVCoord().getY());
+      if (layout == POS_NORMAL_UV || layout == POS_UV || layout == POS_NORMAL_UV_TAN_BITAN || layout == POS2D_UV) {
+        floatBuffer.put(vertex.getUVCoord().getX());
+        floatBuffer.put(vertex.getUVCoord().getY());
       }
 
-      if (layout == VertexLayout.POS_NORMAL_UV_TAN_BITAN) {
+      if (layout == POS_NORMAL_UV_TAN_BITAN) {
+        floatBuffer.put(vertex.getTangent().getX());
+        floatBuffer.put(vertex.getTangent().getY());
+        floatBuffer.put(vertex.getTangent().getZ());
 
-        floatBuffer.put(vertices[i].getTangent().getX());
-        floatBuffer.put(vertices[i].getTangent().getY());
-        floatBuffer.put(vertices[i].getTangent().getZ());
-        floatBuffer.put(vertices[i].getBitangent().getX());
-        floatBuffer.put(vertices[i].getBitangent().getY());
-        floatBuffer.put(vertices[i].getBitangent().getZ());
+        floatBuffer.put(vertex.getBitangent().getX());
+        floatBuffer.put(vertex.getBitangent().getY());
+        floatBuffer.put(vertex.getBitangent().getZ());
       }
     }
 
@@ -336,9 +334,8 @@ public class BufferUtil {
   }
 
   public static ByteBuffer createByteBuffer(int... values) {
-
-    ByteBuffer byteBuffer = memAlloc(Integer.BYTES * values.length);
-    IntBuffer intBuffer = byteBuffer.asIntBuffer();
+    final ByteBuffer byteBuffer = memAlloc(Integer.BYTES * values.length);
+    final IntBuffer intBuffer = byteBuffer.asIntBuffer();
     intBuffer.put(values);
     intBuffer.flip();
 
@@ -346,9 +343,8 @@ public class BufferUtil {
   }
 
   public static ByteBuffer createByteBuffer(float... values) {
-
-    ByteBuffer byteBuffer = memAlloc(Float.BYTES * values.length);
-    FloatBuffer intBuffer = byteBuffer.asFloatBuffer();
+    final ByteBuffer byteBuffer = memAlloc(Float.BYTES * values.length);
+    final FloatBuffer intBuffer = byteBuffer.asFloatBuffer();
     intBuffer.put(values);
     intBuffer.flip();
 
@@ -356,9 +352,8 @@ public class BufferUtil {
   }
 
   public static ByteBuffer createByteBuffer(FloatBuffer floatBuffer) {
-
-    ByteBuffer byteBuffer = memAlloc(Float.BYTES * floatBuffer.limit());
-    FloatBuffer intBuffer = byteBuffer.asFloatBuffer();
+    final ByteBuffer byteBuffer = memAlloc(Float.BYTES * floatBuffer.limit());
+    final FloatBuffer intBuffer = byteBuffer.asFloatBuffer();
     intBuffer.put(floatBuffer);
     intBuffer.flip();
 
@@ -366,44 +361,24 @@ public class BufferUtil {
   }
 
   public static ByteBuffer createByteBuffer(Vec2f vector) {
-
     return createByteBuffer(createFlippedBuffer(vector));
   }
 
   public static ByteBuffer allocateVertexByteBuffer(VertexLayout layout, int vertexCount) {
-
-    ByteBuffer byteBuffer;
-
-    switch (layout) {
-      case POS2D:
-        byteBuffer = memAlloc(Float.BYTES * 2 * vertexCount);
-        break;
-      case POS:
-        byteBuffer = memAlloc(Float.BYTES * 3 * vertexCount);
-        break;
-      case POS_UV:
-        byteBuffer = memAlloc(Float.BYTES * 5 * vertexCount);
-        break;
-      case POS2D_UV:
-        byteBuffer = memAlloc(Float.BYTES * 4 * vertexCount);
-        break;
-      case POS_NORMAL:
-        byteBuffer = memAlloc(Float.BYTES * 6 * vertexCount);
-        break;
-      case POS_NORMAL_UV:
-        byteBuffer = memAlloc(Float.BYTES * 8 * vertexCount);
-        break;
-      case POS_NORMAL_UV_TAN_BITAN:
-        byteBuffer = memAlloc(Float.BYTES * 14 * vertexCount);
-        break;
-      default:
-        byteBuffer = memAlloc(0);
-    }
-    return byteBuffer;
+    return switch (layout) {
+      case POS2D -> memAlloc(Float.BYTES * 2 * vertexCount);
+      case POS -> memAlloc(Float.BYTES * 3 * vertexCount);
+      case POS_UV -> memAlloc(Float.BYTES * 5 * vertexCount);
+      case POS2D_UV -> memAlloc(Float.BYTES * 4 * vertexCount);
+      case POS_NORMAL -> memAlloc(Float.BYTES * 6 * vertexCount);
+      case POS_NORMAL_UV -> memAlloc(Float.BYTES * 8 * vertexCount);
+      case POS_NORMAL_UV_TAN_BITAN -> memAlloc(Float.BYTES * 14 * vertexCount);
+      default -> memAlloc(0);
+    };
   }
 
   public static ByteBuffer resizeBuffer(ByteBuffer buffer, int newCapacity) {
-    ByteBuffer newBuffer = BufferUtils.createByteBuffer(newCapacity);
+    final ByteBuffer newBuffer = BufferUtils.createByteBuffer(newCapacity);
     buffer.flip();
     newBuffer.put(buffer);
     return newBuffer;

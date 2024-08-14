@@ -25,7 +25,7 @@ import org.oreon.core.instanced.InstancedHandler;
 import org.oreon.core.light.LightHandler;
 import org.oreon.core.scenegraph.RenderList;
 import org.oreon.core.scenegraph.Renderable;
-import org.oreon.core.target.FrameBufferObject.Attachment;
+import org.oreon.core.target.Attachment;
 import org.oreon.gl.components.filter.bloom.Bloom;
 import org.oreon.gl.components.filter.contrast.ContrastController;
 import org.oreon.gl.components.filter.dofblur.DepthOfField;
@@ -43,27 +43,21 @@ import org.oreon.gl.engine.transparency.OpaqueTransparencyBlending;
 
 public class GLDeferredEngine extends BaseOreonRenderEngine {
 
+  private final GLResources resources;
   private RenderList opaqueSceneRenderList;
   private RenderList transparencySceneRenderList;
-
   private GLFrameBufferObject primarySceneFbo;
   private GLFrameBufferObject secondarySceneFbo;
-
   private FullScreenQuad fullScreenQuad;
   private FullScreenMultisampleQuad fullScreenQuadMultisample;
   private SampleCoverage sampleCoverage;
   private FXAA fxaa;
-
   private InstancedHandler instancingObjectHandler;
-
   private DeferredLighting deferredLighting;
   private OpaqueTransparencyBlending opaqueTransparencyBlending;
-
   @Setter
   private GLGUI gui;
-
   private ParallelSplitShadowMapsFbo pssmFbo;
-
   // post processing effects
   private MotionBlur motionBlur;
   private DepthOfField depthOfField;
@@ -73,7 +67,6 @@ public class GLDeferredEngine extends BaseOreonRenderEngine {
   private SSAO ssao;
   private UnderWaterRenderer underWaterRenderer;
   private ContrastController contrastController;
-
   private boolean renderAlbedoBuffer = false;
   private boolean renderNormalBuffer = false;
   private boolean renderPositionBuffer = false;
@@ -81,8 +74,6 @@ public class GLDeferredEngine extends BaseOreonRenderEngine {
   private boolean renderDeferredLightingScene = false;
   private boolean renderSSAOBuffer = false;
   private boolean renderPostProcessingEffects = true;
-
-  private final GLResources resources;
 
   public GLDeferredEngine(final Config config, final GLCamera camera, final GLResources resources) {
     super(config, camera);
@@ -156,9 +147,9 @@ public class GLDeferredEngine extends BaseOreonRenderEngine {
     GLUtil.clearScreen();
     secondarySceneFbo.bind();
     GLUtil.clearScreen();
-    pssmFbo.getFbo().bind();
+    pssmFbo.getGlFramebuffer().bind();
     glClear(GL_DEPTH_BUFFER_BIT);
-    pssmFbo.getFbo().unbind();
+    pssmFbo.getGlFramebuffer().unbind();
 
     //----------------------------------//
     //      Record Render Objects       //
@@ -172,14 +163,20 @@ public class GLDeferredEngine extends BaseOreonRenderEngine {
 
     final OreonContext<?, ?, ?> context = ContextHolder.getContext();
     if (context.getConfig().isShadowsEnable()) {
-      pssmFbo.getFbo().bind();
+      pssmFbo.getGlFramebuffer().bind();
       pssmFbo.getConfig().enable();
-      glViewport(0, 0, context.getConfig().getShadowMapResolution(),
-          context.getConfig().getShadowMapResolution());
-      opaqueSceneRenderList.getValues().forEach(Renderable::renderShadows);
-      glViewport(0, 0, getConfig().getFrameWidth(), getConfig().getFrameHeight());
+      glViewport(0, 0,
+          context.getConfig().getShadowMapResolution(),
+          context.getConfig().getShadowMapResolution()
+      );
+      opaqueSceneRenderList.getValues()
+          .forEach(Renderable::renderShadows);
+      glViewport(0, 0,
+          getConfig().getFrameWidth(),
+          getConfig().getFrameHeight()
+      );
       pssmFbo.getConfig().disable();
-      pssmFbo.getFbo().unbind();
+      pssmFbo.getGlFramebuffer().unbind();
     }
 
     //----------------------------------------------//
@@ -499,11 +496,7 @@ public class GLDeferredEngine extends BaseOreonRenderEngine {
       }
     }
     if (ContextHolder.getContext().getInput().isKeyPushed(GLFW.GLFW_KEY_KP_9)) {
-      if (renderPostProcessingEffects) {
-        renderPostProcessingEffects = false;
-      } else {
-        renderPostProcessingEffects = true;
-      }
+      renderPostProcessingEffects = !renderPostProcessingEffects;
     }
 
     if (gui != null) {
@@ -519,7 +512,6 @@ public class GLDeferredEngine extends BaseOreonRenderEngine {
 
   @Override
   public void shutdown() {
-
     super.shutdown();
 
     instancingObjectHandler.signalAll();

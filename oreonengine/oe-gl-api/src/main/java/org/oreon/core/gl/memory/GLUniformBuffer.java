@@ -12,6 +12,8 @@ import static org.lwjgl.opengl.GL31.GL_UNIFORM_BUFFER;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Uniform Buffer Object
@@ -19,13 +21,17 @@ import java.nio.FloatBuffer;
 
 public class GLUniformBuffer {
 
-  private int ubo;
-  private int binding_point_index;
+  private final int ubo;
+  @Setter
+  @Getter
+  private int bindingPointIndex;
+  @Setter
+  @Getter
   private String bindingName;
 
   public GLUniformBuffer() {
     ubo = glGenBuffers();
-    bindingName = new String();
+    bindingName = "";
   }
 
   public void allocate(int bytes) {
@@ -39,7 +45,6 @@ public class GLUniformBuffer {
   }
 
   public void updateData(FloatBuffer buffer, int length) {
-
     glBindBuffer(GL_UNIFORM_BUFFER, ubo);
     ByteBuffer mappedBuffer = glMapBuffer(GL_UNIFORM_BUFFER, GL_READ_WRITE, length, null);
     mappedBuffer.clear();
@@ -56,7 +61,6 @@ public class GLUniformBuffer {
   }
 
   public void updateData(ByteBuffer buffer, int length) {
-
     glBindBuffer(GL_UNIFORM_BUFFER, ubo);
     ByteBuffer mappedBuffer = glMapBuffer(GL_UNIFORM_BUFFER, GL_READ_WRITE, length, null);
     mappedBuffer.clear();
@@ -72,26 +76,11 @@ public class GLUniformBuffer {
   }
 
   public void bindBufferBase() {
-    glBindBufferBase(GL_UNIFORM_BUFFER, binding_point_index, ubo);
+    glBindBufferBase(GL_UNIFORM_BUFFER, bindingPointIndex, ubo);
   }
 
   public void bindBufferBase(int index) {
     glBindBufferBase(GL_UNIFORM_BUFFER, index, ubo);
   }
 
-  public int getBinding_point_index() {
-    return binding_point_index;
-  }
-
-  public void setBinding_point_index(int binding_point_index) {
-    this.binding_point_index = binding_point_index;
-  }
-
-  public String getBindingName() {
-    return bindingName;
-  }
-
-  public void setBindingName(String bindingName) {
-    this.bindingName = bindingName;
-  }
 }

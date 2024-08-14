@@ -3,7 +3,8 @@ package org.oreon.core;
 import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
 import static org.lwjgl.glfw.GLFW.glfwTerminate;
 
-import java.util.concurrent.CompletableFuture;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.io.IoBuilder;
@@ -15,10 +16,13 @@ import org.oreon.core.util.Constants;
 @Log4j2
 public class CoreEngine {
 
+  public static float currentFrameTime = 0;
+  @Getter
+  @Setter
   private static int fps;
   private static float framerate = 1000;
+  @Getter
   private static float frameTime = 1.0f / framerate;
-  public static float currentFrameTime = 0;
   private boolean isRunning;
 
   private Window window;
@@ -131,17 +135,4 @@ public class CoreEngine {
     errorCallback.free();
     glfwTerminate();
   }
-
-  public static float getFrameTime() {
-    return frameTime;
-  }
-
-  public static int getFps() {
-    return fps;
-  }
-
-  public static void setFps(int fps) {
-    CoreEngine.fps = fps;
-  }
-
 }

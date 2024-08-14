@@ -7,7 +7,7 @@ import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.instanced.InstancedCluster;
 import org.oreon.core.scenegraph.Renderable;
 import org.oreon.core.util.Constants;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class BushShadowShader extends GLShaderProgram {
 
@@ -23,9 +23,9 @@ public class BushShadowShader extends GLShaderProgram {
   protected BushShadowShader() {
     super();
 
-    addVertexShader(ResourceLoader.loadShader("oreonworlds/shaders/assets/Bush_Shader/Bush01_VS.glsl"));
-    addGeometryShader(ResourceLoader.loadShader("oreonworlds/shaders/assets/Bush_Shader/Bush01Shadow_GS.glsl"));
-    addFragmentShader(ResourceLoader.loadShader("oreonworlds/shaders/assets/Bush_Shader/Bush01Shadow_FS.glsl"));
+    addVertexShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Bush_Shader/Bush01_VS.glsl"));
+    addGeometryShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Bush_Shader/Bush01Shadow_GS.glsl"));
+    addFragmentShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Bush_Shader/Bush01Shadow_FS.glsl"));
     compileShader();
 
     addUniform("clipplane");

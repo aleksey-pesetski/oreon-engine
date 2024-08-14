@@ -16,7 +16,7 @@ import java.nio.LongBuffer;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkPipelineShaderStageCreateInfo;
 import org.lwjgl.vulkan.VkShaderModuleCreateInfo;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 import org.oreon.core.vk.util.VkUtil;
 
 import lombok.Getter;
@@ -41,7 +41,7 @@ public class ShaderModule {
 
     ByteBuffer shaderCode = null;
     try {
-      shaderCode = ResourceLoader.ioResourceToByteBuffer(filePath, 1024);
+      shaderCode = ResourceLoaderUtils.ioResourceToByteBuffer(filePath, 1024);
     } catch (IOException e) {
       e.printStackTrace();
     }

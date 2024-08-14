@@ -1,7 +1,7 @@
 package org.oreon.gl.components.filter.contrast;
 
 import org.oreon.core.gl.pipeline.GLShaderProgram;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class ContrastShader extends GLShaderProgram {
 
@@ -17,7 +17,7 @@ public class ContrastShader extends GLShaderProgram {
   protected ContrastShader() {
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/filter/contrast/Contrast_CS.glsl"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/contrast/Contrast_CS.glsl"));
 
     compileShader();
 

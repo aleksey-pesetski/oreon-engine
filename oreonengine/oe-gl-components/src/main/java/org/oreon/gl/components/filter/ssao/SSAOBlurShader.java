@@ -1,7 +1,7 @@
 package org.oreon.gl.components.filter.ssao;
 
 import org.oreon.core.gl.pipeline.GLShaderProgram;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class SSAOBlurShader extends GLShaderProgram {
 
@@ -19,7 +19,7 @@ public class SSAOBlurShader extends GLShaderProgram {
 
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/filter/ssao/ssao_blur.comp"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/ssao/ssao_blur.comp"));
     compileShader();
   }
 }

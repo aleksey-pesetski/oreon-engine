@@ -5,7 +5,7 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.gl.texture.GLTexture;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class FullScreenQuadShader extends GLShaderProgram {
 
@@ -18,11 +18,11 @@ public class FullScreenQuadShader extends GLShaderProgram {
     return instance;
   }
 
-  protected FullScreenQuadShader() {
+  private FullScreenQuadShader() {
     super();
 
-    addVertexShader(ResourceLoader.loadShader("shaders/quad/quad_VS.glsl"));
-    addFragmentShader(ResourceLoader.loadShader("shaders/quad/quad_FS.glsl"));
+    addVertexShader(ResourceLoaderUtils.loadShader("shaders/quad/quad_VS.glsl"));
+    addFragmentShader(ResourceLoaderUtils.loadShader("shaders/quad/quad_FS.glsl"));
     compileShader();
 
     addUniform("texture");

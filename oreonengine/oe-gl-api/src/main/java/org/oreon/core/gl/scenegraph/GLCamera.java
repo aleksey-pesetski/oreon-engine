@@ -24,7 +24,7 @@ public class GLCamera extends BaseOreonCamera {
   @Override
   public void init() {
     ubo = new GLUniformBuffer();
-    ubo.setBinding_point_index(Constants.CameraUniformBlockBinding);
+    ubo.setBindingPointIndex(Constants.CameraUniformBlockBinding);
     ubo.bindBufferBase();
     ubo.allocate(bufferSize);
   }

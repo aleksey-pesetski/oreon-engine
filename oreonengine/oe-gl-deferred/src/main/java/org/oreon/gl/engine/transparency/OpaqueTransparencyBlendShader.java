@@ -3,7 +3,7 @@ package org.oreon.gl.engine.transparency;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.gl.texture.GLTexture;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 import static org.lwjgl.opengl.GL13.*;
 
@@ -22,7 +22,7 @@ public class OpaqueTransparencyBlendShader extends GLShaderProgram {
 
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/opaqueTransparencyBlend.comp"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/opaqueTransparencyBlend.comp"));
 
     compileShader();
 

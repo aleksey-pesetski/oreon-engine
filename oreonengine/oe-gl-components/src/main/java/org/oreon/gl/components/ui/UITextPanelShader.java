@@ -2,7 +2,7 @@ package org.oreon.gl.components.ui;
 
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.math.Matrix4f;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class UITextPanelShader extends GLShaderProgram {
 
@@ -18,8 +18,8 @@ public class UITextPanelShader extends GLShaderProgram {
   protected UITextPanelShader() {
     super();
 
-    addVertexShader(ResourceLoader.loadShader("shaders/ui/textPanel.vert"));
-    addFragmentShader(ResourceLoader.loadShader("shaders/ui/textPanel.frag"));
+    addVertexShader(ResourceLoaderUtils.loadShader("shaders/ui/textPanel.vert"));
+    addFragmentShader(ResourceLoaderUtils.loadShader("shaders/ui/textPanel.frag"));
     compileShader();
 
     addUniform("orthographicMatrix");

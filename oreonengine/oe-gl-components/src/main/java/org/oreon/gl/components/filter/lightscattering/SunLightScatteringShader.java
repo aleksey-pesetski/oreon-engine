@@ -4,7 +4,7 @@ import org.oreon.core.context.ContextHolder;
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.math.Matrix4f;
 import org.oreon.core.util.Constants;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class SunLightScatteringShader extends GLShaderProgram {
 
@@ -20,7 +20,7 @@ public class SunLightScatteringShader extends GLShaderProgram {
   protected SunLightScatteringShader() {
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/filter/light_scattering/lightScattering.comp"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/light_scattering/lightScattering.comp"));
 
     compileShader();
 

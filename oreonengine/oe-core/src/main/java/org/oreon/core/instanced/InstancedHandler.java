@@ -3,15 +3,17 @@ package org.oreon.core.instanced;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import lombok.Data;
 
+@Data
 public class InstancedHandler {
+
+  private static InstancedHandler instance;
 
   private Lock lock = new ReentrantLock();
   private Condition condition = lock.newCondition();
 
-  private static InstancedHandler instance = null;
-
-  public static InstancedHandler getInstance() {
+  public static synchronized InstancedHandler getInstance() {
     if (instance == null) {
       instance = new InstancedHandler();
     }
@@ -25,21 +27,5 @@ public class InstancedHandler {
     } finally {
       lock.unlock();
     }
-  }
-
-  public Condition getCondition() {
-    return condition;
-  }
-
-  public void setCondition(Condition condition) {
-    this.condition = condition;
-  }
-
-  public Lock getLock() {
-    return lock;
-  }
-
-  public void setLock(Lock lock) {
-    this.lock = lock;
   }
 }

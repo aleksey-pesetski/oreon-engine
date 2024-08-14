@@ -8,7 +8,6 @@ import static org.lwjgl.opengl.GL30.glBindBufferBase;
 import static org.lwjgl.opengl.GL43.GL_SHADER_STORAGE_BUFFER;
 
 import java.nio.ByteBuffer;
-
 import org.oreon.core.math.Vec2f;
 import org.oreon.core.util.BufferUtil;
 
@@ -18,7 +17,7 @@ import org.oreon.core.util.BufferUtil;
 
 public class GLShaderStorageBuffer {
 
-  private int ssbo;
+  private final int ssbo;
 
   public GLShaderStorageBuffer() {
     ssbo = glGenBuffers();

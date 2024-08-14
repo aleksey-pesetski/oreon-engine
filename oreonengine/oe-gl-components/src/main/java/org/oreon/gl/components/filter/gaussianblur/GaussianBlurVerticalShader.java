@@ -1,7 +1,7 @@
 package org.oreon.gl.components.filter.gaussianblur;
 
 import org.oreon.core.gl.pipeline.GLShaderProgram;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class GaussianBlurVerticalShader extends GLShaderProgram {
 
@@ -17,7 +17,7 @@ public class GaussianBlurVerticalShader extends GLShaderProgram {
   protected GaussianBlurVerticalShader() {
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/filter/gaussian_blur/vertical_gaussian_blur.comp"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/gaussian_blur/vertical_gaussian_blur.comp"));
 
     compileShader();
   }

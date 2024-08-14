@@ -11,7 +11,7 @@ import org.oreon.core.model.Material;
 import org.oreon.core.scenegraph.NodeComponentType;
 import org.oreon.core.scenegraph.Renderable;
 import org.oreon.core.util.Constants;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class InstancedBillboardShadowShader extends GLShaderProgram {
 
@@ -27,9 +27,9 @@ public class InstancedBillboardShadowShader extends GLShaderProgram {
   protected InstancedBillboardShadowShader() {
     super();
 
-    addVertexShader(ResourceLoader.loadShader("oreonworlds/shaders/assets/Billboard_Shader/billboard.vert"));
-    addGeometryShader(ResourceLoader.loadShader("oreonworlds/shaders/assets/Billboard_Shader/billboard_shadow.geom"));
-    addFragmentShader(ResourceLoader.loadShader("oreonworlds/shaders/assets/Billboard_Shader/billboard_shadow.frag"));
+    addVertexShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Billboard_Shader/billboard.vert"));
+    addGeometryShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Billboard_Shader/billboard_shadow.geom"));
+    addFragmentShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Billboard_Shader/billboard_shadow.frag"));
     compileShader();
 
     addUniformBlock("worldMatrices");

@@ -15,7 +15,7 @@ import static org.lwjgl.vulkan.VK10.vkDestroyRenderPass;
 import java.nio.LongBuffer;
 import java.util.ArrayList;
 import java.util.List;
-
+import lombok.Getter;
 import org.lwjgl.vulkan.VkAttachmentDescription;
 import org.lwjgl.vulkan.VkAttachmentReference;
 import org.lwjgl.vulkan.VkDevice;
@@ -24,22 +24,19 @@ import org.lwjgl.vulkan.VkSubpassDependency;
 import org.lwjgl.vulkan.VkSubpassDescription;
 import org.oreon.core.vk.util.VkUtil;
 
-import lombok.Getter;
-
 public class RenderPass {
 
-  private List<VkAttachmentReference> colorReferences = new ArrayList<>();
+  private final List<VkAttachmentReference> colorReferences = new ArrayList<>();
+  private final List<VkAttachmentDescription> attachmentDescriptions = new ArrayList<>();
+  private final List<VkSubpassDependency> subpassDependendies = new ArrayList<>();
+  private final List<VkSubpassDescription> subpassDescriptions = new ArrayList<>();
+  private final VkDevice device;
   private VkAttachmentReference depthReference;
-  private List<VkAttachmentDescription> attachmentDescriptions = new ArrayList<>();
-  private List<VkSubpassDependency> subpassDependendies = new ArrayList<>();
-  private List<VkSubpassDescription> subpassDescriptions = new ArrayList<>();
 
   @Getter
   private long handle;
   @Getter
   private int attachmentCount;
-
-  private final VkDevice device;
 
   public RenderPass(VkDevice device) {
 

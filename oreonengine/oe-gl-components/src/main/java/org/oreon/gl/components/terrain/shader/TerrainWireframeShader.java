@@ -1,5 +1,9 @@
 package org.oreon.gl.components.terrain.shader;
 
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE1;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
+
 import org.oreon.common.quadtree.ChunkConfig;
 import org.oreon.common.quadtree.QuadtreeNode;
 import org.oreon.core.context.ContextHolder;
@@ -8,30 +12,34 @@ import org.oreon.core.math.Vec2f;
 import org.oreon.core.scenegraph.NodeComponentType;
 import org.oreon.core.scenegraph.Renderable;
 import org.oreon.core.util.Constants;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 import org.oreon.gl.components.terrain.GLTerrainConfig;
-
-import static org.lwjgl.opengl.GL13.*;
 
 public class TerrainWireframeShader extends GLShaderProgram {
 
-  private static TerrainWireframeShader instance = null;
+  private static final String SHADOW_MAP_RESOLUTION_PLACEHOLDER = "#var_shadow_map_resolution";
+  private static final String LIB_GLSL_PLACEHOLDER = "#lib.glsl";
 
-  public static TerrainWireframeShader getInstance() {
-    if (instance == null) {
-      instance = new TerrainWireframeShader();
-    }
-    return instance;
-  }
+  private static TerrainWireframeShader instance = null;
 
   protected TerrainWireframeShader() {
     super();
 
-    addVertexShader(ResourceLoader.loadShader("shaders/terrain/terrain.vert", "lib.glsl"));
-    addTessellationControlShader(ResourceLoader.loadShader("shaders/terrain/terrain.tesc", "lib.glsl"));
-    addTessellationEvaluationShader(ResourceLoader.loadShader("shaders/terrain/terrain.tese", "lib.glsl"));
-    addGeometryShader(ResourceLoader.loadShader("shaders/terrain/terrain_wireframe.geom", "lib.glsl"));
-    addFragmentShader(ResourceLoader.loadShader("shaders/terrain/terrain_wireframe.frag"));
+    final String vLib = ResourceLoaderUtils.loadShader("shader/lib.glsl")
+        .replaceFirst(
+            SHADOW_MAP_RESOLUTION_PLACEHOLDER,
+            Integer.toString(ContextHolder.getContext().getConfig().getShadowMapResolution())
+        );
+
+    addVertexShader(ResourceLoaderUtils.loadShader("shaders/terrain/terrain.vert")
+        .replaceFirst(LIB_GLSL_PLACEHOLDER, vLib));
+    addTessellationControlShader(ResourceLoaderUtils.loadShader("shaders/terrain/terrain.tesc")
+        .replaceFirst(LIB_GLSL_PLACEHOLDER, vLib));
+    addTessellationEvaluationShader(ResourceLoaderUtils.loadShader("shaders/terrain/terrain.tese")
+        .replaceFirst(LIB_GLSL_PLACEHOLDER, vLib));
+    addGeometryShader(ResourceLoaderUtils.loadShader("shaders/terrain/terrain_wireframe.geom")
+        .replaceFirst(LIB_GLSL_PLACEHOLDER, vLib));
+    addFragmentShader(ResourceLoaderUtils.loadShader("shaders/terrain/terrain_wireframe.frag"));
     compileShader();
 
     addUniform("localMatrix");
@@ -57,6 +65,13 @@ public class TerrainWireframeShader extends GLShaderProgram {
     addUniform("clipplane");
 
     addUniformBlock("Camera");
+  }
+
+  public static TerrainWireframeShader getInstance() {
+    if (instance == null) {
+      instance = new TerrainWireframeShader();
+    }
+    return instance;
   }
 
   public void updateUniforms(Renderable object) {

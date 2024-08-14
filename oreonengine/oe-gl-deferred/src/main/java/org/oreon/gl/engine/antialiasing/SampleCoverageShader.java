@@ -2,7 +2,7 @@ package org.oreon.gl.engine.antialiasing;
 
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.gl.pipeline.GLShaderProgram;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class SampleCoverageShader extends GLShaderProgram {
 
@@ -18,7 +18,7 @@ public class SampleCoverageShader extends GLShaderProgram {
   protected SampleCoverageShader() {
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/sampleCoverage.comp"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/sampleCoverage.comp"));
 
     compileShader();
 

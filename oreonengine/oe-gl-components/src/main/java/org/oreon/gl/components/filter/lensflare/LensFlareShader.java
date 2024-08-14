@@ -6,7 +6,7 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.gl.texture.GLTexture;
 import org.oreon.core.math.Matrix4f;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class LensFlareShader extends GLShaderProgram {
 
@@ -22,8 +22,8 @@ public class LensFlareShader extends GLShaderProgram {
   protected LensFlareShader() {
     super();
 
-    addVertexShader(ResourceLoader.loadShader("shaders/filter/lens_flare/LensFlare_VS.glsl"));
-    addFragmentShader(ResourceLoader.loadShader("shaders/filter/lens_flare/LensFlare_FS.glsl"));
+    addVertexShader(ResourceLoaderUtils.loadShader("shaders/filter/lens_flare/LensFlare_VS.glsl"));
+    addFragmentShader(ResourceLoaderUtils.loadShader("shaders/filter/lens_flare/LensFlare_FS.glsl"));
     compileShader();
 
     addUniform("orthographicMatrix");

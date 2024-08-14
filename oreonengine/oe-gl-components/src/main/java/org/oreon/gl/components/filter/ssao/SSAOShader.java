@@ -3,7 +3,7 @@ package org.oreon.gl.components.filter.ssao;
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.math.Matrix4f;
 import org.oreon.core.math.Vec3f;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class SSAOShader extends GLShaderProgram {
 
@@ -21,7 +21,7 @@ public class SSAOShader extends GLShaderProgram {
 
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/filter/ssao/ssao.comp"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/ssao/ssao.comp"));
     compileShader();
 
     addUniform("m_View");

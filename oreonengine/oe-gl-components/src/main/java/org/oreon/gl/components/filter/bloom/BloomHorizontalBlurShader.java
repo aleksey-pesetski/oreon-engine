@@ -8,7 +8,7 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.gl.texture.GLTexture;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class BloomHorizontalBlurShader extends GLShaderProgram {
 
@@ -24,7 +24,7 @@ public class BloomHorizontalBlurShader extends GLShaderProgram {
   protected BloomHorizontalBlurShader() {
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/filter/bloom/bloom_horizontalGaussianBlur.comp"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/bloom/bloom_horizontalGaussianBlur.comp"));
 
     compileShader();
 

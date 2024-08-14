@@ -2,7 +2,7 @@ package org.oreon.gl.components.fft;
 
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.math.Vec2f;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class H0kShader extends GLShaderProgram {
 
@@ -18,7 +18,7 @@ public class H0kShader extends GLShaderProgram {
   protected H0kShader() {
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/fft/h0k.comp"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/fft/h0k.comp"));
     compileShader();
 
     addUniform("N");

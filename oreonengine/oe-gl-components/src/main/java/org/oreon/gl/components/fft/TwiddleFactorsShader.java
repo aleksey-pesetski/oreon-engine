@@ -1,7 +1,7 @@
 package org.oreon.gl.components.fft;
 
 import org.oreon.core.gl.pipeline.GLShaderProgram;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class TwiddleFactorsShader extends GLShaderProgram {
 
@@ -17,7 +17,7 @@ public class TwiddleFactorsShader extends GLShaderProgram {
   protected TwiddleFactorsShader() {
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/fft/twiddleFactors.comp"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/fft/twiddleFactors.comp"));
     compileShader();
 
     addUniform("N");

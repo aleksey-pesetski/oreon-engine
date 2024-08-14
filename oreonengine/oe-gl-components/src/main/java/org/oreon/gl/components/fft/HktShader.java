@@ -1,7 +1,7 @@
 package org.oreon.gl.components.fft;
 
 import org.oreon.core.gl.pipeline.GLShaderProgram;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class HktShader extends GLShaderProgram {
 
@@ -17,7 +17,7 @@ public class HktShader extends GLShaderProgram {
   protected HktShader() {
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/fft/hkt.comp"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/fft/hkt.comp"));
     compileShader();
 
     addUniform("N");

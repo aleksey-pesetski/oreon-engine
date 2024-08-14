@@ -8,26 +8,23 @@ import static org.lwjgl.vulkan.VK10.vkCreateFramebuffer;
 import static org.lwjgl.vulkan.VK10.vkDestroyFramebuffer;
 
 import java.nio.LongBuffer;
-
+import lombok.Getter;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkFramebufferCreateInfo;
 import org.oreon.core.vk.util.VkUtil;
 
-import lombok.Getter;
-
 public class VkFrameBuffer {
 
   @Getter
-  private long handle;
+  private final long handle;
 
-  private VkDevice device;
+  private final VkDevice device;
 
-  public VkFrameBuffer(VkDevice device, int width, int height, int layers,
-      LongBuffer pAttachments, long renderPass) {
-
+  public VkFrameBuffer(final VkDevice device, final int width, final int height, final int layers,
+      final LongBuffer pAttachments, final long renderPass) {
     this.device = device;
 
-    VkFramebufferCreateInfo framebufferInfo = VkFramebufferCreateInfo.calloc()
+    final VkFramebufferCreateInfo framebufferInfo = VkFramebufferCreateInfo.calloc()
         .sType(VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO)
         .pAttachments(pAttachments)
         .flags(0)
@@ -52,7 +49,6 @@ public class VkFrameBuffer {
   }
 
   public void destroy() {
-
     vkDestroyFramebuffer(device, handle, null);
   }
 

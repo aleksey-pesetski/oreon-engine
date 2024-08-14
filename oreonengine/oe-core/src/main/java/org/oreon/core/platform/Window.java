@@ -5,7 +5,7 @@ import static org.lwjgl.glfw.GLFW.glfwSetWindowIcon;
 import java.nio.ByteBuffer;
 
 import org.lwjgl.glfw.GLFWImage;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public abstract class Window {
 
@@ -35,7 +35,7 @@ public abstract class Window {
 
   public void setIcon(String path) {
 
-    ByteBuffer bufferedImage = ResourceLoader.loadImageToByteBuffer(path);
+    ByteBuffer bufferedImage = ResourceLoaderUtils.loadImageToByteBuffer(path);
 
     GLFWImage image = GLFWImage.malloc();
 

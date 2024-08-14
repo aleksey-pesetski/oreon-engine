@@ -5,7 +5,7 @@ import org.oreon.core.context.ContextHolder;
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.scenegraph.Renderable;
 import org.oreon.core.util.Constants;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 import static org.lwjgl.opengl.GL13.*;
 
@@ -23,11 +23,11 @@ public class WaterShader extends GLShaderProgram {
   protected WaterShader() {
     super();
 
-    addVertexShader(ResourceLoader.loadShader("shaders/water/water.vert"));
-    addTessellationControlShader(ResourceLoader.loadShader("shaders/water/water.tesc"));
-    addTessellationEvaluationShader(ResourceLoader.loadShader("shaders/water/water.tese"));
-    addGeometryShader(ResourceLoader.loadShader("shaders/water/water.geom"));
-    addFragmentShader(ResourceLoader.loadShader("shaders/water/water.frag"));
+    addVertexShader(ResourceLoaderUtils.loadShader("shaders/water/water.vert"));
+    addTessellationControlShader(ResourceLoaderUtils.loadShader("shaders/water/water.tesc"));
+    addTessellationEvaluationShader(ResourceLoaderUtils.loadShader("shaders/water/water.tese"));
+    addGeometryShader(ResourceLoaderUtils.loadShader("shaders/water/water.geom"));
+    addFragmentShader(ResourceLoaderUtils.loadShader("shaders/water/water.frag"));
     compileShader();
 
     addUniform("waterReflection");

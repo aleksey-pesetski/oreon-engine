@@ -5,7 +5,7 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.gl.texture.GLTexture;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class NormalMapShader extends GLShaderProgram {
 
@@ -21,7 +21,7 @@ public class NormalMapShader extends GLShaderProgram {
   protected NormalMapShader() {
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/util/normals.comp"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/util/normals.comp"));
     compileShader();
 
     addUniform("heightmap");

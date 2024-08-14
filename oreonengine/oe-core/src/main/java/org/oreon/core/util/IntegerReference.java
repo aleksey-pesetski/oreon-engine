@@ -1,5 +1,8 @@
 package org.oreon.core.util;
 
+import lombok.Data;
+
+@Data
 public class IntegerReference {
 
   private int value;
@@ -9,13 +12,5 @@ public class IntegerReference {
 
   public IntegerReference(int value) {
     setValue(value);
-  }
-
-  public int getValue() {
-    return value;
-  }
-
-  public void setValue(int value) {
-    this.value = value;
   }
 }

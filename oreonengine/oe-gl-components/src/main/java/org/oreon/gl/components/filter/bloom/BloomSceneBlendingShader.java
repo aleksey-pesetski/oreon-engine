@@ -1,7 +1,7 @@
 package org.oreon.gl.components.filter.bloom;
 
 import org.oreon.core.gl.pipeline.GLShaderProgram;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class BloomSceneBlendingShader extends GLShaderProgram {
 
@@ -17,7 +17,7 @@ public class BloomSceneBlendingShader extends GLShaderProgram {
   protected BloomSceneBlendingShader() {
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/filter/bloom/bloomSceneBlending.comp"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/bloom/bloomSceneBlending.comp"));
 
     compileShader();
   }

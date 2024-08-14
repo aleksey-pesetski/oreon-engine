@@ -1,7 +1,7 @@
 package org.oreon.gl.components.filter.bloom;
 
 import org.oreon.core.gl.pipeline.GLShaderProgram;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class BloomVerticalBlurShader extends GLShaderProgram {
 
@@ -17,7 +17,7 @@ public class BloomVerticalBlurShader extends GLShaderProgram {
   protected BloomVerticalBlurShader() {
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/filter/bloom/bloom_verticalGaussianBlur.comp"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/bloom/bloom_verticalGaussianBlur.comp"));
     compileShader();
   }
 }

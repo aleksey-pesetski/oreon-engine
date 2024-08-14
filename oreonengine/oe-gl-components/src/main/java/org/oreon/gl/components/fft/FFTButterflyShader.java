@@ -1,7 +1,7 @@
 package org.oreon.gl.components.fft;
 
 import org.oreon.core.gl.pipeline.GLShaderProgram;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class FFTButterflyShader extends GLShaderProgram {
 
@@ -17,7 +17,7 @@ public class FFTButterflyShader extends GLShaderProgram {
   protected FFTButterflyShader() {
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/fft/butterfly.comp"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/fft/butterfly.comp"));
     compileShader();
 
     addUniform("direction");

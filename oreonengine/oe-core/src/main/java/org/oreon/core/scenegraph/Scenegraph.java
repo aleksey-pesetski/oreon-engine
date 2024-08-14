@@ -1,16 +1,16 @@
 package org.oreon.core.scenegraph;
 
-import org.oreon.core.math.Transform;
-
 import lombok.Getter;
+import org.oreon.core.math.Transform;
 
 @Getter
 public class Scenegraph extends Node {
 
-  private Node root;
+  private final Node root;
+  private final Node transparentObjects;
+
   private Node terrain;
   private Node water;
-  private Node transparentObjects;
 
   private boolean hasTerrain = false;
   private boolean hasWater = false;
@@ -30,12 +30,14 @@ public class Scenegraph extends Node {
     transparentObjects.setParent(this);
   }
 
+  @Override
   public void render() {
     root.render();
     terrain.render();
     water.render();
   }
 
+  @Override
   public void renderWireframe() {
     root.renderWireframe();
     terrain.renderWireframe();
@@ -46,12 +48,14 @@ public class Scenegraph extends Node {
     transparentObjects.render();
   }
 
+  @Override
   public void renderShadows() {
     root.renderShadows();
     terrain.renderShadows();
     water.renderShadows();
   }
 
+  @Override
   public void record(RenderList renderList) {
     root.record(renderList);
     terrain.record(renderList);
@@ -62,6 +66,7 @@ public class Scenegraph extends Node {
     transparentObjects.record(renderList);
   }
 
+  @Override
   public void update() {
     root.update();
     terrain.update();
@@ -69,16 +74,19 @@ public class Scenegraph extends Node {
     transparentObjects.update();
   }
 
+  @Override
   public void updateLights() {
     root.updateLights();
   }
 
+  @Override
   public void input() {
     root.input();
     terrain.input();
     water.input();
   }
 
+  @Override
   public void shutdown() {
     root.shutdown();
     terrain.shutdown();

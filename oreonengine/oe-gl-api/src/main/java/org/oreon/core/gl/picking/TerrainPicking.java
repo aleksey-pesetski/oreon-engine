@@ -22,21 +22,22 @@ import org.oreon.core.util.BufferUtil;
 @Log4j2
 public class TerrainPicking {
 
-  private FloatBuffer depthmapBuffer;
   private static TerrainPicking instance;
-  private boolean isActive = true;
 
-  public static TerrainPicking getInstance() {
-    if (instance == null) {
-      instance = new TerrainPicking();
-    }
-    return instance;
-  }
+  private final FloatBuffer depthmapBuffer;
+  private boolean isActive = true;
 
   private TerrainPicking() {
     depthmapBuffer = BufferUtil.createFloatBuffer(
         ContextHolder.getContext().getWindow().getWidth() * ContextHolder.getContext().getWindow().getHeight()
     );
+  }
+
+  public static synchronized TerrainPicking getInstance() {
+    if (instance == null) {
+      instance = new TerrainPicking();
+    }
+    return instance;
   }
 
   public void getTerrainPosition() {

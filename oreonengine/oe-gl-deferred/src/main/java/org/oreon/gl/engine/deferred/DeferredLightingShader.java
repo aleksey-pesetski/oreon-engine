@@ -1,29 +1,22 @@
 package org.oreon.gl.engine.deferred;
 
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
+
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.gl.texture.GLTexture;
 import org.oreon.core.util.Constants;
-import org.oreon.core.util.ResourceLoader;
-
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class DeferredLightingShader extends GLShaderProgram {
 
   private static DeferredLightingShader instance = null;
 
-  public static DeferredLightingShader getInstance() {
-    if (instance == null) {
-      instance = new DeferredLightingShader();
-    }
-    return instance;
-  }
-
   protected DeferredLightingShader() {
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/deferredLighting.comp", "lib.glsl"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/deferredLighting.comp", "lib.glsl"));
     compileShader();
 
     addUniformBlock("Camera");
@@ -36,6 +29,13 @@ public class DeferredLightingShader extends GLShaderProgram {
     addUniform("shadowsEnable");
     addUniform("shadowsQuality");
     addUniform("ssaoEnable");
+  }
+
+  public static DeferredLightingShader getInstance() {
+    if (instance == null) {
+      instance = new DeferredLightingShader();
+    }
+    return instance;
   }
 
   public void updateUniforms(GLTexture pssm) {

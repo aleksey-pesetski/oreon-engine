@@ -1,6 +1,7 @@
 package org.oreon.core.gl.memory;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.glDrawArrays;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
@@ -11,8 +12,9 @@ import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
+import static org.lwjgl.opengl.GL30.glGenVertexArrays;
+import static org.lwjgl.opengl.GL40.GL_PATCHES;
 import static org.lwjgl.opengl.GL40.GL_PATCH_VERTICES;
 import static org.lwjgl.opengl.GL40.glPatchParameteri;
 
@@ -20,13 +22,10 @@ import org.oreon.core.math.Vec2f;
 import org.oreon.core.math.Vec3f;
 import org.oreon.core.util.BufferUtil;
 
-import static org.lwjgl.opengl.GL40.GL_PATCHES;
-import static org.lwjgl.opengl.GL11.glDrawArrays;
-
 public class GLPatchVBO implements VBO {
 
-  private int vbo;
-  private int vaoId;
+  private final int vaoId;
+  private final int vbo;
   private int size;
 
   public GLPatchVBO() {
@@ -63,6 +62,7 @@ public class GLPatchVBO implements VBO {
     glBindVertexArray(0);
   }
 
+  @Override
   public void draw() {
     glBindVertexArray(vaoId);
     glEnableVertexAttribArray(0);
@@ -73,6 +73,7 @@ public class GLPatchVBO implements VBO {
     glBindVertexArray(0);
   }
 
+  @Override
   public void update(Vec3f[] vertices) {
     glBindVertexArray(vaoId);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -80,6 +81,7 @@ public class GLPatchVBO implements VBO {
     glBindVertexArray(0);
   }
 
+  @Override
   public void delete() {
     glBindVertexArray(vaoId);
     glDeleteBuffers(vbo);

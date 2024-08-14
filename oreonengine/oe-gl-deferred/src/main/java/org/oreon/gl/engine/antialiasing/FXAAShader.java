@@ -3,7 +3,7 @@ package org.oreon.gl.engine.antialiasing;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.gl.texture.GLTexture;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
@@ -22,7 +22,7 @@ public class FXAAShader extends GLShaderProgram {
   protected FXAAShader() {
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/fxaa.comp"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/fxaa.comp"));
 
     compileShader();
 

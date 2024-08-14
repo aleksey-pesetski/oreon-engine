@@ -1,12 +1,16 @@
 package org.oreon.core.gl.memory;
 
+import org.oreon.core.math.Vec3f;
+
 /**
  * Vertex Array Object
  */
 
 public interface VBO {
 
-  public void draw();
+  void draw();
 
-  public void delete();
+  void update(Vec3f[] vertices);
+
+  void delete();
 }

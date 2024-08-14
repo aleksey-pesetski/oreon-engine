@@ -17,7 +17,7 @@ import org.oreon.core.BaseOreonRenderEngine;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.scenegraph.NodeComponentType;
 import org.oreon.core.scenegraph.RenderList;
-import org.oreon.core.target.FrameBufferObject.Attachment;
+import org.oreon.core.target.Attachment;
 import org.oreon.core.vk.command.CommandBuffer;
 import org.oreon.core.vk.command.SubmitInfo;
 import org.oreon.core.vk.context.DeviceManager.DeviceType;

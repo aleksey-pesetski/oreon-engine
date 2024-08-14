@@ -1,7 +1,7 @@
 package org.oreon.gl.components.fft;
 
 import org.oreon.core.gl.pipeline.GLShaderProgram;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class FFTInversionShader extends GLShaderProgram {
 
@@ -17,7 +17,7 @@ public class FFTInversionShader extends GLShaderProgram {
   protected FFTInversionShader() {
     super();
 
-    addComputeShader(ResourceLoader.loadShader("shaders/fft/inversion.comp"));
+    addComputeShader(ResourceLoaderUtils.loadShader("shaders/fft/inversion.comp"));
     compileShader();
 
     addUniform("pingpong");

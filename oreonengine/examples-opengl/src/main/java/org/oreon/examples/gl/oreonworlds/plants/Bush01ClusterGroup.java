@@ -17,13 +17,11 @@ import org.oreon.examples.gl.oreonworlds.shaders.plants.BushShadowShader;
 public class Bush01ClusterGroup extends InstancedObject {
 
   public Bush01ClusterGroup() {
-
     List<Renderable> objects = new ArrayList<>();
 
     List<Model> models = GLAssimpModelLoader.loadModel("oreonworlds/assets/plants/Bush_01", "Bush_01.obj");
 
     for (Model model : models) {
-
       GLMeshVBO meshBuffer = new GLMeshVBO();
       model.getMesh().setTangentSpace(false);
 //			model.getMesh().setInstanced(true);

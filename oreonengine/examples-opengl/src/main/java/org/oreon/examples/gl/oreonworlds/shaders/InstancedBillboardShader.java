@@ -12,7 +12,7 @@ import org.oreon.core.model.Material;
 import org.oreon.core.scenegraph.NodeComponentType;
 import org.oreon.core.scenegraph.Renderable;
 import org.oreon.core.util.Constants;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class InstancedBillboardShader extends GLShaderProgram {
 
@@ -28,9 +28,9 @@ public class InstancedBillboardShader extends GLShaderProgram {
   protected InstancedBillboardShader() {
     super();
 
-    addVertexShader(ResourceLoader.loadShader("oreonworlds/shaders/assets/Billboard_Shader/billboard.vert"));
-    addGeometryShader(ResourceLoader.loadShader("oreonworlds/shaders/assets/Billboard_Shader/billboard.geom"));
-    addFragmentShader(ResourceLoader.loadShader("oreonworlds/shaders/assets/Billboard_Shader/billboard.frag"));
+    addVertexShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Billboard_Shader/billboard.vert"));
+    addGeometryShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Billboard_Shader/billboard.geom"));
+    addFragmentShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Billboard_Shader/billboard.frag"));
     compileShader();
 
     addUniform("clipplane");

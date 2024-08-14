@@ -33,7 +33,7 @@ import org.oreon.core.image.Image.SamplerFilter;
 import org.oreon.core.math.Vec2f;
 import org.oreon.core.model.Material;
 import org.oreon.core.util.BufferUtil;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 import org.oreon.gl.components.fft.FFT;
 import org.oreon.gl.components.util.NormalRenderer;
 
@@ -269,7 +269,7 @@ public class GLTerrainConfig extends QuadtreeConfig {
 
       super();
 
-      addComputeShader(ResourceLoader.loadShader("shaders/terrain/HeightMap.comp"));
+      addComputeShader(ResourceLoaderUtils.loadShader("shaders/terrain/HeightMap.comp"));
       compileShader();
 
       addUniform("N");
@@ -357,7 +357,7 @@ public class GLTerrainConfig extends QuadtreeConfig {
 
       super();
 
-      addComputeShader(ResourceLoader.loadShader("shaders/terrain/SplatMap.comp"));
+      addComputeShader(ResourceLoaderUtils.loadShader("shaders/terrain/SplatMap.comp"));
       compileShader();
     }
   }

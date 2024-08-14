@@ -17,14 +17,14 @@ import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 import org.oreon.core.math.Vec2f;
+import org.oreon.core.math.Vec3f;
 import org.oreon.core.util.BufferUtil;
 
 public class GLPointVBO2D implements VBO {
 
-  private int vbo;
-  private int vaoId;
+  private final int vaoId;
+  private final int vbo;
   private int size;
-
 
   public GLPointVBO2D() {
     vbo = glGenBuffers();
@@ -45,19 +45,21 @@ public class GLPointVBO2D implements VBO {
     glBindVertexArray(0);
   }
 
-
+  @Override
   public void draw() {
     glBindVertexArray(vaoId);
-
     glEnableVertexAttribArray(0);
-
     glDrawArrays(GL_POINTS, 0, size);
-
     glDisableVertexAttribArray(0);
-
     glBindVertexArray(0);
   }
 
+  @Override
+  public void update(Vec3f[] vertices) {
+    //omit
+  }
+
+  @Override
   public void delete() {
     glBindVertexArray(vaoId);
     glDeleteBuffers(vbo);

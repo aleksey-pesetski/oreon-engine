@@ -7,7 +7,7 @@ import org.oreon.core.instanced.InstancedObject;
 import org.oreon.core.math.Matrix4f;
 import org.oreon.core.scenegraph.Renderable;
 import org.oreon.core.util.Constants;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class InstancedWireframeShader extends GLShaderProgram {
 
@@ -24,11 +24,11 @@ public class InstancedWireframeShader extends GLShaderProgram {
     super();
 
     addVertexShader(
-        ResourceLoader.loadShader("oreonworlds/shaders/assets/InstancedWireframe_Shader/instanced_wireframe.vert"));
+        ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/InstancedWireframe_Shader/instanced_wireframe.vert"));
     addGeometryShader(
-        ResourceLoader.loadShader("oreonworlds/shaders/assets/InstancedWireframe_Shader/instanced_wireframe.geom"));
+        ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/InstancedWireframe_Shader/instanced_wireframe.geom"));
     addFragmentShader(
-        ResourceLoader.loadShader("oreonworlds/shaders/assets/InstancedWireframe_Shader/instanced_wireframe.frag"));
+        ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/InstancedWireframe_Shader/instanced_wireframe.frag"));
     compileShader();
 
     addUniform("clipplane");

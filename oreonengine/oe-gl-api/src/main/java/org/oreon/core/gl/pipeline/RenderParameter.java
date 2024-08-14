@@ -2,7 +2,7 @@ package org.oreon.core.gl.pipeline;
 
 public interface RenderParameter {
 
-  public void enable();
+  void enable();
 
-  public void disable();
+  void disable();
 }

@@ -3,7 +3,7 @@ package org.oreon.gl.components.atmosphere;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.scenegraph.Renderable;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class AtmosphericScatteringShader extends GLShaderProgram {
 
@@ -19,8 +19,8 @@ public class AtmosphericScatteringShader extends GLShaderProgram {
   protected AtmosphericScatteringShader() {
     super();
 
-    addVertexShader(ResourceLoader.loadShader("shaders/atmosphere/atmospheric_scattering.vert"));
-    addFragmentShader(ResourceLoader.loadShader("shaders/atmosphere/atmospheric_scattering.frag"));
+    addVertexShader(ResourceLoaderUtils.loadShader("shaders/atmosphere/atmospheric_scattering.vert"));
+    addFragmentShader(ResourceLoaderUtils.loadShader("shaders/atmosphere/atmospheric_scattering.frag"));
     compileShader();
 
     addUniform("m_MVP");

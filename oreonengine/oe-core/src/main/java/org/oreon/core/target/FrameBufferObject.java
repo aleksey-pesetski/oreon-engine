@@ -5,19 +5,18 @@ import lombok.Getter;
 @Getter
 public abstract class FrameBufferObject {
 
-  protected int height;
-  protected int width;
-  protected int colorAttachmentCount;
-  protected int depthAttachmentCount;
+  private final int height;
+  private final int width;
+  private final int depthAttachmentCount;
+  private int colorAttachmentCount;
 
-  public enum Attachment {
+  protected FrameBufferObject(final int width, final int height, final int depthAttachmentCount) {
+    this.width = width;
+    this.height = height;
+    this.depthAttachmentCount = depthAttachmentCount;
+  }
 
-    COLOR,
-    ALPHA,
-    NORMAL,
-    POSITION,
-    SPECULAR_EMISSION_DIFFUSE_SSAO_BLOOM,
-    LIGHT_SCATTERING,
-    DEPTH;
+  protected void setColorAttachmentCount(final int colorAttachmentCount) {
+    this.colorAttachmentCount = colorAttachmentCount;
   }
 }

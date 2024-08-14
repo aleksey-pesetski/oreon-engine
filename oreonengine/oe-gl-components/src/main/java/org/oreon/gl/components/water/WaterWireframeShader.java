@@ -8,7 +8,7 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.scenegraph.Renderable;
 import org.oreon.core.util.Constants;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class WaterWireframeShader extends GLShaderProgram {
 
@@ -25,11 +25,11 @@ public class WaterWireframeShader extends GLShaderProgram {
   protected WaterWireframeShader() {
     super();
 
-    addVertexShader(ResourceLoader.loadShader("shaders/water/water.vert"));
-    addTessellationControlShader(ResourceLoader.loadShader("shaders/water/water.tesc"));
-    addTessellationEvaluationShader(ResourceLoader.loadShader("shaders/water/water.tese"));
-    addGeometryShader(ResourceLoader.loadShader("shaders/water/water.wireframe.geom"));
-    addFragmentShader(ResourceLoader.loadShader("shaders/water/water.wireframe.frag"));
+    addVertexShader(ResourceLoaderUtils.loadShader("shaders/water/water.vert"));
+    addTessellationControlShader(ResourceLoaderUtils.loadShader("shaders/water/water.tesc"));
+    addTessellationEvaluationShader(ResourceLoaderUtils.loadShader("shaders/water/water.tese"));
+    addGeometryShader(ResourceLoaderUtils.loadShader("shaders/water/water.wireframe.geom"));
+    addFragmentShader(ResourceLoaderUtils.loadShader("shaders/water/water.wireframe.frag"));
     compileShader();
 
     addUniform("Dy");

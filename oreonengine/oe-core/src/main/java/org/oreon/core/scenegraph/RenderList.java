@@ -5,21 +5,19 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.Getter;
 import lombok.Setter;
 
 public class RenderList {
 
   @Getter
-  private LinkedHashMap<String, Renderable> objectList;
+  private final Map<String, Renderable> objectList;
   @Setter
   private boolean changed;
 
   public RenderList() {
-
     changed = false;
-    objectList = new LinkedHashMap<String, Renderable>();
+    objectList = new LinkedHashMap<>();
   }
 
   public boolean contains(String id) {
@@ -63,13 +61,11 @@ public class RenderList {
   }
 
   public List<Renderable> sortFrontToBack() {
-
     // TODO
     return null;
   }
 
   public List<Renderable> sortBackToFront() {
-
     // TODO
     return null;
   }

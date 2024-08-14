@@ -11,7 +11,6 @@ import static org.lwjgl.opengl.GL20.glCreateProgram;
 import static org.lwjgl.opengl.GL20.glCreateShader;
 import static org.lwjgl.opengl.GL20.glGetProgramInfoLog;
 import static org.lwjgl.opengl.GL20.glGetProgrami;
-import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
 import static org.lwjgl.opengl.GL20.glGetShaderi;
 import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 import static org.lwjgl.opengl.GL20.glLinkProgram;
@@ -34,6 +33,7 @@ import static org.lwjgl.opengl.GL43.GL_COMPUTE_SHADER;
 
 import java.util.HashMap;
 import java.util.Map;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.oreon.core.gl.texture.GLTexture;
 import org.oreon.core.math.Matrix4f;
@@ -46,6 +46,7 @@ import org.oreon.core.util.BufferUtil;
 @Log4j2
 public abstract class GLShaderProgram {
 
+  @Getter
   private final int program;
   private final Map<String, Integer> uniforms;
 
@@ -134,7 +135,7 @@ public abstract class GLShaderProgram {
 
   private void checkIfUniformExist(String uniform, int uniformLocation) {
     if (uniformLocation == 0xFFFFFFFF) {
-      log.error("{} Error: Could not find uniform: {}", this.getClass().getName(), uniform);
+      log.error("Could not find uniform: {}.", uniform);
       System.exit(1);
     }
   }
@@ -167,14 +168,14 @@ public abstract class GLShaderProgram {
     glLinkProgram(program);
 
     if (glGetProgrami(program, GL_LINK_STATUS) == 0) {
-      System.out.println(this.getClass().getName() + " " + glGetProgramInfoLog(program, 1024));
+      log.error(glGetProgramInfoLog(program, 1024));
       System.exit(1);
     }
 
     glValidateProgram(program);
 
     if (glGetProgrami(program, GL_VALIDATE_STATUS) == 0) {
-      System.err.println(this.getClass().getName() + " " + glGetProgramInfoLog(program, 1024));
+      log.error(glGetProgramInfoLog(program, 1024));
       System.exit(1);
     }
   }
@@ -183,7 +184,7 @@ public abstract class GLShaderProgram {
     int shader = glCreateShader(type);
 
     if (shader == 0) {
-      System.err.println(this.getClass().getName() + " Shader creation failed");
+      log.error("Shader creation failed.");
       System.exit(1);
     }
 
@@ -191,7 +192,7 @@ public abstract class GLShaderProgram {
     glCompileShader(shader);
 
     if (glGetShaderi(shader, GL_COMPILE_STATUS) == 0) {
-      System.err.println(this.getClass().getName() + " " + glGetShaderInfoLog(shader, 1024));
+      log.error(glGetProgramInfoLog(shader, 1024));
       System.exit(1);
     }
 
@@ -230,7 +231,4 @@ public abstract class GLShaderProgram {
     glBindFragDataLocation(program, index, name);
   }
 
-  public int getProgram() {
-    return program;
-  }
 }

@@ -4,7 +4,7 @@ import org.oreon.core.context.ContextHolder;
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.gl.texture.GLTexture;
 import org.oreon.core.math.Matrix4f;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
@@ -24,7 +24,7 @@ public class PixelVelocityShader extends GLShaderProgram {
     super();
 
     addComputeShader(
-        ResourceLoader.loadShader(ContextHolder.getContext().getConfig().getMultisampling_sampleCount() > 1 ?
+        ResourceLoaderUtils.loadShader(ContextHolder.getContext().getConfig().getMultisampling_sampleCount() > 1 ?
             "shaders/filter/motion_blur/pixelVelocity.comp"
             : "shaders/filter/motion_blur/pixelVelocity_singleSample.comp"));
 

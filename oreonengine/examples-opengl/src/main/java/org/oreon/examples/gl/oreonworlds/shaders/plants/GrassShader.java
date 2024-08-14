@@ -12,7 +12,7 @@ import org.oreon.core.model.Material;
 import org.oreon.core.scenegraph.NodeComponentType;
 import org.oreon.core.scenegraph.Renderable;
 import org.oreon.core.util.Constants;
-import org.oreon.core.util.ResourceLoader;
+import org.oreon.core.util.ResourceLoaderUtils;
 
 public class GrassShader extends GLShaderProgram {
 
@@ -28,9 +28,9 @@ public class GrassShader extends GLShaderProgram {
   protected GrassShader() {
     super();
 
-    addVertexShader(ResourceLoader.loadShader("oreonworlds/shaders/assets/Grass_Shader/Grass_VS.glsl"));
-    addGeometryShader(ResourceLoader.loadShader("oreonworlds/shaders/assets/Grass_Shader/Grass_GS.glsl"));
-    addFragmentShader(ResourceLoader.loadShader("oreonworlds/shaders/assets/Grass_Shader/Grass_FS.glsl"));
+    addVertexShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Grass_Shader/Grass_VS.glsl"));
+    addGeometryShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Grass_Shader/Grass_GS.glsl"));
+    addFragmentShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Grass_Shader/Grass_FS.glsl"));
     compileShader();
 
     addUniform("material.diffusemap");
