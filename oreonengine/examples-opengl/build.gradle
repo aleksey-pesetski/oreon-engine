@@ -8,6 +8,35 @@
     }
 }*/
 
+apply plugin: 'application'
+//apply plugin: 'com.github.johnrengelman.shadow'
+
+application {
+    mainClass = 'org.oreon.examples.gl.oreonworlds.GLOreonworlds' // Replace with your main class package and name
+}
+
+/*
+shadowJar {
+    // Ensures that the JAR is named as my-java-app.jar without the 'all' suffix
+    archiveClassifier.set('')
+    mergeServiceFiles()
+    // Optionally, you can exclude specific files or dependencies
+    // exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+}
+*/
+
+jar {
+    manifest {
+        attributes 'Main-Class': application.mainClass.get()
+    }
+    // Copy dependencies into the JAR
+    /*from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar*/
+}
+
+
 dependencies {
     api project(':oe-core')
     api project(':oe-gl-api')

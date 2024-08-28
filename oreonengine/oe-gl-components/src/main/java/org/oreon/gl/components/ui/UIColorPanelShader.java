@@ -19,8 +19,8 @@ public class UIColorPanelShader extends GLShaderProgram {
   protected UIColorPanelShader() {
     super();
 
-    addVertexShader(ResourceLoaderUtils.loadShader("shaders/ui/colorPanel.vert"));
-    addFragmentShader(ResourceLoaderUtils.loadShader("shaders/ui/colorPanel.frag"));
+    addVertexShader(ResourceLoaderUtils.load("shaders/ui/colorPanel.vert"));
+    addFragmentShader(ResourceLoaderUtils.load("shaders/ui/colorPanel.frag"));
     compileShader();
 
     addUniform("orthographicMatrix");

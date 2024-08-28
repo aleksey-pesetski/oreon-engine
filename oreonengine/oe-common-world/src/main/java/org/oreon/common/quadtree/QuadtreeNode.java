@@ -1,15 +1,19 @@
 package org.oreon.common.quadtree;
 
-import lombok.Getter;
-
 import java.util.Map;
-
+import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.math.Transform;
 import org.oreon.core.math.Vec2f;
 import org.oreon.core.math.Vec3f;
-import org.oreon.core.scenegraph.*;
+import org.oreon.core.scenegraph.Node;
+import org.oreon.core.scenegraph.NodeComponent;
+import org.oreon.core.scenegraph.NodeComponentType;
+import org.oreon.core.scenegraph.RenderList;
+import org.oreon.core.scenegraph.Renderable;
 
+@Log4j2
 public abstract class QuadtreeNode extends Renderable {
 
   protected Vec3f worldPos;
@@ -24,15 +28,21 @@ public abstract class QuadtreeNode extends Renderable {
       Vec2f location, int lod, Vec2f index) {
 
     try {
-      addComponent(NodeComponentType.MAIN_RENDERINFO, components.get(NodeComponentType.MAIN_RENDERINFO).clone());
-      addComponent(NodeComponentType.WIREFRAME_RENDERINFO,
-          components.get(NodeComponentType.WIREFRAME_RENDERINFO).clone());
+      addComponent(
+          NodeComponentType.MAIN_RENDERINFO,
+          components.get(NodeComponentType.MAIN_RENDERINFO).clone()
+      );
+      addComponent(
+          NodeComponentType.WIREFRAME_RENDERINFO,
+          components.get(NodeComponentType.WIREFRAME_RENDERINFO).clone()
+      );
+
       if (components.containsKey(NodeComponentType.SHADOW_RENDERINFO)) {
         addComponent(NodeComponentType.SHADOW_RENDERINFO, components.get(NodeComponentType.SHADOW_RENDERINFO).clone());
       }
       addComponent(NodeComponentType.CONFIGURATION, components.get(NodeComponentType.CONFIGURATION));
     } catch (CloneNotSupportedException e) {
-      e.printStackTrace();
+      log.error("Clone exception.", e);
     }
 
     quadtreeConfig = getComponent(NodeComponentType.CONFIGURATION);
@@ -106,7 +116,7 @@ public abstract class QuadtreeNode extends Renderable {
 
   public void record(RenderList renderList) {
 
-    if (!renderList.contains(id)) {
+    if (!renderList.contains(getId())) {
       renderList.add(this);
       renderList.setChanged(true);
     }
@@ -137,7 +147,7 @@ public abstract class QuadtreeNode extends Renderable {
     if (isleaf) {
       isleaf = false;
     }
-    if (getChildren().size() == 0) {
+    if (getChildren().isEmpty()) {
       for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
           addChild(createChildChunk(getComponents(), quadtreeCache, getWorldTransform(),

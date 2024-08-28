@@ -28,9 +28,9 @@ public class GrassShader extends GLShaderProgram {
   protected GrassShader() {
     super();
 
-    addVertexShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Grass_Shader/Grass_VS.glsl"));
-    addGeometryShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Grass_Shader/Grass_GS.glsl"));
-    addFragmentShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Grass_Shader/Grass_FS.glsl"));
+    addVertexShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Grass_Shader/Grass_VS.glsl"));
+    addGeometryShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Grass_Shader/Grass_GS.glsl"));
+    addFragmentShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Grass_Shader/Grass_FS.glsl"));
     compileShader();
 
     addUniform("material.diffusemap");

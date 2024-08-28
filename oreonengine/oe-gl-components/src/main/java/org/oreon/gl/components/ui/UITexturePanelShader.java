@@ -18,8 +18,8 @@ public class UITexturePanelShader extends GLShaderProgram {
   protected UITexturePanelShader() {
     super();
 
-    addVertexShader(ResourceLoaderUtils.loadShader("shaders/ui/texturePanel.vert"));
-    addFragmentShader(ResourceLoaderUtils.loadShader("shaders/ui/texturePanel.frag"));
+    addVertexShader(ResourceLoaderUtils.load("shaders/ui/texturePanel.vert"));
+    addFragmentShader(ResourceLoaderUtils.load("shaders/ui/texturePanel.frag"));
     compileShader();
 
     addUniform("orthographicMatrix");

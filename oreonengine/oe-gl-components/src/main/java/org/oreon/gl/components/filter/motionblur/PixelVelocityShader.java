@@ -24,7 +24,7 @@ public class PixelVelocityShader extends GLShaderProgram {
     super();
 
     addComputeShader(
-        ResourceLoaderUtils.loadShader(ContextHolder.getContext().getConfig().getMultisampling_sampleCount() > 1 ?
+        ResourceLoaderUtils.load(ContextHolder.getContext().getConfig().getMultisampling_sampleCount() > 1 ?
             "shaders/filter/motion_blur/pixelVelocity.comp"
             : "shaders/filter/motion_blur/pixelVelocity_singleSample.comp"));
 

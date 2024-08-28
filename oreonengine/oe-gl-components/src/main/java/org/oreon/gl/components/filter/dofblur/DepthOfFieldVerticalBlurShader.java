@@ -21,7 +21,7 @@ public class DepthOfFieldVerticalBlurShader extends GLShaderProgram {
   protected DepthOfFieldVerticalBlurShader() {
     super();
 
-    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/depth_of_field/depthOfField_verticalGaussianBlur.comp"));
+    addComputeShader(ResourceLoaderUtils.load("shaders/filter/depth_of_field/depthOfField_verticalGaussianBlur.comp"));
 
     compileShader();
 

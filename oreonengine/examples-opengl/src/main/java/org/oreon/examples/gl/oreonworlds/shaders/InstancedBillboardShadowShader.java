@@ -27,9 +27,9 @@ public class InstancedBillboardShadowShader extends GLShaderProgram {
   protected InstancedBillboardShadowShader() {
     super();
 
-    addVertexShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Billboard_Shader/billboard.vert"));
-    addGeometryShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Billboard_Shader/billboard_shadow.geom"));
-    addFragmentShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Billboard_Shader/billboard_shadow.frag"));
+    addVertexShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Billboard_Shader/billboard.vert"));
+    addGeometryShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Billboard_Shader/billboard_shadow.geom"));
+    addFragmentShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Billboard_Shader/billboard_shadow.frag"));
     compileShader();
 
     addUniformBlock("worldMatrices");

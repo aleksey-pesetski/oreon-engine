@@ -25,11 +25,11 @@ public class WaterWireframeShader extends GLShaderProgram {
   protected WaterWireframeShader() {
     super();
 
-    addVertexShader(ResourceLoaderUtils.loadShader("shaders/water/water.vert"));
-    addTessellationControlShader(ResourceLoaderUtils.loadShader("shaders/water/water.tesc"));
-    addTessellationEvaluationShader(ResourceLoaderUtils.loadShader("shaders/water/water.tese"));
-    addGeometryShader(ResourceLoaderUtils.loadShader("shaders/water/water.wireframe.geom"));
-    addFragmentShader(ResourceLoaderUtils.loadShader("shaders/water/water.wireframe.frag"));
+    addVertexShader(ResourceLoaderUtils.load("shaders/water/water.vert"));
+    addTessellationControlShader(ResourceLoaderUtils.load("shaders/water/water.tesc"));
+    addTessellationEvaluationShader(ResourceLoaderUtils.load("shaders/water/water.tese"));
+    addGeometryShader(ResourceLoaderUtils.load("shaders/water/water.wireframe.geom"));
+    addFragmentShader(ResourceLoaderUtils.load("shaders/water/water.wireframe.frag"));
     compileShader();
 
     addUniform("Dy");

@@ -24,11 +24,11 @@ public class InstancedWireframeShader extends GLShaderProgram {
     super();
 
     addVertexShader(
-        ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/InstancedWireframe_Shader/instanced_wireframe.vert"));
+        ResourceLoaderUtils.load("oreonworlds/shaders/assets/InstancedWireframe_Shader/instanced_wireframe.vert"));
     addGeometryShader(
-        ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/InstancedWireframe_Shader/instanced_wireframe.geom"));
+        ResourceLoaderUtils.load("oreonworlds/shaders/assets/InstancedWireframe_Shader/instanced_wireframe.geom"));
     addFragmentShader(
-        ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/InstancedWireframe_Shader/instanced_wireframe.frag"));
+        ResourceLoaderUtils.load("oreonworlds/shaders/assets/InstancedWireframe_Shader/instanced_wireframe.frag"));
     compileShader();
 
     addUniform("clipplane");

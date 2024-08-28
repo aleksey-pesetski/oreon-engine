@@ -3,27 +3,31 @@ package org.oreon.core.scenegraph;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
+import lombok.Data;
 import org.oreon.core.math.Transform;
 
+@Data
 public class Node {
 
-  protected String id;
+  private final String id;
+
   private Node parent;
   private List<Node> children;
   private Transform worldTransform;
   private Transform localTransform;
 
   public Node() {
-    id = UUID.randomUUID().toString();
+    this.id = UUID.randomUUID().toString();
+    this.children = new ArrayList<>();
+
     setWorldTransform(new Transform());
     setLocalTransform(new Transform());
-    setChildren(new ArrayList<Node>());
+    setChildren(new ArrayList<>());
   }
 
   public void addChild(Node child) {
     child.setParent(this);
-    children.add(child);
+    this.children.add(child);
   }
 
   public void update() {
@@ -34,82 +38,47 @@ public class Node {
     getWorldTransform().setScaling(
         getWorldTransform().getLocalScaling().mul(getParentNode().getWorldTransform().getScaling()));
 
-    for (Node child : children) {
+    for (Node child : this.children) {
       child.update();
     }
   }
 
   public void updateLights() {
-
-    for (Node child : children) {
+    for (Node child : this.children) {
       child.updateLights();
     }
   }
 
   public void input() {
-    children.forEach(child -> child.input());
+    this.children.forEach(Node::input);
   }
 
   public void render() {
-    children.forEach(child -> child.render());
+    this.children.forEach(Node::render);
   }
 
   public void renderWireframe() {
-    children.forEach(Node::renderWireframe);
+    this.children.forEach(Node::renderWireframe);
   }
 
   public void renderShadows() {
-    children.forEach(child -> child.renderShadows());
+    this.children.forEach(Node::renderShadows);
   }
 
   public void record(RenderList renderList) {
-    children.forEach(child -> child.record(renderList));
+    this.children.forEach(child -> child.record(renderList));
   }
 
   public void shutdown() {
-    children.forEach(child -> child.shutdown());
+    this.children.forEach(Node::shutdown);
   }
 
   public Node getParentNode() {
-    return parent;
+    return this.parent;
   }
 
   @SuppressWarnings("unchecked")
   public <T> T getParentObject() {
-
-    return (T) parent;
+    return (T) this.parent;
   }
-
-  public void setParent(Node parent) {
-    this.parent = parent;
-  }
-
-  public List<Node> getChildren() {
-    return children;
-  }
-
-  public void setChildren(List<Node> children) {
-    this.children = children;
-  }
-
-  public Transform getWorldTransform() {
-    return worldTransform;
-  }
-
-  public void setWorldTransform(Transform transform) {
-    this.worldTransform = transform;
-  }
-
-  public Transform getLocalTransform() {
-    return localTransform;
-  }
-
-  public void setLocalTransform(Transform localTransform) {
-    this.localTransform = localTransform;
-  }
-
-  public String getId() {
-    return id;
-  }
-
 }

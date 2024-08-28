@@ -49,14 +49,13 @@ public class Renderable extends Node {
 
   @Override
   public void input() {
-    components.values().forEach(component -> component.input());
+    components.values().forEach(NodeComponent::input);
 
     super.input();
   }
 
   @Override
   public void render() {
-
     if (components.containsKey(NodeComponentType.MAIN_RENDERINFO)) {
       components.get(NodeComponentType.MAIN_RENDERINFO).render();
     }
@@ -86,12 +85,12 @@ public class Renderable extends Node {
   @Override
   public void record(RenderList renderList) {
     if (render) {
-      if (!renderList.contains(id)) {
+      if (!renderList.contains(getId())) {
         renderList.add(this);
         renderList.setChanged(true);
       }
     } else {
-      if (renderList.contains(id)) {
+      if (renderList.contains(getId())) {
         renderList.remove(this);
         renderList.setChanged(true);
       }
@@ -102,6 +101,7 @@ public class Renderable extends Node {
 
   @Override
   public void shutdown() {
+
     components.values().forEach(NodeComponent::shutdown);
 
     super.shutdown();

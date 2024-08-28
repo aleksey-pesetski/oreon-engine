@@ -29,21 +29,21 @@ public class TerrainShader extends GLShaderProgram {
   protected TerrainShader() {
     super();
 
-    final String vLib = ResourceLoaderUtils.loadShader("shader/lib.glsl")
+    final String vLib = ResourceLoaderUtils.load("shader/lib.glsl")
         .replaceFirst(
             SHADOW_MAP_RESOLUTION_PLACEHOLDER,
             Integer.toString(ContextHolder.getContext().getConfig().getShadowMapResolution())
         );
 
-    addVertexShader(ResourceLoaderUtils.loadShader("shaders/terrain/terrain.vert")
+    addVertexShader(ResourceLoaderUtils.load("shaders/terrain/terrain.vert")
         .replaceFirst(LIB_GLSL_PLACEHOLDER, vLib));
-    addTessellationControlShader(ResourceLoaderUtils.loadShader("shaders/terrain/terrain.tesc")
+    addTessellationControlShader(ResourceLoaderUtils.load("shaders/terrain/terrain.tesc")
         .replaceFirst(LIB_GLSL_PLACEHOLDER, vLib));
-    addTessellationEvaluationShader(ResourceLoaderUtils.loadShader("shaders/terrain/terrain.tese")
+    addTessellationEvaluationShader(ResourceLoaderUtils.load("shaders/terrain/terrain.tese")
         .replaceFirst(LIB_GLSL_PLACEHOLDER, vLib));
-    addGeometryShader(ResourceLoaderUtils.loadShader("shaders/terrain/terrain.geom")
+    addGeometryShader(ResourceLoaderUtils.load("shaders/terrain/terrain.geom")
         .replaceFirst(LIB_GLSL_PLACEHOLDER, vLib));
-    addFragmentShader(ResourceLoaderUtils.loadShader("shaders/terrain/terrain.frag")
+    addFragmentShader(ResourceLoaderUtils.load("shaders/terrain/terrain.frag")
         .replaceFirst(LIB_GLSL_PLACEHOLDER, vLib));
     compileShader();
 

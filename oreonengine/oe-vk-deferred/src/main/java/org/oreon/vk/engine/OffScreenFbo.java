@@ -27,6 +27,7 @@ import org.oreon.core.vk.framebuffer.FrameBufferColorAttachment;
 import org.oreon.core.vk.framebuffer.FrameBufferDepthAttachment;
 import org.oreon.core.vk.framebuffer.VkFrameBufferObject;
 import org.oreon.core.vk.pipeline.RenderPass;
+import org.oreon.core.vk.wrapper.image.VkImageBundle;
 
 @Getter
 public class OffScreenFbo extends VkFrameBufferObject {
@@ -56,7 +57,7 @@ public class OffScreenFbo extends VkFrameBufferObject {
         }
     );
 
-    final int samples = ContextHolder.getContext().getConfig().getMultisampling_sampleCount();
+    /*final int samples = ContextHolder.getContext().getConfig().getMultisampling_sampleCount();
     getAttachments().put(Attachment.COLOR, new FrameBufferColorAttachment(device, memoryProperties,
         getWidth(), getHeight(), VK_FORMAT_R16G16B16A16_SFLOAT, samples));
     getAttachments().put(Attachment.POSITION, new FrameBufferColorAttachment(device, memoryProperties,
@@ -69,9 +70,12 @@ public class OffScreenFbo extends VkFrameBufferObject {
         new FrameBufferColorAttachment(device, memoryProperties,
             getWidth(), getHeight(), VK_FORMAT_R16G16B16A16_SFLOAT, samples));
     getAttachments().put(Attachment.DEPTH, new FrameBufferDepthAttachment(device, memoryProperties,
-        getWidth(), getHeight(), VK_FORMAT_D32_SFLOAT, samples));
+        getWidth(), getHeight(), VK_FORMAT_D32_SFLOAT, samples));*/
+  }
 
-
+  @Override
+  protected Map<Attachment, VkImageBundle> configureAttachments(int width, int height) {
+    return Map.of();
   }
 
   @Override

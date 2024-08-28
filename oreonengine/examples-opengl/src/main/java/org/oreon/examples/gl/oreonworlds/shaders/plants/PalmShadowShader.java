@@ -23,9 +23,9 @@ public class PalmShadowShader extends GLShaderProgram {
   protected PalmShadowShader() {
     super();
 
-    addVertexShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Palm_Shader/Palm01_VS.glsl"));
-    addGeometryShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Palm_Shader/Palm01Shadow_GS.glsl"));
-    addFragmentShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Palm_Shader/Palm01Shadow_FS.glsl"));
+    addVertexShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Palm_Shader/Palm01_VS.glsl"));
+    addGeometryShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Palm_Shader/Palm01Shadow_GS.glsl"));
+    addFragmentShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Palm_Shader/Palm01Shadow_FS.glsl"));
     compileShader();
 
     addUniform("clipplane");

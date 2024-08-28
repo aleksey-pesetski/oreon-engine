@@ -23,9 +23,9 @@ public class RockShadowShader extends GLShaderProgram {
   protected RockShadowShader() {
     super();
 
-    addVertexShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Rock_Shader/RockShadow_VS.glsl"));
-    addGeometryShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Rock_Shader/RockShadow_GS.glsl"));
-    addFragmentShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Rock_Shader/RockShadow_FS.glsl"));
+    addVertexShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Rock_Shader/RockShadow_VS.glsl"));
+    addGeometryShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Rock_Shader/RockShadow_GS.glsl"));
+    addFragmentShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Rock_Shader/RockShadow_FS.glsl"));
     compileShader();
 
     addUniformBlock("worldMatrices");

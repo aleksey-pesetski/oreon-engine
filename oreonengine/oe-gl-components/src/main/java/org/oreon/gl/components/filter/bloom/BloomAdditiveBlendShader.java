@@ -24,7 +24,7 @@ public class BloomAdditiveBlendShader extends GLShaderProgram {
   protected BloomAdditiveBlendShader() {
     super();
 
-    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/bloom/bloom_additiveBlending.comp"));
+    addComputeShader(ResourceLoaderUtils.load("shaders/filter/bloom/bloom_additiveBlending.comp"));
 
     compileShader();
 

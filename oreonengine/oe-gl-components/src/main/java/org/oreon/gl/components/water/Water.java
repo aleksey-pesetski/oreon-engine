@@ -15,6 +15,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.oreon.common.water.WaterConfig;
 import org.oreon.core.context.ContextHolder;
@@ -78,8 +79,7 @@ public class Water extends Renderable {
   private long systemTime = System.currentTimeMillis();
 
   public Water(int patches, GLShaderProgram shader, GLShaderProgram wireframeShader) {
-    config = new WaterConfig();
-    config.loadFile("water-config.properties");
+    config = loadWaterConfig();
     GLOreonContext context = (GLOreonContext) ContextHolder.getContext();
     context.getResources().setWaterConfig(config);
 
@@ -202,7 +202,7 @@ public class Water extends Renderable {
 
       if (!isCameraUnderwater) {
         scenegraph.record(reflectionRenderList);
-        reflectionRenderList.remove(this.id);
+        reflectionRenderList.remove(getId());
         reflectionRenderList.getValues().forEach(Renderable::render);
       }
 
@@ -231,7 +231,7 @@ public class Water extends Renderable {
       refraction_fbo.bind();
       renderConfig.clearScreenDeepOcean();
       scenegraph.record(refractionRenderList);
-      refractionRenderList.remove(this.id);
+      refractionRenderList.remove(getId());
       refractionRenderList.getValues().forEach(Renderable::render);
 
       // glFinish() important, to prevent conflicts with following compute shaders
@@ -294,4 +294,8 @@ public class Water extends Renderable {
     ssbo.addData(byteBuffer);
   }
 
+  @SneakyThrows
+  private WaterConfig loadWaterConfig() {
+    return WaterConfig.load("water-config.properties");
+  }
 }

@@ -2,7 +2,6 @@ package org.oreon.examples.gl.oreonworlds.plants;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.oreon.common.terrain.TerrainHelper;
 import org.oreon.core.gl.instanced.GLInstancedObject;
 import org.oreon.core.gl.memory.GLMeshVBO;
@@ -23,7 +22,8 @@ public class Grass01ClusterGroup extends GLInstancedObject {
   public Grass01ClusterGroup() {
 
     setInstanceCount(1);
-    Vec3f[] positions = {new Vec3f(243.69344f, 220.08157f, -2171.1907f)};
+    //Vec3f[] positions = {new Vec3f(243.69344f, 220.08157f, -2171.1907f)};
+    Vec3f[] positions = {new Vec3f(387.41534f, 289.75342f, -1108.2454f)};
     setPositions(positions);
     setHighPolyRange(-1);
 

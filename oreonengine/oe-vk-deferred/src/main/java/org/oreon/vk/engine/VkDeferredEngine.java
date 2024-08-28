@@ -14,6 +14,7 @@ import java.nio.LongBuffer;
 import java.util.LinkedHashMap;
 import lombok.Setter;
 import org.oreon.core.BaseOreonRenderEngine;
+import org.oreon.core.context.Config;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.scenegraph.NodeComponentType;
 import org.oreon.core.scenegraph.RenderList;
@@ -25,6 +26,7 @@ import org.oreon.core.vk.context.VkOreonContext;
 import org.oreon.core.vk.device.VkDeviceBundle;
 import org.oreon.core.vk.framebuffer.VkFrameBufferObject;
 import org.oreon.core.vk.image.VkImageView;
+import org.oreon.core.vk.scenegraph.VkCamera;
 import org.oreon.core.vk.scenegraph.VkRenderInfo;
 import org.oreon.core.vk.swapchain.SwapChain;
 import org.oreon.core.vk.synchronization.VkSemaphore;
@@ -79,13 +81,12 @@ public class VkDeferredEngine extends BaseOreonRenderEngine {
   @Setter
   private VkGUI gui;
 
-  public VkDeferredEngine() {
-    super(null, null);
+  public VkDeferredEngine(final Config config, final VkCamera camera) {
+    super(config, camera);
   }
 
   @Override
   public void init() {
-
     super.init();
 
     getSceneGraph().addObject(new VkDirectionalLight());

@@ -20,8 +20,8 @@ public class AtmosphereShader extends GLShaderProgram {
   protected AtmosphereShader() {
     super();
 
-    addVertexShader(ResourceLoaderUtils.loadShader("shaders/atmosphere/atmosphere.vert"));
-    addFragmentShader(ResourceLoaderUtils.loadShader("shaders/atmosphere/atmosphere.frag"));
+    addVertexShader(ResourceLoaderUtils.load("shaders/atmosphere/atmosphere.vert"));
+    addFragmentShader(ResourceLoaderUtils.load("shaders/atmosphere/atmosphere.frag"));
     compileShader();
 
     addUniform("modelViewProjectionMatrix");

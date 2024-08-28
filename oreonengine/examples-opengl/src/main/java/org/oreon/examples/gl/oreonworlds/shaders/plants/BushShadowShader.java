@@ -23,9 +23,9 @@ public class BushShadowShader extends GLShaderProgram {
   protected BushShadowShader() {
     super();
 
-    addVertexShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Bush_Shader/Bush01_VS.glsl"));
-    addGeometryShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Bush_Shader/Bush01Shadow_GS.glsl"));
-    addFragmentShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Bush_Shader/Bush01Shadow_FS.glsl"));
+    addVertexShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Bush_Shader/Bush01_VS.glsl"));
+    addGeometryShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Bush_Shader/Bush01Shadow_GS.glsl"));
+    addFragmentShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Bush_Shader/Bush01Shadow_FS.glsl"));
     compileShader();
 
     addUniform("clipplane");

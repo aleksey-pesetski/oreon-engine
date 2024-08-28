@@ -29,9 +29,9 @@ public class TreeTrunkShader extends GLShaderProgram {
   protected TreeTrunkShader() {
     super();
 
-    addVertexShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Tree_Shader/TreeTrunk_VS.glsl"));
-    addGeometryShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Tree_Shader/TreeTrunk_GS.glsl"));
-    addFragmentShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Tree_Shader/TreeTrunk_FS.glsl"));
+    addVertexShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Tree_Shader/TreeTrunk_VS.glsl"));
+    addGeometryShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Tree_Shader/TreeTrunk_GS.glsl"));
+    addFragmentShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Tree_Shader/TreeTrunk_FS.glsl"));
     compileShader();
 
     addUniform("material.diffusemap");

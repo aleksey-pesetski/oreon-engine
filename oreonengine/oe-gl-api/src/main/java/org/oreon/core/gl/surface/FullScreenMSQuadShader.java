@@ -15,8 +15,8 @@ public class FullScreenMSQuadShader extends GLShaderProgram {
   private FullScreenMSQuadShader() {
     super();
 
-    addVertexShader(ResourceLoaderUtils.loadShader("shaders/quad/quad_VS.glsl"));
-    addFragmentShader(ResourceLoaderUtils.loadShader("shaders/quad/quadMS_FS.glsl"));
+    addVertexShader(ResourceLoaderUtils.load("shaders/quad/quad_VS.glsl"));
+    addFragmentShader(ResourceLoaderUtils.load("shaders/quad/quadMS_FS.glsl"));
     compileShader();
 
     addUniform("texture");

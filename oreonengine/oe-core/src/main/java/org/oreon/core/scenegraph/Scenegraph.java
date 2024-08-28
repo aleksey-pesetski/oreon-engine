@@ -16,7 +16,6 @@ public class Scenegraph extends Node {
   private boolean hasWater = false;
 
   public Scenegraph() {
-
     setWorldTransform(new Transform());
 
     root = new Node();
@@ -44,7 +43,7 @@ public class Scenegraph extends Node {
     water.renderWireframe();
   }
 
-  public void renderTransparentObejcts() {
+  public void renderTransparentObjects() {
     transparentObjects.render();
   }
 

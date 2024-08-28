@@ -21,12 +21,13 @@ import org.lwjgl.BufferUtils;
 import org.oreon.core.context.ContextHolder;
 
 @Log4j2
-public class ResourceLoaderUtils {
+public final class ResourceLoaderUtils {
 
   private ResourceLoaderUtils() {
+    throw new IllegalStateException("Utility class");
   }
 
-  public static String loadShader(String fileName) {
+  public static String load(String fileName) {
     try (InputStream is = ResourceLoaderUtils.class.getClassLoader().getResourceAsStream(fileName)) {
       if (is == null) {
         throw new IOException("File not found: " + fileName);
@@ -60,7 +61,7 @@ public class ResourceLoaderUtils {
                 Integer.toString(ContextHolder.getContext().getConfig().getShadowMapResolution())
             );
 
-        return loadShader(fileName).replaceFirst("#lib.glsl", vLib);
+        return load(fileName).replaceFirst("#lib.glsl", vLib);
       }
     } catch (IOException e) {
       log.error("Unable to load lib file [{}]!", fileName, e);

@@ -17,7 +17,7 @@ public class BloomSceneBlendingShader extends GLShaderProgram {
   protected BloomSceneBlendingShader() {
     super();
 
-    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/bloom/bloomSceneBlending.comp"));
+    addComputeShader(ResourceLoaderUtils.load("shaders/filter/bloom/bloomSceneBlending.comp"));
 
     compileShader();
   }

@@ -1,7 +1,6 @@
 package org.oreon.examples.gl.oreonworlds.plants;
 
 import java.util.List;
-
 import org.oreon.common.terrain.TerrainHelper;
 import org.oreon.core.gl.instanced.GLInstancedObject;
 import org.oreon.core.gl.memory.GLMeshVBO;
@@ -28,19 +27,22 @@ public class Tree01ClusterGroup extends GLInstancedObject {
 
   public Tree01ClusterGroup() {
 
-    setInstanceCount(6);
-    Vec3f[] positions = {new Vec3f(-1061.5507f, 152.36606f, 1029.8318f),
-        new Vec3f(-1102.2029f, 162.44598f, 1242.017f), new Vec3f(-1149.664f, 143.76784f, 1060.4601f),
-        new Vec3f(-1109.2875f, 172.1296f, 1304.6906f), new Vec3f(-1031.7795f, 118.724434f, 1067.6212f),
-        new Vec3f(-1112.1095f, 141.70348f, 1041.5681f)};
+    var positions = new Vec3f[]{
+        new Vec3f(-1061.5507f, 152.36606f, 1029.8318f)
+        /*, new Vec3f(-1102.2029f, 162.44598f, 1242.017f)
+        , new Vec3f(-1149.664f, 143.76784f, 1060.4601f)
+        , new Vec3f(-1109.2875f, 172.1296f, 1304.6906f)
+        , new Vec3f(-1031.7795f, 118.724434f, 1067.6212f)
+        , new Vec3f(-1112.1095f, 141.70348f, 1041.5681f)*/
+    };
     setPositions(positions);
+    setInstanceCount(positions.length);
     setHighPolyRange(800);
+    setHighPolyInstanceCount(new IntegerReference(0));
+    setLowPolyInstanceCount(new IntegerReference(getInstanceCount()));
 
     List<Model> models = GLAssimpModelLoader.loadModel("oreonworlds/assets/plants/Tree_01", "tree01.obj");
     List<Model> billboards = GLAssimpModelLoader.loadModel("oreonworlds/assets/plants/Tree_01", "billboardmodel.obj");
-
-    setHighPolyInstanceCount(new IntegerReference(0));
-    setLowPolyInstanceCount(new IntegerReference(getInstanceCount()));
 
     for (Model model : models) {
 

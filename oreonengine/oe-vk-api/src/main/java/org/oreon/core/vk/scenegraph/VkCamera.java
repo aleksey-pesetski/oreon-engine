@@ -6,6 +6,7 @@ import static org.lwjgl.vulkan.VK10.VK_SHADER_STAGE_COMPUTE_BIT;
 
 import lombok.Getter;
 import org.lwjgl.vulkan.VkDevice;
+import org.oreon.core.context.Config;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.math.Vec3f;
 import org.oreon.core.scenegraph.BaseOreonCamera;
@@ -25,10 +26,10 @@ public class VkCamera extends BaseOreonCamera {
   private DescriptorSet descriptorSet;
   private DescriptorSetLayout descriptorSetLayout;
 
-  public VkCamera() {
+  public VkCamera(final Config config) {
 
     super(
-        null, null, null,
+        config, null, null,
         new Vec3f(-179.94112f, 63.197327f, -105.08341f),
         new Vec3f(0.48035842f, -0.39218548f, 0.7845039f),
         new Vec3f(0.20479666f, 0.9198862f, 0.33446646f)

@@ -1,12 +1,14 @@
 package org.oreon.core.vk.image;
 
-import org.lwjgl.BufferUtils;
-import org.lwjgl.stb.STBImage;
-import org.oreon.core.image.ImageMetaData;
+import static org.lwjgl.stb.STBImage.STBI_rgb_alpha;
+import static org.lwjgl.stb.STBImage.stbi_failure_reason;
+import static org.lwjgl.stb.STBImage.stbi_info_from_memory;
+import static org.lwjgl.stb.STBImage.stbi_load;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.channels.Channels;
@@ -15,9 +17,12 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import lombok.extern.log4j.Log4j2;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.stb.STBImage;
+import org.oreon.core.image.ImageMetaData;
 
-import static org.lwjgl.stb.STBImage.*;
-
+@Log4j2
 public class VkImageLoader {
 
   public static ImageMetaData getImageMetaData(String file) {
@@ -41,9 +46,10 @@ public class VkImageLoader {
     return new ImageMetaData(x.get(0), y.get(0), channels.get(0));
   }
 
-  public static ByteBuffer decodeImage(String file) {
+  public static ByteBuffer decodeImage(String resource) {
+    var resourceUrl = VkImageLoader.class.getClassLoader().getResource(resource);
 
-    String absolutePath = VkImageLoader.class.getClassLoader().getResource(file).getPath().substring(1);
+    String absolutePath = resourceUrl.getPath().substring(1);
     if (!System.getProperty("os.name").contains("Windows")) { // TODO Language/region agnostic value for 'Windows' ?
       // stbi_load requires a file system path, NOT a classpath resource path
       absolutePath = File.separator + absolutePath;
@@ -55,8 +61,7 @@ public class VkImageLoader {
 
     ByteBuffer image = stbi_load(absolutePath, x, y, channels, STBI_rgb_alpha);
     if (image == null) {
-      System.err.println(
-          "Could not decode image file [" + absolutePath + "]: [" + STBImage.stbi_failure_reason() + "]");
+      log.error("Could not decode image file [{}]: [{}]", absolutePath, STBImage.stbi_failure_reason());
     }
 
     return image;

@@ -28,9 +28,9 @@ public class InstancedBillboardShader extends GLShaderProgram {
   protected InstancedBillboardShader() {
     super();
 
-    addVertexShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Billboard_Shader/billboard.vert"));
-    addGeometryShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Billboard_Shader/billboard.geom"));
-    addFragmentShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Billboard_Shader/billboard.frag"));
+    addVertexShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Billboard_Shader/billboard.vert"));
+    addGeometryShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Billboard_Shader/billboard.geom"));
+    addFragmentShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Billboard_Shader/billboard.frag"));
     compileShader();
 
     addUniform("clipplane");

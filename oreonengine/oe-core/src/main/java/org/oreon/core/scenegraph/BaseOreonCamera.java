@@ -93,7 +93,8 @@ public abstract class BaseOreonCamera implements OreonCamera {
   protected FloatBuffer floatBuffer;
   protected final int bufferSize = Float.BYTES * (4 + 16 + 16 + (6 * 4) + (4));
 
-  protected BaseOreonCamera(Config config, Input input, Window window, Vec3f position, Vec3f forward, Vec3f up) {
+  protected BaseOreonCamera(final Config config, final Input input, final Window window,
+      final Vec3f position, final Vec3f forward, final Vec3f up) {
     this.config = config;
     this.input = input;
     this.window = window;

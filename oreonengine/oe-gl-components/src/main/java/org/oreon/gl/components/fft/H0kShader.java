@@ -18,7 +18,7 @@ public class H0kShader extends GLShaderProgram {
   protected H0kShader() {
     super();
 
-    addComputeShader(ResourceLoaderUtils.loadShader("shaders/fft/h0k.comp"));
+    addComputeShader(ResourceLoaderUtils.load("shaders/fft/h0k.comp"));
     compileShader();
 
     addUniform("N");

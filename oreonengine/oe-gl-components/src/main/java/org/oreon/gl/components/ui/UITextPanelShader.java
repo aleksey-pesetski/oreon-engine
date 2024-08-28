@@ -18,8 +18,8 @@ public class UITextPanelShader extends GLShaderProgram {
   protected UITextPanelShader() {
     super();
 
-    addVertexShader(ResourceLoaderUtils.loadShader("shaders/ui/textPanel.vert"));
-    addFragmentShader(ResourceLoaderUtils.loadShader("shaders/ui/textPanel.frag"));
+    addVertexShader(ResourceLoaderUtils.load("shaders/ui/textPanel.vert"));
+    addFragmentShader(ResourceLoaderUtils.load("shaders/ui/textPanel.frag"));
     compileShader();
 
     addUniform("orthographicMatrix");

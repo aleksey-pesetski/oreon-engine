@@ -9,19 +9,20 @@ import org.oreon.core.platform.Window;
 import org.oreon.core.scenegraph.BaseOreonCamera;
 
 @Getter
-public class BaseOreonContext<I extends Input, C extends BaseOreonCamera, W extends Window, R extends OreonResource>
-    implements OreonContext<I, C, W> {
+public class BaseOreonContext<I extends Input, C extends BaseOreonCamera,
+    W extends Window, R extends OreonResource> implements OreonContext<I, C, W> {
 
-  private Config config;
-  private I input;
+  private final Config config;
+  private final I input;
+  private final C camera;
+  private final W window;
+  private final R resources;
+
   @Setter
   private BaseOreonRenderEngine renderEngine;
   @Setter
   private CoreEngine coreEngine;
 
-  private C camera;
-  private W window;
-  private R resources;
 
   protected BaseOreonContext(final I input, final C camera, final W window, final R resources,
       final Config config, final BaseOreonRenderEngine renderEngine, final CoreEngine coreEngine) {

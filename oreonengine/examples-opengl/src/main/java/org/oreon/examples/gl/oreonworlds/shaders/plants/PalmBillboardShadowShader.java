@@ -28,11 +28,11 @@ public class PalmBillboardShadowShader extends GLShaderProgram {
   protected PalmBillboardShadowShader() {
     super();
 
-    addVertexShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Palm_Shader/Palm01_VS.glsl"));
+    addVertexShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Palm_Shader/Palm01_VS.glsl"));
     addGeometryShader(
-        ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Palm_Shader/Palm01BillboardShadow_GS.glsl"));
+        ResourceLoaderUtils.load("oreonworlds/shaders/assets/Palm_Shader/Palm01BillboardShadow_GS.glsl"));
     addFragmentShader(
-        ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Palm_Shader/Palm01BillboardShadow_FS.glsl"));
+        ResourceLoaderUtils.load("oreonworlds/shaders/assets/Palm_Shader/Palm01BillboardShadow_FS.glsl"));
     compileShader();
 
     addUniformBlock("InstancedMatrices");

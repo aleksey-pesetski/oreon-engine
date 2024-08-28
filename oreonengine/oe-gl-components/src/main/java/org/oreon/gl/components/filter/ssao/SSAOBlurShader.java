@@ -19,7 +19,7 @@ public class SSAOBlurShader extends GLShaderProgram {
 
     super();
 
-    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/ssao/ssao_blur.comp"));
+    addComputeShader(ResourceLoaderUtils.load("shaders/filter/ssao/ssao_blur.comp"));
     compileShader();
   }
 }

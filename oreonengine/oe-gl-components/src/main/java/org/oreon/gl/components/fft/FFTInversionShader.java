@@ -17,7 +17,7 @@ public class FFTInversionShader extends GLShaderProgram {
   protected FFTInversionShader() {
     super();
 
-    addComputeShader(ResourceLoaderUtils.loadShader("shaders/fft/inversion.comp"));
+    addComputeShader(ResourceLoaderUtils.load("shaders/fft/inversion.comp"));
     compileShader();
 
     addUniform("pingpong");

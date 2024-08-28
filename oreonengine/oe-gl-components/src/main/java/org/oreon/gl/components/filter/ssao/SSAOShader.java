@@ -21,7 +21,7 @@ public class SSAOShader extends GLShaderProgram {
 
     super();
 
-    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/ssao/ssao.comp"));
+    addComputeShader(ResourceLoaderUtils.load("shaders/filter/ssao/ssao.comp"));
     compileShader();
 
     addUniform("m_View");

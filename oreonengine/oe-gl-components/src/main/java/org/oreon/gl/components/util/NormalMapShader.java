@@ -21,7 +21,7 @@ public class NormalMapShader extends GLShaderProgram {
   protected NormalMapShader() {
     super();
 
-    addComputeShader(ResourceLoaderUtils.loadShader("shaders/util/normals.comp"));
+    addComputeShader(ResourceLoaderUtils.load("shaders/util/normals.comp"));
     compileShader();
 
     addUniform("heightmap");

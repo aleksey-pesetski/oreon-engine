@@ -9,12 +9,14 @@ import static org.lwjgl.vulkan.VK10.VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 import static org.lwjgl.vulkan.VK10.VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 import static org.lwjgl.vulkan.VK10.VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
 import static org.lwjgl.vulkan.VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+import static org.lwjgl.vulkan.VK10.VK_SUCCESS;
 
 import java.nio.ByteBuffer;
 import java.nio.LongBuffer;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.oreon.core.context.BaseOreonContext;
+import org.oreon.core.context.Config;
 import org.oreon.core.platform.Input;
 import org.oreon.core.vk.context.DeviceManager.DeviceType;
 import org.oreon.core.vk.descriptor.DescriptorPool;
@@ -34,9 +36,13 @@ public class VkOreonContext extends BaseOreonContext<Input, VkCamera, VkWindow, 
   private DeviceManager deviceManager;
   private long surface;
 
-  public VkOreonContext() {
+  public VkOreonContext(
+      final Config config,
+      final VkCamera camera,
+      final VkWindow window,
+      final VkResources resources) {
     //super(new VkCamera(), new VkWindow(), new VkResources(), null, null);
-    super(null, null, null, null, null, null, null);
+    super(null, camera, window, resources, config, null, null);
     deviceManager = new DeviceManager();
 
     if (!glfwInit()) {
@@ -55,14 +61,14 @@ public class VkOreonContext extends BaseOreonContext<Input, VkCamera, VkWindow, 
         VkUtil.getValidationLayerNames(getConfig().isVkValidation(), enabledLayers)
     );
 
-    //getWindow().create();
+    getWindow().create();
 
     LongBuffer pSurface = memAllocLong(1);
-    /*int err = glfwCreateWindowSurface(vkInstance.getHandle(), getWindow().getId(), null, pSurface);
+    int err = glfwCreateWindowSurface(vkInstance.getHandle(), getWindow().getId(), null, pSurface);
     surface = pSurface.get(0);
     if (err != VK_SUCCESS) {
       throw new AssertionError("Failed to create surface: " + VkUtil.translateVulkanResult(err));
-    }*/
+    }
     PhysicalDevice physicalDevice = new PhysicalDevice(vkInstance.getHandle(), surface);
     LogicalDevice logicalDevice = new LogicalDevice(physicalDevice, 0);
     VkDeviceBundle majorDevice = new VkDeviceBundle(physicalDevice, logicalDevice);

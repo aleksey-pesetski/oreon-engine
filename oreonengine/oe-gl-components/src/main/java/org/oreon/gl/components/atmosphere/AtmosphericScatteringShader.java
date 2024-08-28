@@ -19,8 +19,8 @@ public class AtmosphericScatteringShader extends GLShaderProgram {
   protected AtmosphericScatteringShader() {
     super();
 
-    addVertexShader(ResourceLoaderUtils.loadShader("shaders/atmosphere/atmospheric_scattering.vert"));
-    addFragmentShader(ResourceLoaderUtils.loadShader("shaders/atmosphere/atmospheric_scattering.frag"));
+    addVertexShader(ResourceLoaderUtils.load("shaders/atmosphere/atmospheric_scattering.vert"));
+    addFragmentShader(ResourceLoaderUtils.load("shaders/atmosphere/atmospheric_scattering.frag"));
     compileShader();
 
     addUniform("m_MVP");

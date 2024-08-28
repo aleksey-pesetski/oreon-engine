@@ -284,6 +284,11 @@ public class VkGUI extends GUI {
     }
 
     @Override
+    protected Map<Attachment, VkImageBundle> configureAttachments(int width, int height) {
+      return Map.of();
+    }
+
+    @Override
     protected RenderPass configureRenderPass(final RenderPass renderPass) {
       renderPass.addColorAttachment(0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
           VK_FORMAT_R16G16B16A16_SFLOAT, 1, VK_IMAGE_LAYOUT_UNDEFINED,

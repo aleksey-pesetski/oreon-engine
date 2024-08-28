@@ -12,6 +12,7 @@ import org.oreon.core.gl.platform.GLWindow;
 import org.oreon.core.gl.scenegraph.GLCamera;
 import org.oreon.core.platform.GLFWInput;
 import org.oreon.examples.gl.oreonworlds.ocean.Ocean;
+import org.oreon.examples.gl.oreonworlds.plants.Tree01ClusterGroup;
 import org.oreon.examples.gl.oreonworlds.terrain.Terrain;
 import org.oreon.gl.components.atmosphere.Atmosphere;
 import org.oreon.gl.components.terrain.shader.TerrainShader;
@@ -43,18 +44,22 @@ public class GLOreonworlds {
       renderEngine.init();
       renderEngine.getSceneGraph().addObject(new Atmosphere());
       renderEngine.getSceneGraph().setWater(new Ocean());
-      renderEngine.getSceneGraph().setTerrain(
-          new Terrain(TerrainShader.getInstance(), TerrainWireframeShader.getInstance(),
-              TerrainShadowShader.getInstance()));
+      renderEngine.getSceneGraph()
+          .setTerrain(new Terrain(
+              TerrainShader.getInstance(),
+              TerrainWireframeShader.getInstance(),
+              TerrainShadowShader.getInstance()
+          ));
+
+      //renderEngine.getSceneGraph().getRoot().addChild(new Palm01ClusterGroup());
+      //renderEngine.getSceneGraph().getRoot().addChild(new Plant01ClusterGroup());
+      //renderEngine.getSceneGraph().getRoot().addChild(new Grass01ClusterGroup());
+      renderEngine.getSceneGraph().getRoot().addChild(new Tree01ClusterGroup());
+      //renderEngine.getSceneGraph().getRoot().addChild(new Tree02ClusterGroup());
+      //renderEngine.getSceneGraph().getRoot().addChild(new Rock01ClusterGroup());
+      //renderEngine.getSceneGraph().getRoot().addChild(new Rock02ClusterGroup());
       coreEngine.start();
 
-      //		renderEngine.getSceneGraph().getRoot().addChild(new Palm01ClusterGroup());
-      //		renderEngine.getSceneGraph().getRoot().addChild(new Plant01ClusterGroup());
-      //		renderEngine.getSceneGraph().getRoot().addChild(new Grass01ClusterGroup());
-      //		renderEngine.getSceneGraph().getRoot().addChild(new Tree02ClusterGroup());
-      //		renderEngine.getSceneGraph().getRoot().addChild(new Tree01ClusterGroup());
-      //		renderEngine.getSceneGraph().getRoot().addChild(new Rock01ClusterGroup());
-      //		renderEngine.getSceneGraph().getRoot().addChild(new Rock02ClusterGroup());
 
     } catch (Exception e) {
       log.error(e.getMessage(), e);

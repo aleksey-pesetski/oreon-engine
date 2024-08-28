@@ -23,6 +23,7 @@ import org.oreon.core.vk.framebuffer.FrameBufferColorAttachment;
 import org.oreon.core.vk.framebuffer.FrameBufferDepthAttachment;
 import org.oreon.core.vk.framebuffer.VkFrameBufferObject;
 import org.oreon.core.vk.pipeline.RenderPass;
+import org.oreon.core.vk.wrapper.image.VkImageBundle;
 
 public class TransparencyFbo extends VkFrameBufferObject {
 
@@ -42,6 +43,11 @@ public class TransparencyFbo extends VkFrameBufferObject {
             Attachment.DEPTH, new FrameBufferDepthAttachment(device, memoryProperties,
                 width, height, VK_FORMAT_D32_SFLOAT, 1)
         ));
+  }
+
+  @Override
+  protected Map<Attachment, VkImageBundle> configureAttachments(int width, int height) {
+    return Map.of();
   }
 
   @Override

@@ -21,7 +21,7 @@ public class MotionBlurShader extends GLShaderProgram {
   protected MotionBlurShader() {
     super();
 
-    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/motion_blur/motionBlur.comp"));
+    addComputeShader(ResourceLoaderUtils.load("shaders/filter/motion_blur/motionBlur.comp"));
 
     compileShader();
 

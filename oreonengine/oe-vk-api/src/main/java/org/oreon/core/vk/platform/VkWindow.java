@@ -11,21 +11,19 @@ import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.opengl.GL11.GL_TRUE;
 
-import org.oreon.core.context.ContextHolder;
+import org.oreon.core.context.Config;
 import org.oreon.core.platform.Window;
 
 public class VkWindow extends Window {
 
-  public VkWindow() {
-
-    super(ContextHolder.getContext().getConfig().getDisplayTitle(),
-        ContextHolder.getContext().getConfig().getWindowWidth(),
-        ContextHolder.getContext().getConfig().getWindowHeight());
+  public VkWindow(final Config config) {
+    super(config.getDisplayTitle(),
+        config.getWindowWidth(),
+        config.getWindowHeight());
   }
 
   @Override
   public void create() {
-
     glfwDefaultWindowHints();
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);

@@ -1,14 +1,19 @@
 package org.oreon.core.gl.util;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.IntBuffer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -79,7 +84,7 @@ public class GLAssimpModelLoader {
       try {
         uri = GLAssimpModelLoader.class.getResource(SEPARATOR + path).toURI();
       } catch (URISyntaxException e) {
-        log.error(e);
+        log.info("Error loading {}", path, e);
       }
 
       try {
@@ -97,10 +102,11 @@ public class GLAssimpModelLoader {
         }
 
       } catch (IOException e) {
-        log.error(e);
+        log.error("Could not create temp file: {}", e.getMessage());
       }
     } else {
-      tmpPath = GLAssimpModelLoader.class.getClassLoader().getResource(path + SEPARATOR + file).getPath();
+      var url = GLAssimpModelLoader.class.getClassLoader().getResource(path + "/" + file);
+      tmpPath = URLDecoder.decode(url.getPath(), UTF_8);
 
       // For Linux need to keep '/' or else the Assimp.aiImportFile(...) call below returns null!
       if (System.getProperty("os.name").contains("Windows")) {

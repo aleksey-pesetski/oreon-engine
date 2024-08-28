@@ -23,7 +23,7 @@ public class UnderWaterShader extends GLShaderProgram {
   protected UnderWaterShader() {
     super();
 
-    addComputeShader(ResourceLoaderUtils.loadShader("shaders/water/underwater.comp"));
+    addComputeShader(ResourceLoaderUtils.load("shaders/water/underwater.comp"));
 
     compileShader();
 

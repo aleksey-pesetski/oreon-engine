@@ -17,7 +17,7 @@ public class SceneBrightnessShader extends GLShaderProgram {
   protected SceneBrightnessShader() {
     super();
 
-    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/bloom/brightness.comp"));
+    addComputeShader(ResourceLoaderUtils.load("shaders/filter/bloom/brightness.comp"));
     compileShader();
   }
 }

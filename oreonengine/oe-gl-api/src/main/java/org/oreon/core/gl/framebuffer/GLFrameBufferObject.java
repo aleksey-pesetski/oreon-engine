@@ -36,7 +36,7 @@ public abstract class GLFrameBufferObject extends FrameBufferObject {
           .forEach(index -> {
             try {
               final Field declaredField = GL30.class.getDeclaredField("GL_COLOR_ATTACHMENT%s".formatted(index));
-              getLog().info("Draw buffer {} attached to {}.", index, declaredField.getName());
+              getLog().debug("Draw buffer {} attached to {}.", index, declaredField.getName());
               drawBuffers.put(declaredField.getInt(null));
             } catch (NoSuchFieldException | IllegalAccessException e) {
               getLog().error("Can't get GL_COLOR_ATTACHMENT{}.", index, e);

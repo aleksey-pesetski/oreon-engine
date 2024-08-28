@@ -24,7 +24,7 @@ public class BloomHorizontalBlurShader extends GLShaderProgram {
   protected BloomHorizontalBlurShader() {
     super();
 
-    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/bloom/bloom_horizontalGaussianBlur.comp"));
+    addComputeShader(ResourceLoaderUtils.load("shaders/filter/bloom/bloom_horizontalGaussianBlur.comp"));
 
     compileShader();
 

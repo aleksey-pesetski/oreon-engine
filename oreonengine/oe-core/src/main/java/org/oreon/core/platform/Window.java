@@ -27,7 +27,6 @@ public abstract class Window {
   public abstract void resize(int x, int y);
 
   public Window(String title, int width, int height) {
-
     this.width = width;
     this.height = height;
     this.title = title;

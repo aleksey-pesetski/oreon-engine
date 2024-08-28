@@ -17,7 +17,7 @@ public class ContrastShader extends GLShaderProgram {
   protected ContrastShader() {
     super();
 
-    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/contrast/Contrast_CS.glsl"));
+    addComputeShader(ResourceLoaderUtils.load("shaders/filter/contrast/Contrast_CS.glsl"));
 
     compileShader();
 

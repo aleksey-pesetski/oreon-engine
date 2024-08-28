@@ -38,6 +38,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkPhysicalDeviceMemoryProperties;
 import org.lwjgl.vulkan.VkQueue;
@@ -161,8 +162,7 @@ public class Water extends Renderable {
     clip_offset = 4;
     clipplane = new Vec4f(0, -1, 0, getWorldTransform().getTranslation().getY() + clip_offset);
 
-    waterConfig = new WaterConfig();
-    waterConfig.loadFile("water-config.properties");
+    waterConfig = loadWaterConfig();
 
     image_dudv = VkImageHelper.loadImageFromFileMipmap(
         device.getHandle(), memoryProperties,
@@ -584,5 +584,10 @@ public class Water extends Renderable {
       renderPass.createRenderPass();
       return null;
     }
+  }
+
+  @SneakyThrows
+  private WaterConfig loadWaterConfig() {
+    return WaterConfig.load("water-config.properties");
   }
 }

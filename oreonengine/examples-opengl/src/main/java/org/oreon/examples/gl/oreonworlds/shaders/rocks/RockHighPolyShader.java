@@ -33,9 +33,9 @@ public class RockHighPolyShader extends GLShaderProgram {
   protected RockHighPolyShader() {
     super();
 
-    addVertexShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Rock_Shader/RockHighPoly_VS.glsl"));
-    addGeometryShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Rock_Shader/RockHighPoly_GS.glsl"));
-    addFragmentShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Rock_Shader/RockHighPoly_FS.glsl"));
+    addVertexShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Rock_Shader/RockHighPoly_VS.glsl"));
+    addGeometryShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Rock_Shader/RockHighPoly_GS.glsl"));
+    addFragmentShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Rock_Shader/RockHighPoly_FS.glsl"));
     compileShader();
 
     addUniform("material.diffusemap");

@@ -29,9 +29,9 @@ public class PalmBillboardShader extends GLShaderProgram {
   protected PalmBillboardShader() {
     super();
 
-    addVertexShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Palm_Shader/Palm01_VS.glsl"));
-    addGeometryShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Palm_Shader/Palm01_GS.glsl"));
-    addFragmentShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Palm_Shader/Palm01Billboard_FS.glsl"));
+    addVertexShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Palm_Shader/Palm01_VS.glsl"));
+    addGeometryShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Palm_Shader/Palm01_GS.glsl"));
+    addFragmentShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Palm_Shader/Palm01Billboard_FS.glsl"));
     compileShader();
 
     addUniform("clipplane");

@@ -17,7 +17,7 @@ public class TwiddleFactorsShader extends GLShaderProgram {
   protected TwiddleFactorsShader() {
     super();
 
-    addComputeShader(ResourceLoaderUtils.loadShader("shaders/fft/twiddleFactors.comp"));
+    addComputeShader(ResourceLoaderUtils.load("shaders/fft/twiddleFactors.comp"));
     compileShader();
 
     addUniform("N");

@@ -17,7 +17,7 @@ public class GaussianBlurVerticalShader extends GLShaderProgram {
   protected GaussianBlurVerticalShader() {
     super();
 
-    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/gaussian_blur/vertical_gaussian_blur.comp"));
+    addComputeShader(ResourceLoaderUtils.load("shaders/filter/gaussian_blur/vertical_gaussian_blur.comp"));
 
     compileShader();
   }

@@ -17,7 +17,7 @@ public class HktShader extends GLShaderProgram {
   protected HktShader() {
     super();
 
-    addComputeShader(ResourceLoaderUtils.loadShader("shaders/fft/hkt.comp"));
+    addComputeShader(ResourceLoaderUtils.load("shaders/fft/hkt.comp"));
     compileShader();
 
     addUniform("N");

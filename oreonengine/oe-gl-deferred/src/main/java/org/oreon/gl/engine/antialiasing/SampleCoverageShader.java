@@ -18,7 +18,7 @@ public class SampleCoverageShader extends GLShaderProgram {
   protected SampleCoverageShader() {
     super();
 
-    addComputeShader(ResourceLoaderUtils.loadShader("shaders/sampleCoverage.comp"));
+    addComputeShader(ResourceLoaderUtils.load("shaders/sampleCoverage.comp"));
 
     compileShader();
 

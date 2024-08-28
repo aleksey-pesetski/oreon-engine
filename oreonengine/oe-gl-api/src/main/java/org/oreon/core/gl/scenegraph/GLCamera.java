@@ -12,10 +12,11 @@ public class GLCamera extends BaseOreonCamera {
 
   private GLUniformBuffer ubo;
 
-  public GLCamera(Config config, GLFWInput input, GLWindow window) {
+  public GLCamera(final Config config, final GLFWInput input, final GLWindow window) {
     super(
         config, input, window,
         new Vec3f(580.4513f, 103.191055f, -2971.5518f),
+        //new Vec3f(0f, -100f, 0f),
         new Vec3f(0.54644656f, -0.16165589f, 0.82174426f),
         new Vec3f(0.08951365f, 0.98684716f, 0.13461028f)
     );

@@ -28,9 +28,9 @@ public class TreeLeavesShader extends GLShaderProgram {
   protected TreeLeavesShader() {
     super();
 
-    addVertexShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Tree_Shader/TreeLeaves_VS.glsl"));
-    addGeometryShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Tree_Shader/TreeLeaves_GS.glsl"));
-    addFragmentShader(ResourceLoaderUtils.loadShader("oreonworlds/shaders/assets/Tree_Shader/TreeLeaves_FS.glsl"));
+    addVertexShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Tree_Shader/TreeLeaves_VS.glsl"));
+    addGeometryShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Tree_Shader/TreeLeaves_GS.glsl"));
+    addFragmentShader(ResourceLoaderUtils.load("oreonworlds/shaders/assets/Tree_Shader/TreeLeaves_FS.glsl"));
     compileShader();
 
     addUniform("material.diffusemap");

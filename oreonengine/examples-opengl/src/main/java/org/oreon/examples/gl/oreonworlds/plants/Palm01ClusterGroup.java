@@ -2,16 +2,17 @@ package org.oreon.examples.gl.oreonworlds.plants;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.oreon.core.gl.memory.GLMeshVBO;
 import org.oreon.core.gl.scenegraph.GLRenderInfo;
 import org.oreon.core.gl.util.GLAssimpModelLoader;
 import org.oreon.core.gl.wrapper.parameter.CullFaceDisable;
 import org.oreon.core.instanced.InstancedObject;
+import org.oreon.core.math.Vec3f;
 import org.oreon.core.model.Model;
 import org.oreon.core.model.Vertex;
 import org.oreon.core.scenegraph.NodeComponentType;
 import org.oreon.core.scenegraph.Renderable;
+import org.oreon.core.util.IntegerReference;
 import org.oreon.examples.gl.oreonworlds.shaders.plants.PalmBillboardShader;
 import org.oreon.examples.gl.oreonworlds.shaders.plants.PalmBillboardShadowShader;
 import org.oreon.examples.gl.oreonworlds.shaders.plants.PalmShader;
@@ -20,11 +21,16 @@ import org.oreon.examples.gl.oreonworlds.shaders.plants.PalmShadowShader;
 public class Palm01ClusterGroup extends InstancedObject {
 
   public Palm01ClusterGroup() {
-
-    List<Renderable> objects = new ArrayList<>();
+    setInstanceCount(1);
+    setPositions(new Vec3f[]{new Vec3f(0f, 0f, 0f)});
+    setHighPolyRange(-1);
 
     List<Model> models = GLAssimpModelLoader.loadModel("oreonworlds/assets/plants/Palm_01", "Palma 001.obj");
     List<Model> billboards = GLAssimpModelLoader.loadModel("oreonworlds/assets/plants/Palm_01", "billboardmodel.obj");
+
+    List<Renderable> objects = new ArrayList<>();
+    setHighPolyInstanceCount(new IntegerReference(0));
+    setLowPolyInstanceCount(new IntegerReference(getInstanceCount()));
 
     for (Model model : models) {
 

@@ -17,7 +17,7 @@ public class FFTButterflyShader extends GLShaderProgram {
   protected FFTButterflyShader() {
     super();
 
-    addComputeShader(ResourceLoaderUtils.loadShader("shaders/fft/butterfly.comp"));
+    addComputeShader(ResourceLoaderUtils.load("shaders/fft/butterfly.comp"));
     compileShader();
 
     addUniform("direction");

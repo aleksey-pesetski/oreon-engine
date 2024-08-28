@@ -9,7 +9,8 @@ import org.oreon.core.scenegraph.BaseOreonCamera;
 @Log4j2
 public abstract class ContextHolder<I extends Input, C extends BaseOreonCamera, W extends Window, OC extends OreonContext<I, C, W>> {
 
-  private static final ThreadLocal<OreonContext<?, ?, ?>> CONTEXT_THREAD_LOCAL = new ThreadLocal<>();
+  //private static final ThreadLocal<OreonContext<?, ?, ?>> CONTEXT_THREAD_LOCAL = new ThreadLocal<>();
+  private static final InheritableThreadLocal<OreonContext<?, ?, ?>> CONTEXT_THREAD_LOCAL = new InheritableThreadLocal<>();
 
   private ContextHolder() {
     throw new IllegalStateException();

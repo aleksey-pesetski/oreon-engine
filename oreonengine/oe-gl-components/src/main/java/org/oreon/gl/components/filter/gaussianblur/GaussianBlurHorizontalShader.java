@@ -17,7 +17,7 @@ public class GaussianBlurHorizontalShader extends GLShaderProgram {
   protected GaussianBlurHorizontalShader() {
     super();
 
-    addComputeShader(ResourceLoaderUtils.loadShader("shaders/filter/gaussian_blur/horizontal_gaussian_blur.comp"));
+    addComputeShader(ResourceLoaderUtils.load("shaders/filter/gaussian_blur/horizontal_gaussian_blur.comp"));
 
     compileShader();
   }

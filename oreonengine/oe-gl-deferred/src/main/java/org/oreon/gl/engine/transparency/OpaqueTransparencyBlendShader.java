@@ -22,7 +22,7 @@ public class OpaqueTransparencyBlendShader extends GLShaderProgram {
 
     super();
 
-    addComputeShader(ResourceLoaderUtils.loadShader("shaders/opaqueTransparencyBlend.comp"));
+    addComputeShader(ResourceLoaderUtils.load("shaders/opaqueTransparencyBlend.comp"));
 
     compileShader();
 

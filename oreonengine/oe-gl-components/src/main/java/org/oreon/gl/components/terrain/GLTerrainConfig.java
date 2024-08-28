@@ -269,7 +269,7 @@ public class GLTerrainConfig extends QuadtreeConfig {
 
       super();
 
-      addComputeShader(ResourceLoaderUtils.loadShader("shaders/terrain/HeightMap.comp"));
+      addComputeShader(ResourceLoaderUtils.load("shaders/terrain/HeightMap.comp"));
       compileShader();
 
       addUniform("N");
@@ -357,7 +357,7 @@ public class GLTerrainConfig extends QuadtreeConfig {
 
       super();
 
-      addComputeShader(ResourceLoaderUtils.loadShader("shaders/terrain/SplatMap.comp"));
+      addComputeShader(ResourceLoaderUtils.load("shaders/terrain/SplatMap.comp"));
       compileShader();
     }
   }

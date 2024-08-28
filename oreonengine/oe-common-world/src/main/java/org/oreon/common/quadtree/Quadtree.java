@@ -1,12 +1,11 @@
 package org.oreon.common.quadtree;
 
-import lombok.Getter;
-
 import java.util.Map;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
+import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.math.Transform;
 import org.oreon.core.math.Vec2f;
@@ -14,20 +13,20 @@ import org.oreon.core.scenegraph.Node;
 import org.oreon.core.scenegraph.NodeComponent;
 import org.oreon.core.scenegraph.NodeComponentType;
 
+@Log4j2
 public abstract class Quadtree extends Node implements Runnable {
 
-  private Thread thread;
-  private Lock startUpdateQuadtreeLock;
-  private Condition startUpdateQuadtreeCondition;
+  private final Thread thread;
+  private final Lock startUpdateQuadtreeLock;
+  private final Condition startUpdateQuadtreeCondition;
+
   private boolean isRunning;
   private int updateCounter;
-  private int updateThreshold = 2;
 
   @Getter
   protected QuadtreeCache quadtreeCache;
 
   public Quadtree() {
-
     isRunning = false;
     startUpdateQuadtreeLock = new ReentrantLock();
     startUpdateQuadtreeCondition = startUpdateQuadtreeLock.newCondition();
@@ -36,13 +35,13 @@ public abstract class Quadtree extends Node implements Runnable {
   }
 
   public void updateQuadtree() {
-
     if (ContextHolder.getContext().getCamera().isCameraMoved()) {
       updateCounter++;
     }
 
-    if (updateCounter == updateThreshold) {
+    if (updateCounter == 2) {
       for (Node node : getChildren()) {
+        log.debug("Updating quadtree: id {}.", node.getId());
         ((QuadtreeNode) node).updateQuadtree();
       }
       updateCounter = 0;
@@ -55,16 +54,15 @@ public abstract class Quadtree extends Node implements Runnable {
 
   @Override
   public void run() {
-
     isRunning = true;
 
     while (isRunning) {
-
       startUpdateQuadtreeLock.lock();
       try {
         startUpdateQuadtreeCondition.await();
       } catch (InterruptedException e) {
-        e.printStackTrace();
+        log.error("Interrupted", e);
+        thread.interrupt();
       } finally {
         startUpdateQuadtreeLock.unlock();
       }
@@ -73,10 +71,7 @@ public abstract class Quadtree extends Node implements Runnable {
     }
   }
 
-  ;
-
   public void signal() {
-
     startUpdateQuadtreeLock.lock();
     try {
       startUpdateQuadtreeCondition.signal();
@@ -87,11 +82,9 @@ public abstract class Quadtree extends Node implements Runnable {
 
   @Override
   public void shutdown() {
-
     isRunning = false;
+    thread.interrupt();
   }
-
-  ;
 
   @Override
   public void update() {
