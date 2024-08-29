@@ -22,7 +22,6 @@ subprojects {
     }
 
     ext.lwjglVersion = '3.3.4'
-    //ext.lwjglVersion = '3.1.7-SNAPSHOT'
     ext.lwjglNatives = ''
 
     ext.log4jVersion = '2.23.1'
@@ -49,3 +48,12 @@ subprojects {
         implementation "org.lwjgl:lwjgl-stb:${lwjglVersion}"*/
     }
 }
+
+evaluationDependsOnChildren()
+
+def subproject1 = project(':examples-vulkan')
+def subproject2 = project(':oe-vk-deferred')
+def subproject3 = project(':oe-vk-components')
+def subproject4 = project(':oe-vk-api')
+
+subproject1.tasks['jar'].mustRunAfter(subproject2.tasks['jar'], subproject3.tasks['jar'], subproject4.tasks['jar'])

@@ -1,3 +1,33 @@
+apply plugin: 'application'
+//apply plugin: 'com.github.johnrengelman.shadow'
+
+application {
+    mainClass = 'org.oreon.examples.vk.oreonworlds.VkOreonworlds'
+}
+
+/*
+shadowJar {
+    // Ensures that the JAR is named as my-java-app.jar without the 'all' suffix
+    archiveClassifier.set('')
+    mergeServiceFiles()
+    // Optionally, you can exclude specific files or dependencies
+    // exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+}
+*/
+
+jar {
+    manifest {
+        //attributes 'Main-Class': application.mainClass.get()
+        attributes('Implementation-Title': project.name,
+                'Implementation-Version': '1.0',
+                'Main-Class': application.mainClass.get())
+    }
+    // Copy dependencies into the JAR
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
 dependencies {
     api project(':oe-core')
     api project(':oe-vk-api')
@@ -14,6 +44,9 @@ dependencies {
     implementation "org.lwjgl:lwjgl-stb"
 
     implementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+    implementation "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+    implementation "org.apache.logging.log4j:log4j-iostreams:${log4jVersion}"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.16.2"
 
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"

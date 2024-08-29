@@ -1,13 +1,3 @@
-/*jar {
-    manifest {
-        attributes("Manifest-Version": "1.0",
-                "Main-Class": "org.oreon.examples.gl.oreonworlds.GLOreonworlds");
-    }
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-}*/
-
 apply plugin: 'application'
 //apply plugin: 'com.github.johnrengelman.shadow'
 
@@ -38,7 +28,6 @@ jar {
 
 
 dependencies {
-    api project(':oe-core')
     api project(':oe-gl-api')
     api project(':oe-gl-components')
     api project(':oe-gl-deferred')

@@ -46,7 +46,7 @@ public class GLSystemMonitor extends GLGUI {
   public void update() {
 
     getScreens().get(0).getElements().get(3).update(Integer.toString(CoreEngine.getFps()));
-    String cpuLoad = Double.toString(bean.getSystemCpuLoad());
+    String cpuLoad = Double.toString(bean.getCpuLoad());
     if (cpuLoad.length() == 3) {
       cpuLoad = cpuLoad.substring(2, 3);
     } else {

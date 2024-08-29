@@ -1,5 +1,5 @@
 dependencies {
-    api project(':oe-core')
+    implementation project(':oe-core')
 
     implementation "org.lwjgl:lwjgl"
     implementation "org.lwjgl:lwjgl-assimp"
