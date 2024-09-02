@@ -51,12 +51,15 @@ jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
         attributes(
-                'Class-Path': configurations.runtimeClasspath.collect { it.getName() }.join(' '),
+                'Implementation-Title': project.name,
+                'Implementation-Version': version,
+                //'Class-Path': configurations.runtimeClasspath.collect { "libs/${it.getName()}" }.join(' '),
+                //'Class-Path': configurations.runtimeClasspath.collect { "./${it.getName()}" }.join(' '),
                 'Main-Class': application.mainClass.get()
         )
     }
     // Copy dependencies into the JAR
-    from {
+    /*from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
+    }*/
 }

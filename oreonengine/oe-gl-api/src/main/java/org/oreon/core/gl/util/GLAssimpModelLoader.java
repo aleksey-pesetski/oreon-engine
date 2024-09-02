@@ -1,28 +1,27 @@
 package org.oreon.core.gl.util;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.FileSystems.getFileSystem;
+import static java.nio.file.FileSystems.newFileSystem;
+import static java.util.Collections.emptyMap;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.IntBuffer;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 import lombok.extern.log4j.Log4j2;
 import org.lwjgl.assimp.AIColor4D;
 import org.lwjgl.assimp.AIFace;
@@ -31,6 +30,7 @@ import org.lwjgl.assimp.AIMesh;
 import org.lwjgl.assimp.AIScene;
 import org.lwjgl.assimp.AIString;
 import org.lwjgl.assimp.AIVector3D;
+import org.lwjgl.assimp.AIVector3D.Buffer;
 import org.lwjgl.assimp.Assimp;
 import org.oreon.core.gl.texture.GLTexture;
 import org.oreon.core.gl.wrapper.texture.TextureImage2D;
@@ -46,11 +46,10 @@ import org.oreon.core.util.Util;
 @Log4j2
 public class GLAssimpModelLoader {
 
-  public static final String SEPARATOR = "/";
-
-  private static FileSystem tempFileSystem = null;
+  private static final String SEPARATOR = "/";
 
   private GLAssimpModelLoader() {
+    throw new IllegalAccessError("Utility class.");
   }
 
   public static List<Model> loadModel(String path, String file) {
@@ -78,31 +77,41 @@ public class GLAssimpModelLoader {
         directory.deleteOnExit();
       }
 
+      log.info("Create Temporary file.");
       tmpPath = createTempFile(path, file, currentAbsolutePath);
+      log.info("Temporary file successfully created: {}", tmpPath);
 
       URI uri = null;
       try {
         uri = GLAssimpModelLoader.class.getResource(SEPARATOR + path).toURI();
       } catch (URISyntaxException e) {
-        log.info("Error loading {}", path, e);
+        log.error("Error loading {}", path, e);
       }
 
+      FileSystem fileSystem;
       try {
-        if (tempFileSystem == null) {
-          tempFileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap());
+        fileSystem = getFileSystem(uri);
+      } catch (Exception e) {
+        log.warn("Failed to get existing FileSystem. Creating a new one.");
+        try {
+          fileSystem = newFileSystem(uri, emptyMap());
+        } catch (IOException ex) {
+          log.error("Error creating new FileSystem for path: {}", path, ex);
+          throw new RuntimeException("Failed to initialize FileSystem", ex);
         }
+      }
 
-        Path myPath = tempFileSystem.getPath(SEPARATOR + path);
+      Path myPath = fileSystem.getPath(SEPARATOR + path);
 
-        for (Iterator<Path> it = Files.walk(myPath, 1).iterator(); it.hasNext(); ) {
-          Path p = it.next();
-          if (!Files.isDirectory(p)) {
-            createTempFile(path, p.getFileName().toString(), currentAbsolutePath);
-          }
-        }
-
+      try (Stream<Path> stream = Files.walk(myPath, 1)) {
+        log.debug("Start walking via {}", myPath.getFileSystem());
+        stream.filter(p -> !Files.isDirectory(p)).forEach(p -> {
+          log.debug("Creating sub temporary file for {}", p.getFileName());
+          String tmpFile = createTempFile(path, p.getFileName().toString(), currentAbsolutePath);
+          log.debug("Sub temporary file successfully created: {}", tmpFile);
+        });
       } catch (IOException e) {
-        log.error("Could not create temp file: {}", e.getMessage());
+        log.error("Error walking the path {}: {}", myPath, e.getMessage(), e);
       }
     } else {
       var url = GLAssimpModelLoader.class.getClassLoader().getResource(path + "/" + file);
@@ -110,9 +119,7 @@ public class GLAssimpModelLoader {
 
       // For Linux need to keep '/' or else the Assimp.aiImportFile(...) call below returns null!
       if (System.getProperty("os.name").contains("Windows")) {
-        if (tmpPath.startsWith(SEPARATOR)) {
-          tmpPath = tmpPath.substring(1);
-        }
+        tmpPath = tmpPath.startsWith(SEPARATOR) ? tmpPath.substring(1) : tmpPath;
       }
     }
 
@@ -149,13 +156,13 @@ public class GLAssimpModelLoader {
     List<Vec3f> tangents = new ArrayList<>();
     List<Vec3f> bitangents = new ArrayList<>();
 
-    AIVector3D.Buffer aiVertices = aiMesh.mVertices();
+    Buffer aiVertices = aiMesh.mVertices();
     while (aiVertices.remaining() > 0) {
       AIVector3D aiVertex = aiVertices.get();
       vertices.add(new Vec3f(aiVertex.x(), aiVertex.y(), aiVertex.z()));
     }
 
-    AIVector3D.Buffer aiTexCoords = aiMesh.mTextureCoords(0);
+    Buffer aiTexCoords = aiMesh.mTextureCoords(0);
     if (aiTexCoords != null) {
       while (aiTexCoords.remaining() > 0) {
         AIVector3D aiTexCoord = aiTexCoords.get();
@@ -163,14 +170,14 @@ public class GLAssimpModelLoader {
       }
     }
 
-    AIVector3D.Buffer aiNormals = aiMesh.mNormals();
+    Buffer aiNormals = aiMesh.mNormals();
     if (aiNormals != null) {
       while (aiNormals.remaining() > 0) {
         AIVector3D aiNormal = aiNormals.get();
         normals.add(new Vec3f(aiNormal.x(), aiNormal.y(), aiNormal.z()));
       }
     }
-    AIVector3D.Buffer aiTangents = aiMesh.mTangents();
+    Buffer aiTangents = aiMesh.mTangents();
     if (aiTangents != null) {
       while (aiTangents.remaining() > 0) {
         AIVector3D aiTangent = aiTangents.get();
@@ -178,7 +185,7 @@ public class GLAssimpModelLoader {
       }
     }
 
-    AIVector3D.Buffer aiBitangents = aiMesh.mBitangents();
+    Buffer aiBitangents = aiMesh.mBitangents();
     if (aiBitangents != null) {
       while (aiBitangents.remaining() > 0) {
         AIVector3D aiBitangent = aiBitangents.get();
@@ -280,9 +287,7 @@ public class GLAssimpModelLoader {
   }
 
   private static String createTempFile(String path, String file, String absolutePath) {
-    log.info("Path {}", path);
-    log.info("File {}", file);
-    log.info("absolutePath {}", file);
+    log.info("Path: {}, File: {}, Absolute Path: {}", path, file, absolutePath);
 
     try {
       InputStream input = GLAssimpModelLoader.class.getResourceAsStream(SEPARATOR + path + SEPARATOR + file);
@@ -302,7 +307,7 @@ public class GLAssimpModelLoader {
       return tmpFile.getAbsolutePath();
 
     } catch (Exception e) {
-      log.error(e);
+      log.error("Can't create temp file.", e);
     }
 
     return "";
