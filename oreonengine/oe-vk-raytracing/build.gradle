@@ -1,7 +1,7 @@
 dependencies {
-    api project(':oe-core')
-    api project(':oe-vk-api')
-    api project(':oe-vk-components')
+    implementation project(':oe-core')
+    implementation project(':oe-vk-api')
+    implementation project(':oe-vk-components')
 
     implementation "org.lwjgl:lwjgl"
     implementation "org.lwjgl:lwjgl-assimp"

@@ -37,18 +37,10 @@ subprojects {
 
     dependencies {
         implementation platform("org.lwjgl:lwjgl-bom:${lwjglVersion}")
-
-        /*implementation "org.lwjgl:lwjgl:${lwjglVersion}"
-        implementation "org.lwjgl:lwjgl-assimp:${lwjglVersion}"
-        implementation "org.lwjgl:lwjgl-glfw:${lwjglVersion}"
-        implementation "org.lwjgl:lwjgl-jemalloc:${lwjglVersion}"
-        implementation "org.lwjgl:lwjgl-openal:${lwjglVersion}"
-        implementation "org.lwjgl:lwjgl-opengl:${lwjglVersion}"
-        implementation "org.lwjgl:lwjgl-vulkan:${lwjglVersion}"
-        implementation "org.lwjgl:lwjgl-stb:${lwjglVersion}"*/
     }
 }
 
+/*
 evaluationDependsOnChildren()
 
 def subproject1 = project(':examples-vulkan')
@@ -57,3 +49,4 @@ def subproject3 = project(':oe-vk-components')
 def subproject4 = project(':oe-vk-api')
 
 subproject1.tasks['jar'].mustRunAfter(subproject2.tasks['jar'], subproject3.tasks['jar'], subproject4.tasks['jar'])
+*/

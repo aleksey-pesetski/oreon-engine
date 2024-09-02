@@ -11,9 +11,10 @@ shadowJar {
     archiveClassifier.set('')
     mergeServiceFiles()
     // Optionally, you can exclude specific files or dependencies
-    // exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
 }
 */
+
 
 jar {
     manifest {
@@ -26,13 +27,16 @@ jar {
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
+    //with jar
 }
 
 dependencies {
-    api project(':oe-core')
-    api project(':oe-vk-api')
-    api project(':oe-vk-components')
-    api project(':oe-vk-deferred')
+    implementation project(':oe-core')
+    implementation project(':oe-common-ui')
+
+    implementation project(':oe-vk-api')
+    implementation project(':oe-vk-components')
+    implementation project(':oe-vk-deferred')
 
     implementation "org.lwjgl:lwjgl"
     implementation "org.lwjgl:lwjgl-assimp"

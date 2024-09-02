@@ -1,36 +1,21 @@
 apply plugin: 'application'
-//apply plugin: 'com.github.johnrengelman.shadow'
 
-application {
-    mainClass = 'org.oreon.examples.gl.oreonworlds.GLOreonworlds' // Replace with your main class package and name
-}
+def oeCore = project(':oe-core')
+def oeCommonUI = project(':oe-common-ui')
+def oeCommonWorld = project(':oe-common-world')
 
-/*
-shadowJar {
-    // Ensures that the JAR is named as my-java-app.jar without the 'all' suffix
-    archiveClassifier.set('')
-    mergeServiceFiles()
-    // Optionally, you can exclude specific files or dependencies
-    // exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
-}
-*/
-
-jar {
-    manifest {
-        attributes 'Main-Class': application.mainClass.get()
-    }
-    // Copy dependencies into the JAR
-    /*from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    with jar*/
-}
-
+def oeGlApi = project(':oe-gl-api')
+def oeGlComponents = project(':oe-gl-components')
+def oeGlDeferred = project(':oe-gl-deferred')
 
 dependencies {
-    api project(':oe-gl-api')
-    api project(':oe-gl-components')
-    api project(':oe-gl-deferred')
+    implementation oeCore
+    implementation oeCommonUI
+    implementation oeCommonWorld
+
+    implementation oeGlApi
+    implementation oeGlComponents
+    implementation oeGlDeferred
 
     implementation "org.lwjgl:lwjgl"
     implementation "org.lwjgl:lwjgl-assimp"
@@ -56,4 +41,22 @@ dependencies {
     runtimeOnly "org.lwjgl:lwjgl-openal::${lwjglNatives}"
     runtimeOnly "org.lwjgl:lwjgl-opengl::${lwjglNatives}"
     runtimeOnly "org.lwjgl:lwjgl-stb::${lwjglNatives}"
+}
+
+application {
+    mainClass = 'org.oreon.examples.gl.oreonworlds.GLOreonworlds' // Replace with your main class package and name
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes(
+                'Class-Path': configurations.runtimeClasspath.collect { it.getName() }.join(' '),
+                'Main-Class': application.mainClass.get()
+        )
+    }
+    // Copy dependencies into the JAR
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
