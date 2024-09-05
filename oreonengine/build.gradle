@@ -37,6 +37,8 @@ subprojects {
 
     dependencies {
         implementation platform("org.lwjgl:lwjgl-bom:${lwjglVersion}")
+
+        implementation 'commons-io:commons-io:2.16.1'
     }
 }
 

@@ -3,22 +3,22 @@ package org.oreon.core.gl.util;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.FileSystems.getFileSystem;
 import static java.nio.file.FileSystems.newFileSystem;
+import static java.nio.file.Files.isRegularFile;
 import static java.util.Collections.emptyMap;
+import static org.apache.commons.io.FilenameUtils.getName;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.IntBuffer;
 import java.nio.file.FileSystem;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -56,74 +56,7 @@ public class GLAssimpModelLoader {
     final List<Model> models = new ArrayList<>();
     final List<Material> materials = new ArrayList<>();
 
-    String tmpPath;
-
-    boolean fromJar = false;
-    URL vPathUrl = GLAssimpModelLoader.class.getResource(SEPARATOR + path);
-
-    if (vPathUrl.getProtocol().equals("jar")) {
-      fromJar = true;
-    }
-
-    // if jar, copy directory to temp folder
-    if (fromJar) {
-      Path currentRelativePath = Paths.get("");
-      String currentAbsolutePath = currentRelativePath.toAbsolutePath().toString();
-
-      // create temp directory
-      File directory = new File(currentAbsolutePath + "/temp");
-      if (!directory.exists()) {
-        directory.mkdir();
-        directory.deleteOnExit();
-      }
-
-      log.info("Create Temporary file.");
-      tmpPath = createTempFile(path, file, currentAbsolutePath);
-      log.info("Temporary file successfully created: {}", tmpPath);
-
-      URI uri = null;
-      try {
-        uri = GLAssimpModelLoader.class.getResource(SEPARATOR + path).toURI();
-      } catch (URISyntaxException e) {
-        log.error("Error loading {}", path, e);
-      }
-
-      FileSystem fileSystem;
-      try {
-        fileSystem = getFileSystem(uri);
-      } catch (Exception e) {
-        log.warn("Failed to get existing FileSystem. Creating a new one.");
-        try {
-          fileSystem = newFileSystem(uri, emptyMap());
-        } catch (IOException ex) {
-          log.error("Error creating new FileSystem for path: {}", path, ex);
-          throw new RuntimeException("Failed to initialize FileSystem", ex);
-        }
-      }
-
-      Path myPath = fileSystem.getPath(SEPARATOR + path);
-
-      try (Stream<Path> stream = Files.walk(myPath, 1)) {
-        log.debug("Start walking via {}", myPath.getFileSystem());
-        stream.filter(p -> !Files.isDirectory(p)).forEach(p -> {
-          log.debug("Creating sub temporary file for {}", p.getFileName());
-          String tmpFile = createTempFile(path, p.getFileName().toString(), currentAbsolutePath);
-          log.debug("Sub temporary file successfully created: {}", tmpFile);
-        });
-      } catch (IOException e) {
-        log.error("Error walking the path {}: {}", myPath, e.getMessage(), e);
-      }
-    } else {
-      var url = GLAssimpModelLoader.class.getClassLoader().getResource(path + "/" + file);
-      tmpPath = URLDecoder.decode(url.getPath(), UTF_8);
-
-      // For Linux need to keep '/' or else the Assimp.aiImportFile(...) call below returns null!
-      if (System.getProperty("os.name").contains("Windows")) {
-        tmpPath = tmpPath.startsWith(SEPARATOR) ? tmpPath.substring(1) : tmpPath;
-      }
-    }
-
-    AIScene aiScene = Assimp.aiImportFile(tmpPath, 0);
+    AIScene aiScene = Assimp.aiImportFile(buildPath(file, path), 0);
 
     if (aiScene.mMaterials() != null) {
       for (int i = 0; i < aiScene.mNumMaterials(); i++) {
@@ -144,6 +77,50 @@ public class GLAssimpModelLoader {
     }
 
     return models;
+  }
+
+  private static String buildPath(final String mainFile, final String path) {
+    boolean fromJar = false;
+    URL vPathUrl = GLAssimpModelLoader.class.getResource(SEPARATOR + path);
+
+    if (vPathUrl.getProtocol().equals("jar")) {
+      fromJar = true;
+    }
+
+    String tmpPath = null;
+    // if jar, copy directory to temp folder
+    if (fromJar) {
+      try {
+        final Path tempDirectory = Files.createTempDirectory("temp");
+        tempDirectory.toFile().deleteOnExit();
+        Path tempFile = createTempFile(tempDirectory, SEPARATOR + path + SEPARATOR + mainFile);
+        tmpPath = tempFile.toString();
+
+        //loading and creating temporary files for each which is around the main mainFile
+        final FileSystem fileSystem = loadFileSystem(vPathUrl.toURI());
+        final Path pathToFolder = fileSystem.getPath(SEPARATOR + path);
+        try (Stream<Path> stream = Files.walk(pathToFolder, 1)) {
+          log.debug("Start walking via {}", pathToFolder.getFileSystem());
+          stream
+              .filter(p -> isRegularFile(p) && !p.getFileName().toString().equals(mainFile))
+              .forEach(p -> createTempFile(tempDirectory, SEPARATOR + path + SEPARATOR + p.getFileName()));
+        } catch (IOException e) {
+          log.error("Error walking the path {}: {}", pathToFolder, e.getMessage(), e);
+        }
+      } catch (IOException | URISyntaxException e) {
+        log.error(e);
+      }
+    } else {
+      var url = GLAssimpModelLoader.class.getClassLoader().getResource(path + "/" + mainFile);
+      tmpPath = URLDecoder.decode(url.getPath(), UTF_8);
+
+      // For Linux need to keep '/' or else the Assimp.aiImportFile(...) call below returns null!
+      if (System.getProperty("os.name").contains("Windows")) {
+        tmpPath = tmpPath.startsWith(SEPARATOR) ? tmpPath.substring(1) : tmpPath;
+      }
+    }
+    log.info("TmpPath: {}", tmpPath);
+    return tmpPath;
   }
 
   private static Mesh processMesh(AIMesh aiMesh) {
@@ -286,31 +263,37 @@ public class GLAssimpModelLoader {
     return material;
   }
 
-  private static String createTempFile(String path, String file, String absolutePath) {
-    log.info("Path: {}, File: {}, Absolute Path: {}", path, file, absolutePath);
-
-    try {
-      InputStream input = GLAssimpModelLoader.class.getResourceAsStream(SEPARATOR + path + SEPARATOR + file);
-      File tmpFile = new File(absolutePath + "/temp/" + file);
-
-      OutputStream out = new FileOutputStream(tmpFile);
-
-      int read;
-      byte[] bytes = new byte[1024];
-
-      while ((read = input.read(bytes)) != -1) {
-        out.write(bytes, 0, read);
-      }
-      out.close();
-      tmpFile.deleteOnExit();
-
-      return tmpFile.getAbsolutePath();
-
-    } catch (Exception e) {
-      log.error("Can't create temp file.", e);
-    }
-
-    return "";
+  private static InputStream loadResource(final String path) {
+    return GLAssimpModelLoader.class.getResourceAsStream(path);
   }
 
+  private static FileSystem loadFileSystem(final URI uri) {
+    try {
+      return getFileSystem(uri);
+    } catch (FileSystemNotFoundException e) {
+      log.warn("FileSystem doesn't exist for the {}. Creating a new one.", uri);
+      try {
+        return newFileSystem(uri, emptyMap());
+      } catch (IOException ex) {
+        log.error("Error at creating new FileSystem for path: {}", uri.getPath(), ex);
+        throw new RuntimeException(ex);
+      }
+    }
+  }
+
+  private static Path createTempFile(final Path tempDirectory, final String pathToFile) {
+    Path tempFile = null;
+    try (final InputStream inputStream = loadResource(pathToFile)) {
+      final File file = new File(tempDirectory.toAbsolutePath() + SEPARATOR + getName(pathToFile));
+      file.deleteOnExit();
+
+      tempFile = file.toPath();
+      Files.copy(inputStream, tempFile);
+      return tempFile;
+    } catch (Exception e) {
+      log.error("Can't create temp file for file by path {}.", pathToFile, e);
+    }
+
+    return tempFile;
+  }
 }
