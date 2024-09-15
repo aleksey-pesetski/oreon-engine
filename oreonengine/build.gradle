@@ -41,14 +41,3 @@ subprojects {
         implementation 'commons-io:commons-io:2.16.1'
     }
 }
-
-/*
-evaluationDependsOnChildren()
-
-def subproject1 = project(':examples-vulkan')
-def subproject2 = project(':oe-vk-deferred')
-def subproject3 = project(':oe-vk-components')
-def subproject4 = project(':oe-vk-api')
-
-subproject1.tasks['jar'].mustRunAfter(subproject2.tasks['jar'], subproject3.tasks['jar'], subproject4.tasks['jar'])
-*/
