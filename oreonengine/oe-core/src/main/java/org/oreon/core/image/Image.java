@@ -10,7 +10,6 @@ public class Image {
   protected ImageMetaData metaData;
 
   public enum ImageFormat {
-
     RGBA8_SNORM,
     RGBA32FLOAT,
     RGB32FLOAT,
@@ -22,7 +21,6 @@ public class Image {
   }
 
   public enum SamplerFilter {
-
     Nearest,
     Bilinear,
     Trilinear,
@@ -30,7 +28,6 @@ public class Image {
   }
 
   public enum TextureWrapMode {
-
     ClampToEdge,
     ClampToBorder,
     Repeat,

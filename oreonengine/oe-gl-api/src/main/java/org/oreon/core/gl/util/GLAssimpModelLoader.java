@@ -6,6 +6,7 @@ import static java.nio.file.FileSystems.newFileSystem;
 import static java.nio.file.Files.isRegularFile;
 import static java.util.Collections.emptyMap;
 import static org.apache.commons.io.FilenameUtils.getName;
+import static org.oreon.core.image.Image.SamplerFilter.Trilinear;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +35,6 @@ import org.lwjgl.assimp.AIVector3D.Buffer;
 import org.lwjgl.assimp.Assimp;
 import org.oreon.core.gl.texture.GLTexture;
 import org.oreon.core.gl.wrapper.texture.TextureImage2D;
-import org.oreon.core.image.Image.SamplerFilter;
 import org.oreon.core.math.Vec2f;
 import org.oreon.core.math.Vec3f;
 import org.oreon.core.model.Material;
@@ -57,6 +57,11 @@ public class GLAssimpModelLoader {
     final List<Material> materials = new ArrayList<>();
 
     AIScene aiScene = Assimp.aiImportFile(buildPath(file, path), 0);
+
+    if (aiScene == null) {
+      log.error("Model loading failed for file '{}'. Error: {}", file, Assimp.aiGetErrorString());
+      throw new RuntimeException();
+    }
 
     if (aiScene.mMaterials() != null) {
       for (int i = 0; i < aiScene.mNumMaterials(); i++) {
@@ -119,7 +124,7 @@ public class GLAssimpModelLoader {
         tmpPath = tmpPath.startsWith(SEPARATOR) ? tmpPath.substring(1) : tmpPath;
       }
     }
-    log.info("TmpPath: {}", tmpPath);
+
     return tmpPath;
   }
 
@@ -232,7 +237,7 @@ public class GLAssimpModelLoader {
 
     GLTexture diffuseTexture = null;
     if (diffTexPath != null && diffTexPath.length() > 0) {
-      diffuseTexture = new TextureImage2D(texturesDir + SEPARATOR + diffTexPath, SamplerFilter.Trilinear);
+      diffuseTexture = new TextureImage2D(texturesDir + SEPARATOR + diffTexPath, Trilinear);
     }
 
     // normal Texture
@@ -243,7 +248,7 @@ public class GLAssimpModelLoader {
 
     GLTexture normalTexture = null;
     if (normalTexPath != null && normalTexPath.length() > 0) {
-      normalTexture = new TextureImage2D(texturesDir + SEPARATOR + normalTexPath, SamplerFilter.Trilinear);
+      normalTexture = new TextureImage2D(texturesDir + SEPARATOR + normalTexPath, Trilinear);
     }
 
     AIColor4D color = AIColor4D.create();

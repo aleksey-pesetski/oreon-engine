@@ -1,11 +1,10 @@
 package org.oreon.core.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.oreon.core.image.Image;
 import org.oreon.core.math.Vec3f;
 import org.oreon.core.scenegraph.NodeComponent;
-
-import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 @Setter

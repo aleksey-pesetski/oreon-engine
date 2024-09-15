@@ -28,6 +28,8 @@ import static org.lwjgl.vulkan.VK10.VK_SAMPLER_ADDRESS_MODE_REPEAT;
 import static org.lwjgl.vulkan.VK10.VK_SAMPLER_MIPMAP_MODE_NEAREST;
 import static org.lwjgl.vulkan.VK10.VK_SHADER_STAGE_FRAGMENT_BIT;
 import static org.lwjgl.vulkan.VK10.VK_SUBPASS_EXTERNAL;
+import static org.oreon.core.model.VertexLayout.POS2D;
+import static org.oreon.core.model.VertexLayout.POS_UV;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -44,7 +46,6 @@ import org.oreon.common.ui.GUI;
 import org.oreon.common.ui.UIPanelLoader;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.model.Mesh;
-import org.oreon.core.model.Vertex.VertexLayout;
 import org.oreon.core.scenegraph.NodeComponentType;
 import org.oreon.core.scenegraph.RenderList;
 import org.oreon.core.target.Attachment;
@@ -152,7 +153,7 @@ public class VkGUI extends GUI {
     panelMeshBuffer = new VkMeshData(device.getHandle(),
         memoryProperties, device.getTransferCommandPool(Thread.currentThread().getId()),
         device.getTransferQueue(), UIPanelLoader.load("gui/basicPanel.gui"),
-        VertexLayout.POS2D);
+        POS2D);
 
     // fullscreen underlay Image resources
     ShaderPipeline shaderPipeline = new ShaderPipeline(device.getHandle());
@@ -160,10 +161,10 @@ public class VkGUI extends GUI {
     shaderPipeline.createFragmentShader("shaders/quad/quad.frag.spv");
     shaderPipeline.createShaderPipeline();
 
-    VkVertexInput vertexInputInfo = new VkVertexInput(VertexLayout.POS_UV);
+    VkVertexInput vertexInputInfo = new VkVertexInput(POS_UV);
 
     Mesh fullScreenQuad = MeshGenerator.NDCQuad2D();
-    ByteBuffer vertexBuffer = BufferUtil.createByteBuffer(fullScreenQuad.getVertices(), VertexLayout.POS_UV);
+    ByteBuffer vertexBuffer = BufferUtil.createByteBuffer(fullScreenQuad.getVertices(), POS_UV);
     ByteBuffer indexBuffer = BufferUtil.createByteBuffer(fullScreenQuad.getIndices());
 
     VkBuffer vertexBufferObject = VkBufferHelper.createDeviceLocalBuffer(

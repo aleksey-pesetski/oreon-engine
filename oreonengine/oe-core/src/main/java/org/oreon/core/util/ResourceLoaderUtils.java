@@ -3,7 +3,6 @@ package org.oreon.core.util;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.lwjgl.stb.STBImage.stbi_failure_reason;
 import static org.lwjgl.stb.STBImage.stbi_info_from_memory;
-import static org.lwjgl.stb.STBImage.stbi_load_from_memory;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -11,7 +10,6 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -88,22 +86,10 @@ public final class ResourceLoaderUtils {
       throw new RuntimeException("Failed to read image information: " + stbi_failure_reason());
     }
 
-//        System.out.println("Image width: " + w.get(0));
-//        System.out.println("Image height: " + h.get(0));
-//        System.out.println("Image components: " + c.get(0));
-//        System.out.println("Image HDR: " + stbi_is_hdr_from_memory(imageBuffer));
-
-    // Decode the image
-    ByteBuffer image = stbi_load_from_memory(imageBuffer, w, h, c, 0);
-    if (image == null) {
-      throw new RuntimeException("Failed to load image: " + stbi_failure_reason());
-    }
-
-    return image;
+    return imageBuffer;
   }
 
   public static ByteBuffer ioResourceToByteBuffer(String resource, int bufferSize) throws IOException {
-
     ByteBuffer buffer;
 
     Path path = Paths.get(resource);
@@ -115,13 +101,16 @@ public final class ResourceLoaderUtils {
       }
     } else {
       try (
-          InputStream source = ResourceLoaderUtils.class.getClassLoader().getResourceAsStream(resource);
-          ReadableByteChannel rbc = Channels.newChannel(source)
+          var source = ResourceLoaderUtils.class.getClassLoader().getResourceAsStream(resource);
+          var byteChannel = Channels.newChannel(source)
       ) {
-        buffer = BufferUtils.createByteBuffer(bufferSize);
+        if (source == null) {
+          throw new IOException("Resource '" + resource + "' not found");
+        }
 
+        buffer = BufferUtils.createByteBuffer(bufferSize);
         while (true) {
-          int bytes = rbc.read(buffer);
+          int bytes = byteChannel.read(buffer);
           if (bytes == -1) {
             break;
           }

@@ -1,14 +1,14 @@
 package org.oreon.common.ui;
 
+import static org.oreon.core.model.VertexLayout.POS_UV;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-
 import org.oreon.core.math.Vec3f;
 import org.oreon.core.model.Mesh;
 import org.oreon.core.model.Vertex;
-import org.oreon.core.model.Vertex.VertexLayout;
 import org.oreon.core.util.Util;
 
 public class UIPanelLoader {
@@ -56,7 +56,7 @@ public class UIPanelLoader {
         int[] indexData = Util.toIntArray(objectArray);
 
         Mesh mesh = new Mesh(vertexData, indexData);
-        mesh.setVertexLayout(VertexLayout.POS_UV);
+        mesh.setVertexLayout(POS_UV);
 
         return mesh;
       } catch (Exception e) {

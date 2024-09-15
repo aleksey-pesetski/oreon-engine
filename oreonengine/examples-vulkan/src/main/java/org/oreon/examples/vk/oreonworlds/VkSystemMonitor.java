@@ -2,7 +2,6 @@ package org.oreon.examples.vk.oreonworlds;
 
 import java.lang.management.ManagementFactory;
 import java.nio.LongBuffer;
-
 import org.oreon.common.ui.UIScreen;
 import org.oreon.core.CoreEngine;
 import org.oreon.core.math.Vec4f;

@@ -1,10 +1,9 @@
 package org.oreon.core.model;
 
-import org.oreon.core.math.Vec2f;
-import org.oreon.core.math.Vec3f;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.oreon.core.math.Vec2f;
+import org.oreon.core.math.Vec3f;
 
 @NoArgsConstructor
 @Getter
@@ -18,17 +17,6 @@ public class Vertex {
   private Vec2f uvCoord;
   private Vec3f tangent;
   private Vec3f bitangent;
-
-  public enum VertexLayout {
-
-    POS_NORMAL_UV_TAN_BITAN,
-    POS_NORMAL,
-    POS_UV,
-    POS,
-    POS_NORMAL_UV,
-    POS2D,
-    POS2D_UV;
-  }
 
   public Vertex(Vec3f pos) {
     this.setPosition(pos);

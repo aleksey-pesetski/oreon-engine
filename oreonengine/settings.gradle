@@ -13,4 +13,4 @@ include 'oe-vk-deferred'
 include 'oe-vk-raytracing'
 
 include 'examples-opengl'
-//include 'examples-vulkan'
+include 'examples-vulkan'

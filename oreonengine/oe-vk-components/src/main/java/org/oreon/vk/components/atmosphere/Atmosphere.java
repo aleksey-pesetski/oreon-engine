@@ -7,6 +7,7 @@ import static org.lwjgl.vulkan.VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 import static org.lwjgl.vulkan.VK10.VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 import static org.lwjgl.vulkan.VK10.VK_SHADER_STAGE_FRAGMENT_BIT;
 import static org.lwjgl.vulkan.VK10.VK_SHADER_STAGE_VERTEX_BIT;
+import static org.oreon.core.model.VertexLayout.POS;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -14,7 +15,6 @@ import java.util.List;
 import org.lwjgl.vulkan.VkPhysicalDeviceMemoryProperties;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.model.Mesh;
-import org.oreon.core.model.Vertex.VertexLayout;
 import org.oreon.core.scenegraph.NodeComponentType;
 import org.oreon.core.scenegraph.Renderable;
 import org.oreon.core.util.BufferUtil;
@@ -98,9 +98,9 @@ public class Atmosphere extends Renderable {
     descriptorSetLayouts.add(
         context.getResources().getDescriptors().get(VkDescriptorName.DIRECTIONAL_LIGHT).getDescriptorSetLayout());
 
-    VkVertexInput vertexInput = new VkVertexInput(VertexLayout.POS);
+    VkVertexInput vertexInput = new VkVertexInput(POS);
 
-    ByteBuffer vertexBuffer = BufferUtil.createByteBuffer(mesh.getVertices(), VertexLayout.POS);
+    ByteBuffer vertexBuffer = BufferUtil.createByteBuffer(mesh.getVertices(), POS);
     ByteBuffer indexBuffer = BufferUtil.createByteBuffer(mesh.getIndices());
 
     int pushConstantsRange = Float.BYTES * 20 + Integer.BYTES * 3;

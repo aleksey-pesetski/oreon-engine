@@ -1,6 +1,7 @@
 package org.oreon.vk.components.planet;
 
 import static org.lwjgl.vulkan.VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+import static org.oreon.core.model.VertexLayout.POS2D;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -12,7 +13,6 @@ import org.oreon.common.quadtree.Quadtree;
 import org.oreon.common.quadtree.QuadtreeConfig;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.math.Vec2f;
-import org.oreon.core.model.Vertex.VertexLayout;
 import org.oreon.core.scenegraph.Node;
 import org.oreon.core.scenegraph.NodeComponent;
 import org.oreon.core.scenegraph.NodeComponentType;
@@ -57,7 +57,7 @@ public class Planet extends Node {
 
     QuadtreeConfig config = new QuadtreeConfig();
 
-    VkVertexInput vertexInput = new VkVertexInput(VertexLayout.POS2D);
+    VkVertexInput vertexInput = new VkVertexInput(POS2D);
 
     ShaderPipeline shaderPipeline = new ShaderPipeline(device.getHandle());
     shaderPipeline.createVertexShader("shaders/planet/planet.vert.spv");

@@ -44,7 +44,7 @@ dependencies {
 }
 
 application {
-    mainClass = 'org.oreon.examples.gl.oreonworlds.GLOreonworlds' // Replace with your main class package and name
+    mainClass = 'org.oreon.examples.gl.oreonworlds.GLOreonworlds'
 }
 
 jar {

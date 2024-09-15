@@ -1,42 +1,19 @@
 apply plugin: 'application'
-//apply plugin: 'com.github.johnrengelman.shadow'
 
-application {
-    mainClass = 'org.oreon.examples.vk.oreonworlds.VkOreonworlds'
-}
+def eoCore = project(':oe-core')
+def oeCommonUI = project(':oe-common-ui')
 
-/*
-shadowJar {
-    // Ensures that the JAR is named as my-java-app.jar without the 'all' suffix
-    archiveClassifier.set('')
-    mergeServiceFiles()
-    // Optionally, you can exclude specific files or dependencies
-    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
-}
-*/
-
-
-jar {
-    manifest {
-        //attributes 'Main-Class': application.mainClass.get()
-        attributes('Implementation-Title': project.name,
-                'Implementation-Version': '1.0',
-                'Main-Class': application.mainClass.get())
-    }
-    // Copy dependencies into the JAR
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    //with jar
-}
+def oeVkApi = project(':oe-vk-api')
+def oeVkComponents = project(':oe-vk-components')
+def oeVkDeferred = project(':oe-vk-deferred')
 
 dependencies {
-    implementation project(':oe-core')
-    implementation project(':oe-common-ui')
+    implementation eoCore
+    implementation oeCommonUI
 
-    implementation project(':oe-vk-api')
-    implementation project(':oe-vk-components')
-    implementation project(':oe-vk-deferred')
+    implementation oeVkApi
+    implementation oeVkComponents
+    implementation oeVkDeferred
 
     implementation "org.lwjgl:lwjgl"
     implementation "org.lwjgl:lwjgl-assimp"
@@ -62,4 +39,25 @@ dependencies {
     runtimeOnly "org.lwjgl:lwjgl-openal::${lwjglNatives}"
     runtimeOnly "org.lwjgl:lwjgl-opengl::${lwjglNatives}"
     runtimeOnly "org.lwjgl:lwjgl-stb::${lwjglNatives}"
+}
+
+application {
+    mainClass = 'org.oreon.examples.vk.oreonworlds.VkOreonworlds'
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes(
+                'Implementation-Title': project.name,
+                'Implementation-Version': version,
+                //'Class-Path': configurations.runtimeClasspath.collect { "libs/${it.getName()}" }.join(' '),
+                //'Class-Path': configurations.runtimeClasspath.collect { "./${it.getName()}" }.join(' '),
+                'Main-Class': application.mainClass.get()
+        )
+    }
+    // Copy dependencies into the JAR
+    /*from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }*/
 }
