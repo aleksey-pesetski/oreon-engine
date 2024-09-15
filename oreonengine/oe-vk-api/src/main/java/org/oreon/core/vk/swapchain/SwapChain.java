@@ -39,6 +39,7 @@ import static org.lwjgl.vulkan.VK10.VK_SHADER_STAGE_FRAGMENT_BIT;
 import static org.lwjgl.vulkan.VK10.VK_SHARING_MODE_EXCLUSIVE;
 import static org.lwjgl.vulkan.VK10.VK_SUBPASS_EXTERNAL;
 import static org.lwjgl.vulkan.VK10.VK_SUCCESS;
+import static org.oreon.core.model.VertexLayout.POS_UV;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -53,7 +54,6 @@ import org.lwjgl.vulkan.VkQueue;
 import org.lwjgl.vulkan.VkSwapchainCreateInfoKHR;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.model.Mesh;
-import org.oreon.core.model.Vertex.VertexLayout;
 import org.oreon.core.util.BufferUtil;
 import org.oreon.core.util.MeshGenerator;
 import org.oreon.core.vk.command.CommandBuffer;
@@ -190,7 +190,7 @@ public class SwapChain {
     swapchainCreateInfo.free();
 
     Mesh fullScreenQuad = MeshGenerator.NDCQuad2D();
-    ByteBuffer vertexBuffer = BufferUtil.createByteBuffer(fullScreenQuad.getVertices(), VertexLayout.POS_UV);
+    ByteBuffer vertexBuffer = BufferUtil.createByteBuffer(fullScreenQuad.getVertices(), POS_UV);
     ByteBuffer indexBuffer = BufferUtil.createByteBuffer(fullScreenQuad.getIndices());
 
     vertexBufferObject = VkBufferHelper.createDeviceLocalBuffer(device,
@@ -253,7 +253,7 @@ public class SwapChain {
     shaderPipeline.createFragmentShader("shaders/quad/quad.frag.spv");
     shaderPipeline.createShaderPipeline();
 
-    VkVertexInput vertexInputInfo = new VkVertexInput(VertexLayout.POS_UV);
+    VkVertexInput vertexInputInfo = new VkVertexInput(POS_UV);
 
     pipeline = new VkPipeline(device);
     pipeline.setVertexInput(vertexInputInfo);

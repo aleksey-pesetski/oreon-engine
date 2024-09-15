@@ -4,11 +4,10 @@ import static org.lwjgl.vulkan.VK10.VK_FORMAT_R32G32B32_SFLOAT;
 import static org.lwjgl.vulkan.VK10.VK_FORMAT_R32G32_SFLOAT;
 import static org.lwjgl.vulkan.VK10.VK_VERTEX_INPUT_RATE_VERTEX;
 
+import lombok.Getter;
 import org.lwjgl.vulkan.VkVertexInputAttributeDescription;
 import org.lwjgl.vulkan.VkVertexInputBindingDescription;
-import org.oreon.core.model.Vertex.VertexLayout;
-
-import lombok.Getter;
+import org.oreon.core.model.VertexLayout;
 
 public class VkVertexInput {
 

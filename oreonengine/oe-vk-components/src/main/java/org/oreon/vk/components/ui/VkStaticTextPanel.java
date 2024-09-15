@@ -8,6 +8,7 @@ import static org.lwjgl.vulkan.VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 import static org.lwjgl.vulkan.VK10.VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 import static org.lwjgl.vulkan.VK10.VK_SHADER_STAGE_FRAGMENT_BIT;
 import static org.lwjgl.vulkan.VK10.VK_SHADER_STAGE_VERTEX_BIT;
+import static org.oreon.core.model.VertexLayout.POS2D_UV;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -15,7 +16,6 @@ import java.util.List;
 import org.lwjgl.vulkan.VkPhysicalDeviceMemoryProperties;
 import org.oreon.common.ui.UITextPanel;
 import org.oreon.core.context.ContextHolder;
-import org.oreon.core.model.Vertex.VertexLayout;
 import org.oreon.core.scenegraph.NodeComponentType;
 import org.oreon.core.util.BufferUtil;
 import org.oreon.core.vk.command.CommandBuffer;
@@ -82,8 +82,8 @@ public class VkStaticTextPanel extends UITextPanel {
     descriptorSets.add(descriptorSet);
     descriptorSetLayouts.add(descriptorSetLayout);
 
-    VkVertexInput vertexInput = new VkVertexInput(VertexLayout.POS2D_UV);
-    ByteBuffer vertexBuffer = BufferUtil.createByteBuffer(panel.getVertices(), VertexLayout.POS2D_UV);
+    VkVertexInput vertexInput = new VkVertexInput(POS2D_UV);
+    ByteBuffer vertexBuffer = BufferUtil.createByteBuffer(panel.getVertices(), POS2D_UV);
     ByteBuffer indexBuffer = BufferUtil.createByteBuffer(panel.getIndices());
 
     VkBuffer vertexBufferObject = VkBufferHelper.createDeviceLocalBuffer(

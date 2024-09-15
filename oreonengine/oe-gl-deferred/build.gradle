@@ -1,11 +1,9 @@
 dependencies {
-    api project(':oe-core')
-    api project(':oe-gl-api')
-    api project(':oe-gl-components')
-
-    //TODO subreferencies
+    implementation project(':oe-core')
     implementation project(':oe-common-ui')
     implementation project(':oe-common-world')
+    implementation project(':oe-gl-api')
+    implementation project(':oe-gl-components')
 
     implementation "org.lwjgl:lwjgl"
     implementation "org.lwjgl:lwjgl-assimp"

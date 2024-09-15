@@ -15,6 +15,7 @@ import static org.lwjgl.vulkan.VK10.VK_SAMPLER_ADDRESS_MODE_REPEAT;
 import static org.lwjgl.vulkan.VK10.VK_SAMPLER_MIPMAP_MODE_NEAREST;
 import static org.lwjgl.vulkan.VK10.VK_SHADER_STAGE_FRAGMENT_BIT;
 import static org.lwjgl.vulkan.VK10.VK_SHADER_STAGE_VERTEX_BIT;
+import static org.oreon.core.model.VertexLayout.POS2D;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -22,7 +23,6 @@ import java.util.List;
 import org.lwjgl.vulkan.VkPhysicalDeviceMemoryProperties;
 import org.oreon.common.ui.UIElement;
 import org.oreon.core.context.ContextHolder;
-import org.oreon.core.model.Vertex.VertexLayout;
 import org.oreon.core.scenegraph.NodeComponentType;
 import org.oreon.core.util.BufferUtil;
 import org.oreon.core.vk.command.CommandBuffer;
@@ -100,7 +100,7 @@ public class VkTexturePanel extends UIElement {
     pushConstants.put(BufferUtil.createByteBuffer(getOrthographicMatrix()));
     pushConstants.flip();
 
-    VkVertexInput vertexInput = new VkVertexInput(VertexLayout.POS2D);
+    VkVertexInput vertexInput = new VkVertexInput(POS2D);
 
     DescriptorSetLayout descriptorSetLayout = new DescriptorSetLayout(device.getHandle(), 1);
     descriptorSetLayout.addLayoutBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,

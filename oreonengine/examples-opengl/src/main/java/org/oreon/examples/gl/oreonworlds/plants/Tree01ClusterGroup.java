@@ -71,11 +71,10 @@ public class Tree01ClusterGroup extends GLInstancedObject {
 
       if (model.equals(models.get(0))) {
         renderInfo = new GLRenderInfo(TreeTrunkShader.getInstance(), new CullFaceDisable(), meshBuffer);
-        shadowRenderInfo = new GLRenderInfo(TreeShadowShader.getInstance(), new CullFaceDisable(), meshBuffer);
       } else {
         renderInfo = new GLRenderInfo(TreeLeavesShader.getInstance(), new CullFaceDisable(), meshBuffer);
-        shadowRenderInfo = new GLRenderInfo(TreeShadowShader.getInstance(), new CullFaceDisable(), meshBuffer);
       }
+      shadowRenderInfo = new GLRenderInfo(TreeShadowShader.getInstance(), new CullFaceDisable(), meshBuffer);
 
       Renderable object = new Renderable();
       object.addComponent(NodeComponentType.MAIN_RENDERINFO, renderInfo);

@@ -2,11 +2,8 @@ package org.oreon.core.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.oreon.core.math.Vec2f;
-import org.oreon.core.model.Vertex.VertexLayout;
-
 import lombok.NoArgsConstructor;
+import org.oreon.core.math.Vec2f;
 
 @NoArgsConstructor
 public class Mesh {

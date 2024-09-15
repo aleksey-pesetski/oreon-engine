@@ -31,12 +31,10 @@ import static org.lwjgl.opengl.GL42.glTexStorage2D;
 import static org.lwjgl.opengl.GL42.glTexStorage3D;
 
 import java.nio.ByteBuffer;
-
+import lombok.Getter;
 import org.lwjgl.opengl.GL;
 import org.oreon.core.image.Image;
 import org.oreon.core.image.ImageMetaData;
-
-import lombok.Getter;
 
 @Getter
 public class GLTexture extends Image {

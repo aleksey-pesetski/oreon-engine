@@ -1,10 +1,11 @@
 package org.oreon.core.util;
 
+import static org.oreon.core.model.VertexLayout.POS_UV;
+
 import org.oreon.core.math.Vec2f;
 import org.oreon.core.math.Vec3f;
 import org.oreon.core.model.Mesh;
 import org.oreon.core.model.Vertex;
-import org.oreon.core.model.Vertex.VertexLayout;
 
 public class MeshGenerator {
 
@@ -16,7 +17,7 @@ public class MeshGenerator {
     vertices[2] = new Vertex(new Vec3f(-1, 1, 0), new Vec2f(0, 1));
     vertices[3] = new Vertex(new Vec3f(1, 1, 0), new Vec2f(1, 1));
     Mesh quad = new Mesh(vertices, indices);
-    quad.setVertexLayout(VertexLayout.POS_UV);
+    quad.setVertexLayout(POS_UV);
     return quad;
   }
 
@@ -28,7 +29,7 @@ public class MeshGenerator {
     vertices[2] = new Vertex(new Vec3f(-1, 1, 0), new Vec2f(0, 0));
     vertices[3] = new Vertex(new Vec3f(1, 1, 0), new Vec2f(1, 0));
     Mesh quad = new Mesh(vertices, indices);
-    quad.setVertexLayout(VertexLayout.POS_UV);
+    quad.setVertexLayout(POS_UV);
     return quad;
   }
 

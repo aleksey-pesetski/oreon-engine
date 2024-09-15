@@ -1,12 +1,12 @@
 package org.oreon.core.util;
 
 import static org.lwjgl.system.MemoryUtil.memAlloc;
-import static org.oreon.core.model.Vertex.VertexLayout.POS2D;
-import static org.oreon.core.model.Vertex.VertexLayout.POS2D_UV;
-import static org.oreon.core.model.Vertex.VertexLayout.POS_NORMAL;
-import static org.oreon.core.model.Vertex.VertexLayout.POS_NORMAL_UV;
-import static org.oreon.core.model.Vertex.VertexLayout.POS_NORMAL_UV_TAN_BITAN;
-import static org.oreon.core.model.Vertex.VertexLayout.POS_UV;
+import static org.oreon.core.model.VertexLayout.POS2D;
+import static org.oreon.core.model.VertexLayout.POS2D_UV;
+import static org.oreon.core.model.VertexLayout.POS_NORMAL;
+import static org.oreon.core.model.VertexLayout.POS_NORMAL_UV;
+import static org.oreon.core.model.VertexLayout.POS_NORMAL_UV_TAN_BITAN;
+import static org.oreon.core.model.VertexLayout.POS_UV;
 
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
@@ -21,7 +21,7 @@ import org.oreon.core.math.Vec2f;
 import org.oreon.core.math.Vec3f;
 import org.oreon.core.math.Vec4f;
 import org.oreon.core.model.Vertex;
-import org.oreon.core.model.Vertex.VertexLayout;
+import org.oreon.core.model.VertexLayout;
 
 public class BufferUtil {
 

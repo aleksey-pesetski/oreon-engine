@@ -31,6 +31,7 @@ import static org.lwjgl.vulkan.VK10.VK_SHADER_STAGE_ALL_GRAPHICS;
 import static org.lwjgl.vulkan.VK10.VK_SHADER_STAGE_FRAGMENT_BIT;
 import static org.lwjgl.vulkan.VK10.VK_SHADER_STAGE_GEOMETRY_BIT;
 import static org.lwjgl.vulkan.VK10.VK_SUBPASS_EXTERNAL;
+import static org.oreon.core.model.VertexLayout.POS2D;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -47,7 +48,6 @@ import org.oreon.core.context.ContextHolder;
 import org.oreon.core.math.Vec2f;
 import org.oreon.core.math.Vec3f;
 import org.oreon.core.math.Vec4f;
-import org.oreon.core.model.Vertex.VertexLayout;
 import org.oreon.core.scenegraph.NodeComponentType;
 import org.oreon.core.scenegraph.RenderList;
 import org.oreon.core.scenegraph.Renderable;
@@ -294,7 +294,7 @@ public class Water extends Renderable {
     descriptorSetLayouts.add(context.getCamera().getDescriptorSetLayout());
     descriptorSetLayouts.add(descriptorSetLayout);
 
-    VkVertexInput vertexInput = new VkVertexInput(VertexLayout.POS2D);
+    VkVertexInput vertexInput = new VkVertexInput(POS2D);
 
     Vec2f[] vertices = MeshGenerator.generatePatch2D4x4(128);
 

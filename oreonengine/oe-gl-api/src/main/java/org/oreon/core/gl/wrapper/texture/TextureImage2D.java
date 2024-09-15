@@ -21,7 +21,6 @@ import org.oreon.core.gl.texture.GLTexture;
 public class TextureImage2D extends GLTexture {
 
   public TextureImage2D(int width, int height, ImageFormat imageFormat) {
-
     super(GL_TEXTURE_2D, width, height);
 
     bind();
@@ -53,7 +52,6 @@ public class TextureImage2D extends GLTexture {
   }
 
   public TextureImage2D(int width, int height, ImageFormat imageFormat, SamplerFilter samplerFilter) {
-
     this(width, height, imageFormat);
 
     bind();
@@ -78,7 +76,6 @@ public class TextureImage2D extends GLTexture {
 
   public TextureImage2D(int width, int height,
       ImageFormat imageFormat, SamplerFilter samplerFilter, TextureWrapMode textureWrapMode) {
-
     this(width, height, imageFormat, samplerFilter);
 
     bind();
@@ -102,7 +99,6 @@ public class TextureImage2D extends GLTexture {
   }
 
   public TextureImage2D(String file, SamplerFilter samplerFilter) {
-
     super(file);
 
     bind();
@@ -127,7 +123,6 @@ public class TextureImage2D extends GLTexture {
 
   public TextureImage2D(String file, SamplerFilter samplerFilter,
       TextureWrapMode textureWrapMode) {
-
     this(file, samplerFilter);
 
     bind();
@@ -151,7 +146,6 @@ public class TextureImage2D extends GLTexture {
   }
 
   public TextureImage2D(int width, int height, int samples, ImageFormat imageFormat) {
-
     super(samples > 1 ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D, width, height);
 
     bind();
@@ -215,7 +209,6 @@ public class TextureImage2D extends GLTexture {
 
   public TextureImage2D(int width, int height, int samples,
       ImageFormat imageFormat, SamplerFilter samplerFilter) {
-
     this(width, height, samples, imageFormat);
 
     bind();
@@ -240,7 +233,6 @@ public class TextureImage2D extends GLTexture {
 
   public TextureImage2D(int width, int height, int samples,
       ImageFormat imageFormat, SamplerFilter samplerFilter, TextureWrapMode textureWrapMode) {
-
     this(width, height, samples, imageFormat, samplerFilter);
 
     bind();

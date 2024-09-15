@@ -11,7 +11,7 @@ import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkPhysicalDeviceMemoryProperties;
 import org.lwjgl.vulkan.VkQueue;
 import org.oreon.core.model.Mesh;
-import org.oreon.core.model.Vertex.VertexLayout;
+import org.oreon.core.model.VertexLayout;
 import org.oreon.core.scenegraph.NodeComponent;
 import org.oreon.core.util.BufferUtil;
 import org.oreon.core.vk.command.CommandPool;

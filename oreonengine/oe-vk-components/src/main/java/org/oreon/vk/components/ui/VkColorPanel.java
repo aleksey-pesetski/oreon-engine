@@ -4,12 +4,12 @@ import static org.lwjgl.system.MemoryUtil.memAlloc;
 import static org.lwjgl.vulkan.VK10.VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 import static org.lwjgl.vulkan.VK10.VK_SHADER_STAGE_FRAGMENT_BIT;
 import static org.lwjgl.vulkan.VK10.VK_SHADER_STAGE_VERTEX_BIT;
+import static org.oreon.core.model.VertexLayout.POS2D;
 
 import java.nio.ByteBuffer;
 import org.oreon.common.ui.UIElement;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.math.Vec4f;
-import org.oreon.core.model.Vertex.VertexLayout;
 import org.oreon.core.scenegraph.NodeComponentType;
 import org.oreon.core.util.BufferUtil;
 import org.oreon.core.vk.command.CommandBuffer;
@@ -57,7 +57,7 @@ public class VkColorPanel extends UIElement {
     pushConstants.putFloat(rgba.getW());
     pushConstants.flip();
 
-    VkVertexInput vertexInput = new VkVertexInput(VertexLayout.POS2D);
+    VkVertexInput vertexInput = new VkVertexInput(POS2D);
 
     graphicsPipeline = new GraphicsPipelineAlphaBlend(device.getHandle(),
         shaderPipeline, vertexInput, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
