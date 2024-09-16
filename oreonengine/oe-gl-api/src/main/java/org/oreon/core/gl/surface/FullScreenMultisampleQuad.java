@@ -1,5 +1,7 @@
 package org.oreon.core.gl.surface;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.oreon.core.gl.memory.GLMeshVBO;
 import org.oreon.core.gl.pipeline.GLShaderProgram;
 import org.oreon.core.gl.pipeline.RenderParameter;
@@ -8,57 +10,33 @@ import org.oreon.core.gl.wrapper.parameter.DefaultRenderParams;
 import org.oreon.core.math.Vec2f;
 import org.oreon.core.util.MeshGenerator;
 
-import lombok.Getter;
-import lombok.Setter;
-
+@Getter
 public class FullScreenMultisampleQuad {
 
-	@Getter @Setter
-	private GLTexture texture;
-	private GLShaderProgram shader;
-	private GLMeshVBO vao;
-	private RenderParameter config;
-	protected Vec2f[] texCoords;
-	
-	public FullScreenMultisampleQuad(){
-		
-		shader = FullScreenMSQuadShader.getInstance();
-		config = new DefaultRenderParams();
-		vao = new GLMeshVBO();
-		vao.addData(MeshGenerator.NDCQuad2D());
-	}
-	
-	
-	public void render()
-	{
-		getConfig().enable();
-		getShader().bind();
-		getShader().updateUniforms(texture);
-		getVao().draw();
-		getConfig().disable();
-	}	
+  @Setter
+  private GLTexture texture;
+  @Setter
+  private GLShaderProgram shader;
+  @Setter
+  private GLMeshVBO vao;
+  @Setter
+  private RenderParameter config;
+  private Vec2f[] texCoords;
 
-	public RenderParameter getConfig() {
-		return config;
-	}
+  public FullScreenMultisampleQuad() {
+    shader = FullScreenMSQuadShader.getInstance();
+    config = new DefaultRenderParams();
+    vao = new GLMeshVBO();
+    vao.addData(MeshGenerator.NDCQuad2D());
+  }
 
-	public void setConfig(RenderParameter config) {
-		this.config = config;
-	}
 
-	public GLShaderProgram getShader() {
-		return shader;
-	}
+  public void render() {
+    getConfig().enable();
+    getShader().bind();
+    getShader().updateUniforms(texture);
+    getVao().draw();
+    getConfig().disable();
+  }
 
-	public void setShader(GLShaderProgram shader) {
-		this.shader = shader;
-	}
-
-	public GLMeshVBO getVao() {
-		return vao;
-	}
-
-	public void setVao(GLMeshVBO vao) {
-		this.vao = vao;
-	}
 }

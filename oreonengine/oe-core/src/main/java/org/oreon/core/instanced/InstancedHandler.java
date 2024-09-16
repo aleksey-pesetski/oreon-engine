@@ -3,46 +3,29 @@ package org.oreon.core.instanced;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import lombok.Data;
 
+@Data
 public class InstancedHandler {
-	
-	private Lock lock = new ReentrantLock();
-	private Condition condition = lock.newCondition();
 
-	private static InstancedHandler instance = null;
-	
-	public static InstancedHandler getInstance() 
-	{
-	    if(instance == null) 
-	    {
-	    	instance = new InstancedHandler();
-	    }
-	      return instance;
-	}
-	
-	public void signalAll(){
-		lock.lock();
-		try{
-			condition.signalAll();
-		}
-		finally{
-			lock.unlock();
-		}
-	}
+  private static InstancedHandler instance;
 
-	public Condition getCondition() {
-		return condition;
-	}
+  private Lock lock = new ReentrantLock();
+  private Condition condition = lock.newCondition();
 
-	public void setCondition(Condition condition) {
-		this.condition = condition;
-	}
-	
-	public Lock getLock() {
-		return lock;
-	}
+  public static synchronized InstancedHandler getInstance() {
+    if (instance == null) {
+      instance = new InstancedHandler();
+    }
+    return instance;
+  }
 
-	public void setLock(Lock lock) {
-		this.lock = lock;
-	}
+  public void signalAll() {
+    lock.lock();
+    try {
+      condition.signalAll();
+    } finally {
+      lock.unlock();
+    }
+  }
 }

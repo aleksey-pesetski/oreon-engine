@@ -1,0 +1,65 @@
+apply plugin: 'application'
+
+def oeCore = project(':oe-core')
+def oeCommonUI = project(':oe-common-ui')
+def oeCommonWorld = project(':oe-common-world')
+
+def oeGlApi = project(':oe-gl-api')
+def oeGlComponents = project(':oe-gl-components')
+def oeGlDeferred = project(':oe-gl-deferred')
+
+dependencies {
+    implementation oeCore
+    implementation oeCommonUI
+    implementation oeCommonWorld
+
+    implementation oeGlApi
+    implementation oeGlComponents
+    implementation oeGlDeferred
+
+    implementation "org.lwjgl:lwjgl"
+    implementation "org.lwjgl:lwjgl-assimp"
+    implementation "org.lwjgl:lwjgl-glfw"
+    implementation "org.lwjgl:lwjgl-jemalloc"
+    implementation "org.lwjgl:lwjgl-openal"
+    implementation "org.lwjgl:lwjgl-opengl"
+    implementation "org.lwjgl:lwjgl-vulkan"
+    implementation "org.lwjgl:lwjgl-stb"
+
+    implementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+    implementation "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+    implementation "org.apache.logging.log4j:log4j-iostreams:${log4jVersion}"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.16.2"
+
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    runtimeOnly "org.lwjgl:lwjgl::${lwjglNatives}"
+    runtimeOnly "org.lwjgl:lwjgl-assimp::${lwjglNatives}"
+    runtimeOnly "org.lwjgl:lwjgl-glfw::${lwjglNatives}"
+    runtimeOnly "org.lwjgl:lwjgl-jemalloc::${lwjglNatives}"
+    runtimeOnly "org.lwjgl:lwjgl-openal::${lwjglNatives}"
+    runtimeOnly "org.lwjgl:lwjgl-opengl::${lwjglNatives}"
+    runtimeOnly "org.lwjgl:lwjgl-stb::${lwjglNatives}"
+}
+
+application {
+    mainClass = 'org.oreon.examples.gl.oreonworlds.GLOreonworlds'
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes(
+                'Implementation-Title': project.name,
+                'Implementation-Version': version,
+                //'Class-Path': configurations.runtimeClasspath.collect { "libs/${it.getName()}" }.join(' '),
+                //'Class-Path': configurations.runtimeClasspath.collect { "./${it.getName()}" }.join(' '),
+                'Main-Class': application.mainClass.get()
+        )
+    }
+    // Copy dependencies into the JAR
+    /*from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }*/
+}

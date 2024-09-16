@@ -1,6 +1,5 @@
 package org.oreon.vk.engine;
 
-import static org.lwjgl.system.MemoryUtil.memAllocLong;
 import static org.lwjgl.vulkan.VK10.VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 import static org.lwjgl.vulkan.VK10.VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 import static org.lwjgl.vulkan.VK10.VK_ACCESS_MEMORY_READ_BIT;
@@ -18,103 +17,149 @@ import static org.lwjgl.vulkan.VK10.VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BI
 import static org.lwjgl.vulkan.VK10.VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
 import static org.lwjgl.vulkan.VK10.VK_SUBPASS_EXTERNAL;
 
-import java.nio.LongBuffer;
-
+import java.util.Map;
+import lombok.Getter;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkPhysicalDeviceMemoryProperties;
-import org.oreon.core.context.BaseContext;
+import org.oreon.core.context.Config;
+import org.oreon.core.context.ContextHolder;
+import org.oreon.core.target.Attachment;
 import org.oreon.core.vk.framebuffer.FrameBufferColorAttachment;
 import org.oreon.core.vk.framebuffer.FrameBufferDepthAttachment;
-import org.oreon.core.vk.framebuffer.VkFrameBuffer;
 import org.oreon.core.vk.framebuffer.VkFrameBufferObject;
 import org.oreon.core.vk.pipeline.RenderPass;
 import org.oreon.core.vk.wrapper.image.VkImageBundle;
 
-import lombok.Getter;
-
 @Getter
 public class OffScreenFbo extends VkFrameBufferObject {
 
-	public OffScreenFbo(VkDevice device, VkPhysicalDeviceMemoryProperties memoryProperties) {
+  public OffScreenFbo(Config config, VkDevice device, VkPhysicalDeviceMemoryProperties memoryProperties) {
+    super(
+        config.getFrameWidth(),
+        config.getFrameHeight(),
+        1,
+        device,
+        (width, height) -> {
+          final int samples = config.getMultisampling_sampleCount();
+          return Map.of(
+              Attachment.COLOR, new FrameBufferColorAttachment(device, memoryProperties,
+                  width, height, VK_FORMAT_R16G16B16A16_SFLOAT, samples),
+              Attachment.POSITION, new FrameBufferColorAttachment(device, memoryProperties,
+                  width, height, VK_FORMAT_R32G32B32A32_SFLOAT, samples),
+              Attachment.NORMAL, new FrameBufferColorAttachment(device, memoryProperties,
+                  width, height, VK_FORMAT_R16G16B16A16_SFLOAT, samples),
+              Attachment.LIGHT_SCATTERING, new FrameBufferColorAttachment(device, memoryProperties,
+                  width, height, VK_FORMAT_R16G16B16A16_SFLOAT, samples),
+              Attachment.SPECULAR_EMISSION_DIFFUSE_SSAO_BLOOM, new FrameBufferColorAttachment(device, memoryProperties,
+                  width, height, VK_FORMAT_R16G16B16A16_SFLOAT, samples),
+              Attachment.DEPTH, new FrameBufferDepthAttachment(device, memoryProperties,
+                  width, height, VK_FORMAT_D32_SFLOAT, samples)
+          );
+        },
+        (renderPass) -> {
+          final int samples = config.getMultisampling_sampleCount();
 
-		width = BaseContext.getConfig().getFrameWidth();
-		height = BaseContext.getConfig().getFrameHeight();
-		int samples = BaseContext.getConfig().getMultisampling_sampleCount();
+          renderPass.addColorAttachment(0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+              VK_FORMAT_R16G16B16A16_SFLOAT, samples, VK_IMAGE_LAYOUT_UNDEFINED,
+              VK_IMAGE_LAYOUT_GENERAL);
+          renderPass.addColorAttachment(1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+              VK_FORMAT_R32G32B32A32_SFLOAT, samples, VK_IMAGE_LAYOUT_UNDEFINED,
+              VK_IMAGE_LAYOUT_GENERAL);
+          renderPass.addColorAttachment(2, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+              VK_FORMAT_R16G16B16A16_SFLOAT, samples, VK_IMAGE_LAYOUT_UNDEFINED,
+              VK_IMAGE_LAYOUT_GENERAL);
+          renderPass.addColorAttachment(3, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+              VK_FORMAT_R16G16B16A16_SFLOAT, samples, VK_IMAGE_LAYOUT_UNDEFINED,
+              VK_IMAGE_LAYOUT_GENERAL);
+          renderPass.addColorAttachment(4, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+              VK_FORMAT_R16G16B16A16_SFLOAT, samples, VK_IMAGE_LAYOUT_UNDEFINED,
+              VK_IMAGE_LAYOUT_GENERAL);
+          renderPass.addDepthAttachment(5, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+              VK_FORMAT_D32_SFLOAT, samples, VK_IMAGE_LAYOUT_UNDEFINED,
+              VK_IMAGE_LAYOUT_GENERAL);
 
-		VkImageBundle albedoAttachment = new FrameBufferColorAttachment(device, memoryProperties,
-				width, height, VK_FORMAT_R16G16B16A16_SFLOAT, samples);
-		
-		VkImageBundle worldPositionAttachment = new FrameBufferColorAttachment(device, memoryProperties,
-				width, height, VK_FORMAT_R32G32B32A32_SFLOAT, samples);
+          renderPass.addSubpassDependency(VK_SUBPASS_EXTERNAL, 0,
+              VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+              VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+              VK_ACCESS_MEMORY_READ_BIT,
+              VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
+                  VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+              VK_DEPENDENCY_BY_REGION_BIT);
+          renderPass.addSubpassDependency(0, VK_SUBPASS_EXTERNAL,
+              VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+              VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+              VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
+                  VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+              VK_ACCESS_SHADER_READ_BIT,
+              VK_DEPENDENCY_BY_REGION_BIT);
+          renderPass.createSubpass();
+          renderPass.createRenderPass();
 
-		VkImageBundle normalAttachment = new FrameBufferColorAttachment(device, memoryProperties,
-				width, height, VK_FORMAT_R16G16B16A16_SFLOAT, samples);
+          return renderPass;
+        }
+    );
 
-		VkImageBundle lightScatteringMaskAttachment = new FrameBufferColorAttachment(device, memoryProperties,
-				width, height, VK_FORMAT_R16G16B16A16_SFLOAT, samples);
-		
-		VkImageBundle specularEmissionAttachment = new FrameBufferColorAttachment(device, memoryProperties,
-				width, height, VK_FORMAT_R16G16B16A16_SFLOAT, samples);
+    /*final int samples = ContextHolder.getContext().getConfig().getMultisampling_sampleCount();
+    getAttachments().put(Attachment.COLOR, new FrameBufferColorAttachment(device, memoryProperties,
+        getWidth(), getHeight(), VK_FORMAT_R16G16B16A16_SFLOAT, samples));
+    getAttachments().put(Attachment.POSITION, new FrameBufferColorAttachment(device, memoryProperties,
+        getWidth(), getHeight(), VK_FORMAT_R32G32B32A32_SFLOAT, samples));
+    getAttachments().put(Attachment.NORMAL, new FrameBufferColorAttachment(device, memoryProperties,
+        getWidth(), getHeight(), VK_FORMAT_R16G16B16A16_SFLOAT, samples));
+    getAttachments().put(Attachment.LIGHT_SCATTERING, new FrameBufferColorAttachment(device, memoryProperties,
+        getWidth(), getHeight(), VK_FORMAT_R16G16B16A16_SFLOAT, samples));
+    getAttachments().put(Attachment.SPECULAR_EMISSION_DIFFUSE_SSAO_BLOOM,
+        new FrameBufferColorAttachment(device, memoryProperties,
+            getWidth(), getHeight(), VK_FORMAT_R16G16B16A16_SFLOAT, samples));
+    getAttachments().put(Attachment.DEPTH, new FrameBufferDepthAttachment(device, memoryProperties,
+        getWidth(), getHeight(), VK_FORMAT_D32_SFLOAT, samples));*/
+  }
 
-		VkImageBundle depthBuffer = new FrameBufferDepthAttachment(device, memoryProperties,
-				width, height, VK_FORMAT_D32_SFLOAT, samples);
+  @Override
+  protected Map<Attachment, VkImageBundle> configureAttachments(int width, int height) {
+    return Map.of();
+  }
 
-		attachments.put(Attachment.COLOR, albedoAttachment);
-		attachments.put(Attachment.POSITION, worldPositionAttachment);
-		attachments.put(Attachment.NORMAL, normalAttachment);
-		attachments.put(Attachment.LIGHT_SCATTERING, lightScatteringMaskAttachment);
-		attachments.put(Attachment.SPECULAR_EMISSION_DIFFUSE_SSAO_BLOOM, specularEmissionAttachment);
-		attachments.put(Attachment.DEPTH, depthBuffer);
+  @Override
+  protected RenderPass configureRenderPass(final RenderPass renderPass) {
+    final int samples = ContextHolder.getContext().getConfig().getMultisampling_sampleCount();
 
-		renderPass = new RenderPass(device);
-		renderPass.addColorAttachment(0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 
-				VK_FORMAT_R16G16B16A16_SFLOAT, samples, VK_IMAGE_LAYOUT_UNDEFINED,
-				VK_IMAGE_LAYOUT_GENERAL);
-		renderPass.addColorAttachment(1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 
-				VK_FORMAT_R32G32B32A32_SFLOAT, samples, VK_IMAGE_LAYOUT_UNDEFINED,
-				VK_IMAGE_LAYOUT_GENERAL);
-		renderPass.addColorAttachment(2, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-				VK_FORMAT_R16G16B16A16_SFLOAT, samples, VK_IMAGE_LAYOUT_UNDEFINED,
-				VK_IMAGE_LAYOUT_GENERAL);
-		renderPass.addColorAttachment(3, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-				VK_FORMAT_R16G16B16A16_SFLOAT, samples, VK_IMAGE_LAYOUT_UNDEFINED,
-				VK_IMAGE_LAYOUT_GENERAL);
-		renderPass.addColorAttachment(4, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-				VK_FORMAT_R16G16B16A16_SFLOAT, samples, VK_IMAGE_LAYOUT_UNDEFINED,
-				VK_IMAGE_LAYOUT_GENERAL);
-		renderPass.addDepthAttachment(5, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-				VK_FORMAT_D32_SFLOAT, samples, VK_IMAGE_LAYOUT_UNDEFINED,
-				VK_IMAGE_LAYOUT_GENERAL);
-		
-		renderPass.addSubpassDependency(VK_SUBPASS_EXTERNAL, 0,
-				VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-				VK_ACCESS_MEMORY_READ_BIT,
-				VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
-				VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-				VK_DEPENDENCY_BY_REGION_BIT);
-		renderPass.addSubpassDependency(0, VK_SUBPASS_EXTERNAL,
-				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-				VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-				VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
-				VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-				VK_ACCESS_SHADER_READ_BIT,
-				VK_DEPENDENCY_BY_REGION_BIT);
-		renderPass.createSubpass();
-		renderPass.createRenderPass();
+    renderPass.addColorAttachment(0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        VK_FORMAT_R16G16B16A16_SFLOAT, samples, VK_IMAGE_LAYOUT_UNDEFINED,
+        VK_IMAGE_LAYOUT_GENERAL);
+    renderPass.addColorAttachment(1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        VK_FORMAT_R32G32B32A32_SFLOAT, samples, VK_IMAGE_LAYOUT_UNDEFINED,
+        VK_IMAGE_LAYOUT_GENERAL);
+    renderPass.addColorAttachment(2, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        VK_FORMAT_R16G16B16A16_SFLOAT, samples, VK_IMAGE_LAYOUT_UNDEFINED,
+        VK_IMAGE_LAYOUT_GENERAL);
+    renderPass.addColorAttachment(3, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        VK_FORMAT_R16G16B16A16_SFLOAT, samples, VK_IMAGE_LAYOUT_UNDEFINED,
+        VK_IMAGE_LAYOUT_GENERAL);
+    renderPass.addColorAttachment(4, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        VK_FORMAT_R16G16B16A16_SFLOAT, samples, VK_IMAGE_LAYOUT_UNDEFINED,
+        VK_IMAGE_LAYOUT_GENERAL);
+    renderPass.addDepthAttachment(5, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+        VK_FORMAT_D32_SFLOAT, samples, VK_IMAGE_LAYOUT_UNDEFINED,
+        VK_IMAGE_LAYOUT_GENERAL);
 
-		depthAttachmentCount = 1;
-		colorAttachmentCount = renderPass.getAttachmentCount()-depthAttachmentCount;
+    renderPass.addSubpassDependency(VK_SUBPASS_EXTERNAL, 0,
+        VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+        VK_ACCESS_MEMORY_READ_BIT,
+        VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
+            VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+        VK_DEPENDENCY_BY_REGION_BIT);
+    renderPass.addSubpassDependency(0, VK_SUBPASS_EXTERNAL,
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+        VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+        VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
+            VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+        VK_ACCESS_SHADER_READ_BIT,
+        VK_DEPENDENCY_BY_REGION_BIT);
+    renderPass.createSubpass();
+    renderPass.createRenderPass();
 
-		LongBuffer pImageViews = memAllocLong(renderPass.getAttachmentCount());
-		pImageViews.put(0, attachments.get(Attachment.COLOR).getImageView().getHandle());
-		pImageViews.put(1, attachments.get(Attachment.POSITION).getImageView().getHandle());
-		pImageViews.put(2, attachments.get(Attachment.NORMAL).getImageView().getHandle());
-		pImageViews.put(3, attachments.get(Attachment.SPECULAR_EMISSION_DIFFUSE_SSAO_BLOOM).getImageView().getHandle());
-		pImageViews.put(4, attachments.get(Attachment.LIGHT_SCATTERING).getImageView().getHandle());
-		pImageViews.put(5, attachments.get(Attachment.DEPTH).getImageView().getHandle());
-		
-		frameBuffer = new VkFrameBuffer(device, width, height, 1, pImageViews, renderPass.getHandle());
-	}
-
+    return renderPass;
+  }
 }
