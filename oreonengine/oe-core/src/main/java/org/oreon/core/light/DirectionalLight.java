@@ -2,6 +2,7 @@ package org.oreon.core.light;
 
 import java.nio.FloatBuffer;
 import org.lwjgl.glfw.GLFW;
+import org.oreon.core.context.Config;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.math.Matrix4f;
 import org.oreon.core.math.Vec3f;
@@ -26,22 +27,28 @@ public abstract class DirectionalLight extends Light {
       + Float.BYTES * 24;  // 6 floats, 3 floats offset each
 
   protected DirectionalLight() {
+    this(ContextHolder.getContext().getConfig());
+  }
+
+  protected DirectionalLight(final Config config) {
     this(
-        ContextHolder.getContext().getConfig().getSunPosition().normalize(),
-        new Vec3f(ContextHolder.getContext().getConfig().getAmbient()),
-        ContextHolder.getContext().getConfig().getSunColor(),
-        ContextHolder.getContext().getConfig().getSunIntensity()
+        config.getSunPosition().normalize(),
+        new Vec3f(config.getAmbient()),
+        config.getSunColor(),
+        config.getSunIntensity(),
+        config.getHorizonVerticalShift()
     );
   }
 
-  private DirectionalLight(Vec3f direction, Vec3f ambient, Vec3f color, float intensity) {
+  private DirectionalLight(
+      final Vec3f direction, final Vec3f ambient,
+      final Vec3f color, final float intensity, final float horizonVerticalShift) {
     super(direction, color, intensity);
     this.direction = direction;
     this.ambient = ambient;
 
     getLocalTransform().setTranslation(
-        direction.add(new Vec3f(0, ContextHolder.getContext().getConfig().getHorizonVerticalShift(), 0))
-            .mul(Constants.ZFAR * 100));
+        direction.add(new Vec3f(0, horizonVerticalShift, 0)).mul(Constants.ZFAR * 100));
 
     up = new Vec3f(direction.getX(), 0, direction.getZ());
     up.setY(-(up.getX() * direction.getX() + up.getZ() * direction.getZ()) / direction.getY());
@@ -59,7 +66,8 @@ public abstract class DirectionalLight extends Light {
     splitLightCameras = new PssmCamera[Constants.PSSM_SPLITS];
 
     for (int i = 0; i < Constants.PSSM_SPLITS * 2; i += 2) {
-      splitLightCameras[i / 2] = new PssmCamera(Constants.PSSM_SPLIT_SHEME[i] * Constants.ZFAR,
+      splitLightCameras[i / 2] = new PssmCamera(
+          Constants.PSSM_SPLIT_SHEME[i] * Constants.ZFAR,
           Constants.PSSM_SPLIT_SHEME[i + 1] * Constants.ZFAR);
       splitLightCameras[i / 2].update(m_View, up, right);
       floatBufferMatrices.put(

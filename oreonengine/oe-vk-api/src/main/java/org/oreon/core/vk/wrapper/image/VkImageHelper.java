@@ -1,5 +1,8 @@
 package org.oreon.core.vk.wrapper.image;
 
+import static org.lwjgl.stb.STBImage.STBI_rgb_alpha;
+import static org.lwjgl.stb.STBImage.stbi_failure_reason;
+import static org.lwjgl.stb.STBImage.stbi_load_from_memory;
 import static org.lwjgl.vulkan.VK10.VK_ACCESS_TRANSFER_READ_BIT;
 import static org.lwjgl.vulkan.VK10.VK_ACCESS_TRANSFER_WRITE_BIT;
 import static org.lwjgl.vulkan.VK10.VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -18,9 +21,9 @@ import static org.lwjgl.vulkan.VK10.VK_QUEUE_FAMILY_IGNORED;
 import static org.lwjgl.vulkan.VK10.VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
 import static org.lwjgl.vulkan.VK10.vkCmdBlitImage;
 import static org.lwjgl.vulkan.VK10.vkCmdPipelineBarrier;
+import static org.oreon.core.util.ResourceLoaderUtils.loadImageToByteBuffer;
 
-import java.nio.ByteBuffer;
-
+import org.lwjgl.BufferUtils;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkImageBlit;
 import org.lwjgl.vulkan.VkImageMemoryBarrier;
@@ -32,7 +35,6 @@ import org.oreon.core.util.Util;
 import org.oreon.core.vk.command.CommandBuffer;
 import org.oreon.core.vk.command.SubmitInfo;
 import org.oreon.core.vk.image.VkImage;
-import org.oreon.core.vk.image.VkImageLoader;
 import org.oreon.core.vk.synchronization.Fence;
 import org.oreon.core.vk.wrapper.buffer.StagingBuffer;
 import org.oreon.core.vk.wrapper.command.ImageCopyCmdBuffer;
@@ -67,10 +69,22 @@ public class VkImageHelper {
       String file, int usage, int finalLayout, int dstAccessMask, int dstStageMask,
       int dstQueueFamilyIndex, boolean mipmap) {
 
-    ImageMetaData metaData = VkImageLoader.getImageMetaData(file);
-    ByteBuffer imageBuffer = VkImageLoader.decodeImage(file);
+    //ImageMetaData metaData = VkImageLoader.getImageMetaData(file);
+    //ByteBuffer imageBuffer = VkImageLoader.decodeImage(file);
+
+    var byteBuffer = loadImageToByteBuffer(file);
+
+    var x = BufferUtils.createIntBuffer(1);
+    var y = BufferUtils.createIntBuffer(1);
+    var channels = BufferUtils.createIntBuffer(1);
+
+    var imageBuffer = stbi_load_from_memory(byteBuffer, x, y, channels, STBI_rgb_alpha);
+    if (imageBuffer == null) {
+      throw new RuntimeException("Failed to load image: " + stbi_failure_reason());
+    }
 
     StagingBuffer stagingBuffer = new StagingBuffer(device, memoryProperties, imageBuffer);
+    ImageMetaData metaData = new ImageMetaData(x.get(0), y.get(0), channels.get(0));
 
     int mipLevels = mipmap ? Util.getMipLevelCount(metaData) : 1;
 

@@ -16,7 +16,6 @@ public class VkDescriptor {
   protected DescriptorSetLayout descriptorSetLayout;
 
   public void destroy() {
-
     descriptorSet.destroy();
     descriptorSetLayout.destroy();
   }

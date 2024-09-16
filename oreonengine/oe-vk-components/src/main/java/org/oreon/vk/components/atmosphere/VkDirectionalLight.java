@@ -6,12 +6,13 @@ import static org.lwjgl.vulkan.VK10.VK_SHADER_STAGE_FRAGMENT_BIT;
 
 import lombok.Getter;
 import org.lwjgl.vulkan.VkPhysicalDeviceMemoryProperties;
+import org.oreon.core.context.Config;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.light.DirectionalLight;
 import org.oreon.core.util.BufferUtil;
 import org.oreon.core.vk.context.DeviceManager.DeviceType;
+import org.oreon.core.vk.context.VkDescriptorName;
 import org.oreon.core.vk.context.VkOreonContext;
-import org.oreon.core.vk.context.VkResources.VkDescriptorName;
 import org.oreon.core.vk.descriptor.DescriptorSet;
 import org.oreon.core.vk.descriptor.DescriptorSetLayout;
 import org.oreon.core.vk.device.LogicalDevice;
@@ -25,8 +26,9 @@ public class VkDirectionalLight extends DirectionalLight {
   private DescriptorSet descriptorSet;
   private DescriptorSetLayout descriptorSetLayout;
 
-  public VkDirectionalLight() {
-    super();
+  public VkDirectionalLight(Config config) {
+    super(config);
+
     final VkOreonContext context = (VkOreonContext) ContextHolder.getContext();
     LogicalDevice device = context.getDeviceManager().getLogicalDevice(DeviceType.MAJOR_GRAPHICS_DEVICE);
     VkPhysicalDeviceMemoryProperties memoryProperties =

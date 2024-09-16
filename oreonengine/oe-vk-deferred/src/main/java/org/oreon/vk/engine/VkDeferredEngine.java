@@ -21,8 +21,10 @@ import org.oreon.core.scenegraph.RenderList;
 import org.oreon.core.target.Attachment;
 import org.oreon.core.vk.command.CommandBuffer;
 import org.oreon.core.vk.command.SubmitInfo;
+import org.oreon.core.vk.context.DeviceManager;
 import org.oreon.core.vk.context.DeviceManager.DeviceType;
 import org.oreon.core.vk.context.VkOreonContext;
+import org.oreon.core.vk.context.VkResources;
 import org.oreon.core.vk.device.VkDeviceBundle;
 import org.oreon.core.vk.framebuffer.VkFrameBufferObject;
 import org.oreon.core.vk.image.VkImageView;
@@ -81,31 +83,31 @@ public class VkDeferredEngine extends BaseOreonRenderEngine {
   @Setter
   private VkGUI gui;
 
-  public VkDeferredEngine(final Config config, final VkCamera camera) {
+  public VkDeferredEngine(final Config config, final VkCamera camera, final DeviceManager deviceManager, final
+  VkResources vkResources) {
     super(config, camera);
+
+    offScreenRenderList = new RenderList();
+    transparencyRenderList = new RenderList();
+    offScreenSecondaryCmdBuffers = new LinkedHashMap<>();
+    transparencySecondaryCmdBuffers = new LinkedHashMap<>();
+
+    graphicsDevice = deviceManager.getDeviceBundle(DeviceType.MAJOR_GRAPHICS_DEVICE);
+
+    offScreenFbo = new OffScreenFbo(getConfig(), graphicsDevice.getLogicalDevice().getHandle(),
+        graphicsDevice.getPhysicalDevice().getMemoryProperties());
+    transparencyFbo = new TransparencyFbo(getConfig(), graphicsDevice.getLogicalDevice().getHandle(),
+        graphicsDevice.getPhysicalDevice().getMemoryProperties());
+
+    vkResources.setOffScreenFbo(offScreenFbo);
+    vkResources.setTransparencyFbo(transparencyFbo);
+
+    getSceneGraph().addObject(new VkDirectionalLight(getConfig()));
   }
 
   @Override
   public void init() {
     super.init();
-
-    getSceneGraph().addObject(new VkDirectionalLight());
-
-    offScreenRenderList = new RenderList();
-    transparencyRenderList = new RenderList();
-    offScreenSecondaryCmdBuffers = new LinkedHashMap<String, CommandBuffer>();
-    transparencySecondaryCmdBuffers = new LinkedHashMap<String, CommandBuffer>();
-
-    final VkOreonContext context = (VkOreonContext) ContextHolder.getContext();
-    graphicsDevice = context.getDeviceManager().getDeviceBundle(DeviceType.MAJOR_GRAPHICS_DEVICE);
-
-    offScreenFbo = new OffScreenFbo(graphicsDevice.getLogicalDevice().getHandle(),
-        graphicsDevice.getPhysicalDevice().getMemoryProperties());
-    transparencyFbo = new TransparencyFbo(graphicsDevice.getLogicalDevice().getHandle(),
-        graphicsDevice.getPhysicalDevice().getMemoryProperties());
-
-    context.getResources().setOffScreenFbo(offScreenFbo);
-    context.getResources().setTransparencyFbo(transparencyFbo);
 
     // Semaphore creations
     offScreenSemaphore = new VkSemaphore(graphicsDevice.getLogicalDevice().getHandle());
@@ -128,15 +130,15 @@ public class VkDeferredEngine extends BaseOreonRenderEngine {
     transparencySubmitInfo.setSignalSemaphores(transparencySemaphore.getHandlePointer());
 
     sampleCoverage = new SampleCoverage(graphicsDevice,
-        context.getConfig().getFrameWidth(),
-        context.getConfig().getFrameHeight(),
+        getConfig().getFrameWidth(),
+        getConfig().getFrameHeight(),
         offScreenFbo.getAttachmentImageView(Attachment.POSITION),
         offScreenFbo.getAttachmentImageView(Attachment.LIGHT_SCATTERING),
         offScreenFbo.getAttachmentImageView(Attachment.SPECULAR_EMISSION_DIFFUSE_SSAO_BLOOM));
 
     deferredLighting = new DeferredLighting(graphicsDevice,
-        context.getConfig().getFrameWidth(),
-        context.getConfig().getFrameHeight(),
+        getConfig().getFrameWidth(),
+        getConfig().getFrameHeight(),
         offScreenFbo.getAttachmentImageView(Attachment.COLOR),
         offScreenFbo.getAttachmentImageView(Attachment.POSITION),
         offScreenFbo.getAttachmentImageView(Attachment.NORMAL),
@@ -147,8 +149,8 @@ public class VkDeferredEngine extends BaseOreonRenderEngine {
     opaqueTransparencyBlendWaitSemaphores.put(0, deferredStageSemaphore.getHandle());
     opaqueTransparencyBlendWaitSemaphores.put(1, transparencySemaphore.getHandle());
     opaqueTransparencyBlending = new OpaqueTransparencyBlending(graphicsDevice,
-        context.getConfig().getFrameWidth(),
-        context.getConfig().getFrameHeight(),
+        getConfig().getFrameWidth(),
+        getConfig().getFrameHeight(),
         deferredLighting.getDeferredLightingSceneImageView(),
         offScreenFbo.getAttachmentImageView(Attachment.DEPTH),
         sampleCoverage.getLightScatteringImageView(),
@@ -160,19 +162,19 @@ public class VkDeferredEngine extends BaseOreonRenderEngine {
 
     VkImageView displayImageView = deferredLighting.getDeferredLightingSceneImageView();
 
-    if (context.getConfig().isFxaaEnabled()) {
+    if (getConfig().isFxaaEnabled()) {
       fxaa = new FXAA(graphicsDevice,
-          context.getConfig().getFrameWidth(),
-          context.getConfig().getFrameHeight(),
+          getConfig().getFrameWidth(),
+          getConfig().getFrameHeight(),
           displayImageView);
 
       displayImageView = fxaa.getFxaaImageView();
     }
 
-    if (context.getConfig().isBloomEnabled()) {
+    if (getConfig().isBloomEnabled()) {
       bloom = new Bloom(graphicsDevice,
-          context.getConfig().getFrameWidth(),
-          context.getConfig().getFrameHeight(),
+          getConfig().getFrameWidth(),
+          getConfig().getFrameHeight(),
           displayImageView,
           sampleCoverage.getSpecularEmissionDiffuseSsaoBloomImageView());
 
@@ -186,7 +188,7 @@ public class VkDeferredEngine extends BaseOreonRenderEngine {
     }
 
     swapChain = new SwapChain(graphicsDevice.getLogicalDevice(), graphicsDevice.getPhysicalDevice(),
-        context.getSurface(), displayImageView.getHandle());
+        ((VkOreonContext) ContextHolder.getContext()).getSurface(), displayImageView.getHandle());
 
     // record sample coverage + deferred lighting command buffer
     deferredStageCmdBuffer = new CommandBuffer(graphicsDevice.getLogicalDevice().getHandle(),
@@ -213,14 +215,14 @@ public class VkDeferredEngine extends BaseOreonRenderEngine {
         graphicsDevice.getLogicalDevice().getComputeCommandPool(Thread.currentThread().getId()).getHandle(),
         VK_COMMAND_BUFFER_LEVEL_PRIMARY);
     postProcessingCmdBuffer.beginRecord(VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT);
-    if (context.getConfig().isFxaaEnabled()) {
+    if (getConfig().isFxaaEnabled()) {
       fxaa.record(postProcessingCmdBuffer);
     }
     postProcessingCmdBuffer.pipelineMemoryBarrierCmd(
         VK_ACCESS_SHADER_WRITE_BIT, VK_ACCESS_SHADER_READ_BIT,
         VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
         VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
-    if (context.getConfig().isBloomEnabled()) {
+    if (getConfig().isBloomEnabled()) {
       bloom.record(postProcessingCmdBuffer);
     }
     postProcessingCmdBuffer.finishRecord();

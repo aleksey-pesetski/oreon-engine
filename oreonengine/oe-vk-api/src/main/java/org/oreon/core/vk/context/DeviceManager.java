@@ -1,12 +1,10 @@
 package org.oreon.core.vk.context;
 
 import java.util.HashMap;
-
+import lombok.Getter;
 import org.oreon.core.vk.device.LogicalDevice;
 import org.oreon.core.vk.device.PhysicalDevice;
 import org.oreon.core.vk.device.VkDeviceBundle;
-
-import lombok.Getter;
 
 @Getter
 public class DeviceManager {
@@ -14,8 +12,7 @@ public class DeviceManager {
   private HashMap<DeviceType, VkDeviceBundle> devices;
 
   public DeviceManager() {
-
-    devices = new HashMap<DeviceType, VkDeviceBundle>();
+    devices = new HashMap<>();
   }
 
   public enum DeviceType {

@@ -5,6 +5,8 @@ import static org.lwjgl.system.MemoryUtil.memAllocLong;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.IntStream;
 import lombok.Getter;
 import org.lwjgl.vulkan.VkDevice;
@@ -24,12 +26,15 @@ public abstract class VkFrameBufferObject extends FrameBufferObject {
   private final VkFrameBuffer frameBuffer;
 
   protected VkFrameBufferObject(final int width, final int height, final int depthAttachmentCount,
-      final VkDevice device, final BiFunction<Integer, Integer, Map<Attachment, VkImageBundle>> createMap) {
+      final VkDevice device,
+      final BiFunction<Integer, Integer, Map<Attachment, VkImageBundle>> attachmentsFunction,
+      final Function<RenderPass, RenderPass> passRenderPassFunction) {
     super(width, height, depthAttachmentCount);
     this.device = device;
-    this.attachments = createMap.apply(getWidth(), getHeight());
+    this.attachments = attachmentsFunction.apply(getWidth(), getHeight());
     configureAttachments(getWidth(), getHeight());
-    this.renderPass = configureRenderPass(createRenderPass(this.device));
+    //this.renderPass = configureRenderPass(createRenderPass(this.device));
+    this.renderPass = passRenderPassFunction.apply(createRenderPass(getDevice()));
 
     setColorAttachmentCount(renderPass.getAttachmentCount() - depthAttachmentCount);
 

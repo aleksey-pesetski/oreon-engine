@@ -44,6 +44,7 @@ import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkPhysicalDeviceMemoryProperties;
 import org.lwjgl.vulkan.VkQueue;
 import org.oreon.common.water.WaterConfig;
+import org.oreon.core.context.Config;
 import org.oreon.core.context.ContextHolder;
 import org.oreon.core.math.Vec2f;
 import org.oreon.core.math.Vec3f;
@@ -59,8 +60,9 @@ import org.oreon.core.util.MeshGenerator;
 import org.oreon.core.util.Util;
 import org.oreon.core.vk.command.CommandBuffer;
 import org.oreon.core.vk.command.SubmitInfo;
+import org.oreon.core.vk.context.DeviceManager;
 import org.oreon.core.vk.context.DeviceManager.DeviceType;
-import org.oreon.core.vk.context.VkOreonContext;
+import org.oreon.core.vk.context.VkResources;
 import org.oreon.core.vk.descriptor.DescriptorPool;
 import org.oreon.core.vk.descriptor.DescriptorSet;
 import org.oreon.core.vk.descriptor.DescriptorSetLayout;
@@ -77,6 +79,7 @@ import org.oreon.core.vk.pipeline.RenderPass;
 import org.oreon.core.vk.pipeline.ShaderPipeline;
 import org.oreon.core.vk.pipeline.VkPipeline;
 import org.oreon.core.vk.pipeline.VkVertexInput;
+import org.oreon.core.vk.scenegraph.VkCamera;
 import org.oreon.core.vk.scenegraph.VkMeshData;
 import org.oreon.core.vk.scenegraph.VkRenderInfo;
 import org.oreon.core.vk.synchronization.Fence;
@@ -137,24 +140,23 @@ public class Water extends Renderable {
 
   private long systemTime = System.currentTimeMillis();
 
-  public Water() {
-    final VkOreonContext context = (VkOreonContext) ContextHolder.getContext();
-
-    VkDeviceBundle deviceBundle = context.getDeviceManager().getDeviceBundle(DeviceType.MAJOR_GRAPHICS_DEVICE);
+  public Water(final Config config, final VkCamera vkCamera,
+      final VkResources vkResources, final DeviceManager deviceManager) {
+    VkDeviceBundle deviceBundle = deviceManager.getDeviceBundle(DeviceType.MAJOR_GRAPHICS_DEVICE);
     LogicalDevice device = deviceBundle.getLogicalDevice();
     DescriptorPool descriptorPool = device.getDescriptorPool(Thread.currentThread().getId());
     VkPhysicalDeviceMemoryProperties memoryProperties =
-        context.getDeviceManager().getPhysicalDevice(DeviceType.MAJOR_GRAPHICS_DEVICE).getMemoryProperties();
+        deviceManager.getPhysicalDevice(DeviceType.MAJOR_GRAPHICS_DEVICE).getMemoryProperties();
     graphicsQueue = device.getGraphicsQueue();
 
     offScreenReflectionRenderList = new RenderList();
     offScreenRefractionRenderList = new RenderList();
     reflectionSecondaryCmdBuffers = new LinkedHashMap<>();
     refractionSecondaryCmdBuffers = new LinkedHashMap<>();
-    reflectionFbo = new ReflectionRefractionFbo(device.getHandle(), memoryProperties);
-    refractionFbo = new ReflectionRefractionFbo(device.getHandle(), memoryProperties);
-    context.getResources().setReflectionFbo(reflectionFbo);
-    context.getResources().setRefractionFbo(refractionFbo);
+    reflectionFbo = new ReflectionRefractionFbo(config, device.getHandle(), memoryProperties);
+    refractionFbo = new ReflectionRefractionFbo(config, device.getHandle(), memoryProperties);
+    vkResources.setReflectionFbo(reflectionFbo);
+    vkResources.setRefractionFbo(refractionFbo);
 
     getWorldTransform().setScaling(Constants.ZFAR, 1, Constants.ZFAR);
     getWorldTransform().setTranslation(-Constants.ZFAR / 2, 0, -Constants.ZFAR / 2);
@@ -204,7 +206,7 @@ public class Water extends Renderable {
         waterConfig.getWindSpeed(), waterConfig.getCapillarWavesSupression());
 
     normalRenderer = new NormalRenderer(
-        context.getDeviceManager().getDeviceBundle(DeviceType.MAJOR_GRAPHICS_DEVICE),
+        deviceManager.getDeviceBundle(DeviceType.MAJOR_GRAPHICS_DEVICE),
         waterConfig.getN(), waterConfig.getNormalStrength(),
         fft.getDyImageView(), dySampler);
 
@@ -289,9 +291,9 @@ public class Water extends Renderable {
     List<DescriptorSet> descriptorSets = new ArrayList<DescriptorSet>();
     List<DescriptorSetLayout> descriptorSetLayouts = new ArrayList<DescriptorSetLayout>();
 
-    descriptorSets.add(context.getCamera().getDescriptorSet());
+    descriptorSets.add(vkCamera.getDescriptorSet());
     descriptorSets.add(descriptorSet);
-    descriptorSetLayouts.add(context.getCamera().getDescriptorSetLayout());
+    descriptorSetLayouts.add(vkCamera.getDescriptorSetLayout());
     descriptorSetLayouts.add(descriptorSetLayout);
 
     VkVertexInput vertexInput = new VkVertexInput(POS2D);
@@ -320,8 +322,8 @@ public class Water extends Renderable {
     pushConstants.putFloat(waterConfig.getChoppiness());
     pushConstants.putFloat(waterConfig.getKReflection());
     pushConstants.putFloat(waterConfig.getKRefraction());
-    pushConstants.putInt(context.getConfig().getFrameWidth());
-    pushConstants.putInt(context.getConfig().getFrameHeight());
+    pushConstants.putInt(config.getFrameWidth());
+    pushConstants.putInt(config.getFrameHeight());
     pushConstants.putInt(waterConfig.isDiffuse() ? 1 : 0);
     pushConstants.putFloat(waterConfig.getEmission());
     pushConstants.putFloat(waterConfig.getSpecularFactor());
@@ -340,19 +342,19 @@ public class Water extends Renderable {
 
     VkPipeline graphicsPipeline = new GraphicsTessellationPipeline(device.getHandle(),
         graphicsShaderPipeline, vertexInput, VkUtil.createLongBuffer(descriptorSetLayouts),
-        context.getConfig().getFrameWidth(),
-        context.getConfig().getFrameHeight(),
-        context.getResources().getOffScreenFbo().getRenderPass().getHandle(),
-        context.getResources().getOffScreenFbo().getColorAttachmentCount(),
-        context.getConfig().getMultisampling_sampleCount(),
+        config.getFrameWidth(),
+        config.getFrameHeight(),
+        vkResources.getOffScreenFbo().getRenderPass().getHandle(),
+        vkResources.getOffScreenFbo().getColorAttachmentCount(),
+        config.getMultisampling_sampleCount(),
         pushConstantsRange, VK_SHADER_STAGE_ALL_GRAPHICS,
         16);
 
     CommandBuffer graphicsCommandBuffer = new SecondaryDrawCmdBuffer(
         device.getHandle(), device.getGraphicsCommandPool(Thread.currentThread().getId()).getHandle(),
         graphicsPipeline.getHandle(), graphicsPipeline.getLayoutHandle(),
-        context.getResources().getOffScreenFbo().getFrameBuffer().getHandle(),
-        context.getResources().getOffScreenFbo().getRenderPass().getHandle(),
+        vkResources.getOffScreenFbo().getFrameBuffer().getHandle(),
+        vkResources.getOffScreenFbo().getRenderPass().getHandle(),
         0,
         VkUtil.createLongArray(descriptorSets),
         vertexBufferObject.getHandle(),
@@ -361,19 +363,19 @@ public class Water extends Renderable {
 
     VkPipeline wireframeGraphicsPipeline = new GraphicsTessellationPipeline(device.getHandle(),
         wireframeShaderPipeline, vertexInput, VkUtil.createLongBuffer(descriptorSetLayouts),
-        context.getConfig().getFrameWidth(),
-        context.getConfig().getFrameHeight(),
-        context.getResources().getOffScreenFbo().getRenderPass().getHandle(),
-        context.getResources().getOffScreenFbo().getColorAttachmentCount(),
-        context.getConfig().getMultisampling_sampleCount(),
+        config.getFrameWidth(),
+        config.getFrameHeight(),
+        vkResources.getOffScreenFbo().getRenderPass().getHandle(),
+        vkResources.getOffScreenFbo().getColorAttachmentCount(),
+        config.getMultisampling_sampleCount(),
         pushConstantsRange, VK_SHADER_STAGE_ALL_GRAPHICS,
         16);
 
     CommandBuffer wireframeCommandBuffer = new SecondaryDrawCmdBuffer(
         device.getHandle(), device.getGraphicsCommandPool(Thread.currentThread().getId()).getHandle(),
         wireframeGraphicsPipeline.getHandle(), wireframeGraphicsPipeline.getLayoutHandle(),
-        context.getResources().getOffScreenFbo().getFrameBuffer().getHandle(),
-        context.getResources().getOffScreenFbo().getRenderPass().getHandle(),
+        vkResources.getOffScreenFbo().getFrameBuffer().getHandle(),
+        vkResources.getOffScreenFbo().getRenderPass().getHandle(),
         0,
         VkUtil.createLongArray(descriptorSets),
         vertexBufferObject.getHandle(),
@@ -538,11 +540,11 @@ public class Water extends Renderable {
 
   public static class ReflectionRefractionFbo extends VkFrameBufferObject {
 
-    public ReflectionRefractionFbo(VkDevice device,
+    public ReflectionRefractionFbo(Config config, VkDevice device,
         VkPhysicalDeviceMemoryProperties memoryProperties) {
       super(
-          ContextHolder.getContext().getConfig().getFrameWidth() / 2,
-          ContextHolder.getContext().getConfig().getFrameHeight() / 2,
+          config.getFrameWidth() / 2,
+          config.getFrameHeight() / 2,
           1,
           device,
           (width, height) -> Map.of(
@@ -550,7 +552,32 @@ public class Water extends Renderable {
                   width, height, VK_FORMAT_R16G16B16A16_SFLOAT, 1),
               Attachment.DEPTH, new FrameBufferDepthAttachment(device, memoryProperties,
                   width, height, VK_FORMAT_D16_UNORM, 1)
-          ));
+          ),
+          (renderPass) -> {
+            renderPass.addColorAttachment(0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                VK_FORMAT_R16G16B16A16_SFLOAT, 1, VK_IMAGE_LAYOUT_UNDEFINED,
+                VK_IMAGE_LAYOUT_GENERAL);
+            renderPass.addDepthAttachment(1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+                VK_FORMAT_D16_UNORM, 1, VK_IMAGE_LAYOUT_UNDEFINED,
+                VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+
+            renderPass.addSubpassDependency(VK_SUBPASS_EXTERNAL, 0,
+                VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+                VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                VK_ACCESS_MEMORY_READ_BIT,
+                VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+                VK_DEPENDENCY_BY_REGION_BIT);
+            renderPass.addSubpassDependency(0, VK_SUBPASS_EXTERNAL,
+                VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+                VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+                VK_ACCESS_MEMORY_READ_BIT,
+                VK_DEPENDENCY_BY_REGION_BIT);
+
+            renderPass.createSubpass();
+            renderPass.createRenderPass();
+            return renderPass;
+          });
     }
 
     @Override
@@ -582,7 +609,7 @@ public class Water extends Renderable {
 
       renderPass.createSubpass();
       renderPass.createRenderPass();
-      return null;
+      return renderPass;
     }
   }
 

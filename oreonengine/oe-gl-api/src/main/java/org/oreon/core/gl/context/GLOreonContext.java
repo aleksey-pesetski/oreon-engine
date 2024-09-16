@@ -1,7 +1,5 @@
 package org.oreon.core.gl.context;
 
-import static org.lwjgl.glfw.GLFW.glfwInit;
-
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.lwjgl.opengl.GL11;
@@ -27,14 +25,6 @@ public class GLOreonContext extends BaseOreonContext<GLFWInput, GLCamera, GLWind
       final BaseOreonRenderEngine renderEngine,
       final CoreEngine coreEngine) {
     super(input, camera, window, resources, config, renderEngine, coreEngine);
-
-    if (!glfwInit()) {
-      throw new IllegalStateException("Unable to initialize GLFW");
-    }
-
-    //TODO moved context to main
-    // create OpenGL Context
-    //getWindow().create();
 
     log.info("OpenGL version: " + GL11.glGetString(GL11.GL_VERSION));
 //		log.info("Max Geometry Uniform Blocks: " + GL11.glGetInteger(GL31.GL_MAX_GEOMETRY_UNIFORM_BLOCKS));

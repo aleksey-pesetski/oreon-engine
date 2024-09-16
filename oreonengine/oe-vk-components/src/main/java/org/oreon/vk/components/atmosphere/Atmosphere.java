@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import org.lwjgl.vulkan.VkPhysicalDeviceMemoryProperties;
-import org.oreon.core.context.ContextHolder;
+import org.oreon.core.context.Config;
 import org.oreon.core.model.Mesh;
 import org.oreon.core.scenegraph.NodeComponentType;
 import org.oreon.core.scenegraph.Renderable;
@@ -21,9 +21,10 @@ import org.oreon.core.util.BufferUtil;
 import org.oreon.core.util.Constants;
 import org.oreon.core.util.ProceduralTexturing;
 import org.oreon.core.vk.command.CommandBuffer;
+import org.oreon.core.vk.context.DeviceManager;
 import org.oreon.core.vk.context.DeviceManager.DeviceType;
-import org.oreon.core.vk.context.VkOreonContext;
-import org.oreon.core.vk.context.VkResources.VkDescriptorName;
+import org.oreon.core.vk.context.VkDescriptorName;
+import org.oreon.core.vk.context.VkResources;
 import org.oreon.core.vk.descriptor.DescriptorSet;
 import org.oreon.core.vk.descriptor.DescriptorSetLayout;
 import org.oreon.core.vk.device.LogicalDevice;
@@ -32,6 +33,7 @@ import org.oreon.core.vk.pipeline.ShaderModule;
 import org.oreon.core.vk.pipeline.ShaderPipeline;
 import org.oreon.core.vk.pipeline.VkPipeline;
 import org.oreon.core.vk.pipeline.VkVertexInput;
+import org.oreon.core.vk.scenegraph.VkCamera;
 import org.oreon.core.vk.scenegraph.VkMeshData;
 import org.oreon.core.vk.scenegraph.VkRenderInfo;
 import org.oreon.core.vk.util.VkAssimpModelLoader;
@@ -45,11 +47,10 @@ public class Atmosphere extends Renderable {
 
   private VkUniformBuffer uniformBuffer;
 
-  public Atmosphere() {
-    final VkOreonContext context = (VkOreonContext) ContextHolder.getContext();
-    LogicalDevice device = context.getDeviceManager().getLogicalDevice(DeviceType.MAJOR_GRAPHICS_DEVICE);
+  public Atmosphere(Config config, VkCamera vkCamera, VkResources vkResources, DeviceManager deviceManager) {
+    LogicalDevice device = deviceManager.getLogicalDevice(DeviceType.MAJOR_GRAPHICS_DEVICE);
     VkPhysicalDeviceMemoryProperties memoryProperties =
-        context.getDeviceManager().getPhysicalDevice(DeviceType.MAJOR_GRAPHICS_DEVICE).getMemoryProperties();
+        deviceManager.getPhysicalDevice(DeviceType.MAJOR_GRAPHICS_DEVICE).getMemoryProperties();
 
     getWorldTransform().setLocalScaling(Constants.ZFAR * 0.5f, Constants.ZFAR * 0.5f, Constants.ZFAR * 0.5f);
 
@@ -67,7 +68,7 @@ public class Atmosphere extends Renderable {
 
     ShaderPipeline graphicsShaderPipeline = new ShaderPipeline(device.getHandle());
     graphicsShaderPipeline.addShaderModule(vertexShader);
-    graphicsShaderPipeline.createFragmentShader(context.getConfig().isAtmosphericScatteringEnable() ?
+    graphicsShaderPipeline.createFragmentShader(config.isAtmosphericScatteringEnable() ?
         "shaders/atmosphere/atmospheric_scattering.frag.spv" : "shaders/atmosphere/atmosphere.frag.spv");
     graphicsShaderPipeline.createShaderPipeline();
 
@@ -89,14 +90,14 @@ public class Atmosphere extends Renderable {
     descriptorSet.updateDescriptorBuffer(uniformBuffer.getHandle(),
         ubo.limit(), 0, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
 
-    descriptorSets.add(context.getCamera().getDescriptorSet());
+    descriptorSets.add(vkCamera.getDescriptorSet());
     descriptorSets.add(descriptorSet);
     descriptorSets.add(
-        context.getResources().getDescriptors().get(VkDescriptorName.DIRECTIONAL_LIGHT).getDescriptorSet());
-    descriptorSetLayouts.add(context.getCamera().getDescriptorSetLayout());
+        vkResources.getDescriptors().get(VkDescriptorName.DIRECTIONAL_LIGHT).getDescriptorSet());
+    descriptorSetLayouts.add(vkCamera.getDescriptorSetLayout());
     descriptorSetLayouts.add(descriptorSetLayout);
     descriptorSetLayouts.add(
-        context.getResources().getDescriptors().get(VkDescriptorName.DIRECTIONAL_LIGHT).getDescriptorSetLayout());
+        vkResources.getDescriptors().get(VkDescriptorName.DIRECTIONAL_LIGHT).getDescriptorSetLayout());
 
     VkVertexInput vertexInput = new VkVertexInput(POS);
 
@@ -106,24 +107,24 @@ public class Atmosphere extends Renderable {
     int pushConstantsRange = Float.BYTES * 20 + Integer.BYTES * 3;
 
     ByteBuffer pushConstants = memAlloc(pushConstantsRange);
-    pushConstants.put(BufferUtil.createByteBuffer(context.getCamera().getProjectionMatrix()));
-    pushConstants.putFloat(context.getConfig().getSunRadius());
-    pushConstants.putInt(context.getConfig().getFrameWidth());
-    pushConstants.putInt(context.getConfig().getFrameHeight());
+    pushConstants.put(BufferUtil.createByteBuffer(vkCamera.getProjectionMatrix()));
+    pushConstants.putFloat(config.getSunRadius());
+    pushConstants.putInt(config.getFrameWidth());
+    pushConstants.putInt(config.getFrameHeight());
     pushConstants.putInt(0);
-    pushConstants.putFloat(context.getConfig().getAtmosphereBloomFactor());
-    pushConstants.putFloat(context.getConfig().getHorizonVerticalShift());
-    pushConstants.putFloat(context.getConfig().getHorizonReflectionVerticalShift());
+    pushConstants.putFloat(config.getAtmosphereBloomFactor());
+    pushConstants.putFloat(config.getHorizonVerticalShift());
+    pushConstants.putFloat(config.getHorizonReflectionVerticalShift());
     pushConstants.flip();
 
     VkPipeline graphicsPipeline = new GraphicsPipeline(device.getHandle(),
         graphicsShaderPipeline, vertexInput, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
         VkUtil.createLongBuffer(descriptorSetLayouts),
-        context.getConfig().getFrameWidth(),
-        context.getConfig().getFrameHeight(),
-        context.getResources().getOffScreenFbo().getRenderPass().getHandle(),
-        context.getResources().getOffScreenFbo().getColorAttachmentCount(),
-        context.getConfig().getMultisampling_sampleCount(),
+        config.getFrameWidth(),
+        config.getFrameHeight(),
+        vkResources.getOffScreenFbo().getRenderPass().getHandle(),
+        vkResources.getOffScreenFbo().getColorAttachmentCount(),
+        config.getMultisampling_sampleCount(),
         pushConstantsRange, VK_SHADER_STAGE_FRAGMENT_BIT);
 
     VkBuffer vertexBufferObject = VkBufferHelper.createDeviceLocalBuffer(
@@ -142,8 +143,8 @@ public class Atmosphere extends Renderable {
         device.getHandle(),
         device.getGraphicsCommandPool(Thread.currentThread().getId()).getHandle(),
         graphicsPipeline.getHandle(), graphicsPipeline.getLayoutHandle(),
-        context.getResources().getOffScreenFbo().getFrameBuffer().getHandle(),
-        context.getResources().getOffScreenFbo().getRenderPass().getHandle(),
+        vkResources.getOffScreenFbo().getFrameBuffer().getHandle(),
+        vkResources.getOffScreenFbo().getRenderPass().getHandle(),
         0,
         VkUtil.createLongArray(descriptorSets),
         vertexBufferObject.getHandle(),
@@ -162,22 +163,22 @@ public class Atmosphere extends Renderable {
     addComponent(NodeComponentType.MAIN_RENDERINFO, mainRenderInfo);
     addComponent(NodeComponentType.WIREFRAME_RENDERINFO, mainRenderInfo);
 
-    if (context.getResources().getReflectionFbo() != null) {
+    if (vkResources.getReflectionFbo() != null) {
       VkPipeline reflectionPipeline = new GraphicsPipeline(device.getHandle(),
           reflectionShaderPipeline, vertexInput, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
           VkUtil.createLongBuffer(descriptorSetLayouts),
-          context.getResources().getReflectionFbo().getWidth(),
-          context.getResources().getReflectionFbo().getHeight(),
-          context.getResources().getReflectionFbo().getRenderPass().getHandle(),
-          context.getResources().getReflectionFbo().getColorAttachmentCount(), 1,
+          vkResources.getReflectionFbo().getWidth(),
+          vkResources.getReflectionFbo().getHeight(),
+          vkResources.getReflectionFbo().getRenderPass().getHandle(),
+          vkResources.getReflectionFbo().getColorAttachmentCount(), 1,
           pushConstantsRange, VK_SHADER_STAGE_FRAGMENT_BIT);
 
       CommandBuffer reflectionCommandBuffer = new SecondaryDrawIndexedCmdBuffer(
           device.getHandle(),
           device.getGraphicsCommandPool(Thread.currentThread().getId()).getHandle(),
           reflectionPipeline.getHandle(), reflectionPipeline.getLayoutHandle(),
-          context.getResources().getReflectionFbo().getFrameBuffer().getHandle(),
-          context.getResources().getReflectionFbo().getRenderPass().getHandle(),
+          vkResources.getReflectionFbo().getFrameBuffer().getHandle(),
+          vkResources.getReflectionFbo().getRenderPass().getHandle(),
           0,
           VkUtil.createLongArray(descriptorSets),
           vertexBufferObject.getHandle(),
