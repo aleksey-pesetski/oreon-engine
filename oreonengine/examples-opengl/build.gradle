@@ -1,0 +1,70 @@
+/*jar {
+    manifest {
+        attributes("Manifest-Version": "1.0",
+                "Main-Class": "org.oreon.examples.gl.oreonworlds.GLOreonworlds");
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}*/
+
+apply plugin: 'application'
+//apply plugin: 'com.github.johnrengelman.shadow'
+
+application {
+    mainClass = 'org.oreon.examples.gl.oreonworlds.GLOreonworlds' // Replace with your main class package and name
+}
+
+/*
+shadowJar {
+    // Ensures that the JAR is named as my-java-app.jar without the 'all' suffix
+    archiveClassifier.set('')
+    mergeServiceFiles()
+    // Optionally, you can exclude specific files or dependencies
+    // exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+}
+*/
+
+jar {
+    manifest {
+        attributes 'Main-Class': application.mainClass.get()
+    }
+    // Copy dependencies into the JAR
+    /*from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar*/
+}
+
+
+dependencies {
+    api project(':oe-core')
+    api project(':oe-gl-api')
+    api project(':oe-gl-components')
+    api project(':oe-gl-deferred')
+
+    implementation "org.lwjgl:lwjgl"
+    implementation "org.lwjgl:lwjgl-assimp"
+    implementation "org.lwjgl:lwjgl-glfw"
+    implementation "org.lwjgl:lwjgl-jemalloc"
+    implementation "org.lwjgl:lwjgl-openal"
+    implementation "org.lwjgl:lwjgl-opengl"
+    implementation "org.lwjgl:lwjgl-vulkan"
+    implementation "org.lwjgl:lwjgl-stb"
+
+    implementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+    implementation "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+    implementation "org.apache.logging.log4j:log4j-iostreams:${log4jVersion}"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.16.2"
+
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    runtimeOnly "org.lwjgl:lwjgl::${lwjglNatives}"
+    runtimeOnly "org.lwjgl:lwjgl-assimp::${lwjglNatives}"
+    runtimeOnly "org.lwjgl:lwjgl-glfw::${lwjglNatives}"
+    runtimeOnly "org.lwjgl:lwjgl-jemalloc::${lwjglNatives}"
+    runtimeOnly "org.lwjgl:lwjgl-openal::${lwjglNatives}"
+    runtimeOnly "org.lwjgl:lwjgl-opengl::${lwjglNatives}"
+    runtimeOnly "org.lwjgl:lwjgl-stb::${lwjglNatives}"
+}
