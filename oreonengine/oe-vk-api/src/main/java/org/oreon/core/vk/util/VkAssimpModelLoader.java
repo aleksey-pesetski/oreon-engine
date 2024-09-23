@@ -1,9 +1,10 @@
 package org.oreon.core.vk.util;
 
+import static org.oreon.core.util.ResourceLoaderUtils.buildPath;
+
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.lwjgl.assimp.AIFace;
 import org.lwjgl.assimp.AIMesh;
 import org.lwjgl.assimp.AIScene;
@@ -22,16 +23,17 @@ public class VkAssimpModelLoader {
 		
 		List<Model> models = new ArrayList<>();
 //		List<Material<VkImage>> materials = new ArrayList<>();
-		
-		path = VkAssimpModelLoader.class.getClassLoader().getResource(path).getPath();
+
+		/*path = VkAssimpModelLoader.class.getClassLoader().getResource(path).getPath();
 		// For Linux need to keep '/' or else the Assimp.aiImportFile(...) call below returns null!
 		if (System.getProperty("os.name").contains("Windows")) { // TODO Language/region agnostic value for 'Windows' ?
 			if (path.startsWith("/"))
 				path = path.substring(1);
-		}
+		}*/
 
-		AIScene aiScene = Assimp.aiImportFile(path + "/" + file, 0);
-		
+		//AIScene aiScene = Assimp.aiImportFile(path + "/" + file, 0);
+    AIScene aiScene = Assimp.aiImportFile(buildPath(file, path), 0);
+
 //		if (aiScene.mMaterials() != null){
 //			for (int i=0; i<aiScene.mNumMaterials(); i++){
 //				AIMaterial aiMaterial = AIMaterial.create(aiScene.mMaterials().get(i));

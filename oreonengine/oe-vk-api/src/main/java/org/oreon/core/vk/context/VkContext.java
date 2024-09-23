@@ -71,12 +71,12 @@ public class VkContext extends BaseContext{
 	    
 	    LongBuffer pSurface = memAllocLong(1);
 	    int err = glfwCreateWindowSurface(vkInstance.getHandle(), BaseContext.getWindow().getId(), null, pSurface);
-	    
-	    surface = pSurface.get(0);
 	    if (err != VK_SUCCESS) {
 	        throw new AssertionError("Failed to create surface: " + VkUtil.translateVulkanResult(err));
 	    }
-	    
+
+	    surface = pSurface.get(0);
+
         PhysicalDevice physicalDevice = new PhysicalDevice(vkInstance.getHandle(), surface);
 	    LogicalDevice logicalDevice = new LogicalDevice(physicalDevice, 0);
 	    VkDeviceBundle majorDevice = new VkDeviceBundle(physicalDevice, logicalDevice);

@@ -1,8 +1,9 @@
 package org.oreon.core.vk.image;
 
-import org.lwjgl.BufferUtils;
-import org.lwjgl.stb.STBImage;
-import org.oreon.core.image.ImageMetaData;
+import static org.lwjgl.stb.STBImage.STBI_rgb_alpha;
+import static org.lwjgl.stb.STBImage.stbi_failure_reason;
+import static org.lwjgl.stb.STBImage.stbi_info_from_memory;
+import static org.lwjgl.stb.STBImage.stbi_load;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,13 +16,17 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import lombok.extern.log4j.Log4j2;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.stb.STBImage;
+import org.oreon.core.image.ImageMetaData;
 
-import static org.lwjgl.stb.STBImage.*;
 
+@Log4j2
 public class VkImageLoader {
-	
+
 	public static ImageMetaData getImageMetaData(String file){
-		
+
 		ByteBuffer imageBuffer;
         try {
             imageBuffer = ioResourceToByteBuffer(file, 128 * 128);
@@ -32,17 +37,17 @@ public class VkImageLoader {
 	    IntBuffer x = BufferUtils.createIntBuffer(1);
 	    IntBuffer y = BufferUtils.createIntBuffer(1);
 	    IntBuffer channels = BufferUtils.createIntBuffer(1);
-	    
+
 	    // Use info to read image metadata without decoding the entire image.
         if (!stbi_info_from_memory(imageBuffer, x, y, channels)) {
             throw new RuntimeException("Failed to read image information: " + stbi_failure_reason());
         }
-	    
+
 	    return new ImageMetaData(x.get(0), y.get(0), channels.get(0));
 	}
 
 	public static ByteBuffer decodeImage(String file){
-		
+
 		String absolutePath = VkImageLoader.class.getClassLoader().getResource(file).getPath().substring(1);
         if (!System.getProperty("os.name").contains("Windows")) { // TODO Language/region agnostic value for 'Windows' ?
             // stbi_load requires a file system path, NOT a classpath resource path
@@ -55,9 +60,9 @@ public class VkImageLoader {
 
 	    ByteBuffer image = stbi_load(absolutePath, x, y, channels, STBI_rgb_alpha);
 	    if (image == null) {
-            System.err.println("Could not decode image file ["+ absolutePath +"]: ["+ STBImage.stbi_failure_reason() +"]");
+        log.error("Could not decode image file [{}]: [{}]", absolutePath, STBImage.stbi_failure_reason());
         }
-	    
+
 	    return image;
 	}
 
@@ -95,7 +100,7 @@ public class VkImageLoader {
             buffer.flip();
             return buffer;
     }
-	
+
 	private static ByteBuffer resizeBuffer(ByteBuffer buffer, int newCapacity) {
         ByteBuffer newBuffer = BufferUtils.createByteBuffer(newCapacity);
         buffer.flip();

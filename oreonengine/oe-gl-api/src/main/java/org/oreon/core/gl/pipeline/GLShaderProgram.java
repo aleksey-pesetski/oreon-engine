@@ -34,6 +34,7 @@ import static org.lwjgl.opengl.GL43.GL_COMPUTE_SHADER;
 
 import java.util.HashMap;
 
+import lombok.extern.log4j.Log4j2;
 import org.oreon.core.gl.texture.GLTexture;
 import org.oreon.core.math.Matrix4f;
 import org.oreon.core.math.Vec2f;
@@ -42,6 +43,7 @@ import org.oreon.core.math.Vec4f;
 import org.oreon.core.scenegraph.Renderable;
 import org.oreon.core.util.BufferUtil;
 
+@Log4j2
 public abstract class GLShaderProgram{
 
 	private int program;
@@ -166,7 +168,7 @@ public abstract class GLShaderProgram{
 
 		if(glGetProgrami(program, GL_LINK_STATUS) == 0)
 		{
-			System.out.println(this.getClass().getName() + " " + glGetProgramInfoLog(program, 1024));
+      log.info(" {} {}", this.getClass().getName(), glGetProgramInfoLog(program, 1024));
 			System.exit(1);
 		}
 		
